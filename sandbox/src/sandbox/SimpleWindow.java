@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -17,6 +18,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.text.JTextComponent;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class SimpleWindow implements ActionListener, MouseListener{
 
@@ -26,6 +29,10 @@ public class SimpleWindow implements ActionListener, MouseListener{
 	private JFormattedTextField ftfThree;
 	private JFormattedTextField ftfFour;
 	private JTextArea txtLog;
+	private JSpinner spinnerOne;
+	private JSpinner spinnerTwo;
+	private JSpinner spinnerThree;
+	
 
 	/**
 	 * Launch the application.
@@ -42,6 +49,45 @@ public class SimpleWindow implements ActionListener, MouseListener{
 			}
 		});
 	}
+	
+	private void doBtnTwo(){
+		int memSize = (int) spinnerOne.getValue();
+		int protectedMem = (int) spinnerTwo.getValue();
+		Core core = new Core(memSize,protectedMem);
+		
+		core.addMemoryAccessErrorListener(new MemoryAccessErrorListener(){
+			@Override
+			public void memoryAccessError(MemoryAccessErrorEvent me) {
+				System.err.printf("%n%nFatal memory error%n%n");
+				System.err.printf(String.format("Location: %s%n",me.getLocation()));
+				System.err.printf(String.format("%s%n",me.getMessage()));
+				//System.exit(-1);
+			}	
+		});
+		
+		core.addMemoryTrapListener(new MemoryTrapListener (){
+
+			@Override
+			public void memoryTrap(MemoryTrapEvent mte) {
+				txtLog.append(String.format("Memory Trapped%n"));
+				txtLog.append(String.format("Location: %04X%n",mte.getLocation()));
+				txtLog.append(String.format("Type: %s%n%n",mte.getTrap().toString()));
+				
+				JOptionPane.showConfirmDialog(null,
+			             "choose one", "choose one", JOptionPane.YES_NO_OPTION);
+			}
+			
+		});
+
+		txtLog.append(String.format("Mem size: %d, protecedBoundary: %d%n",core.getSize(),core.getProtectedBoundary()));
+		int loc = memSize-7;
+		
+		core.addTrapLocation(loc, Core.TRAP.DEBUG);
+		
+		core.write(loc+33, (byte)((int)spinnerThree.getValue()));
+		 
+//		 txtLog.append(String.format("End: Location %04X, value %d%n",loc,core.read(loc)));
+	}//
 	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
@@ -69,6 +115,7 @@ public class SimpleWindow implements ActionListener, MouseListener{
 		
 			break;
 		case "btnTwo":
+			doBtnTwo();
 			break;
 		case "btnThree":
 			break;
@@ -163,21 +210,21 @@ public class SimpleWindow implements ActionListener, MouseListener{
 		btnOne.setName("btnOne");
 		btnOne.setActionCommand("btnOne");
 		btnOne.addActionListener(this);
-		btnOne.setBounds(128, 231, 91, 23);
+		btnOne.setBounds(109, 339, 91, 23);
 		panel.add(btnOne);
 		
 		JButton btnTwo = new JButton("btnTwo");
 		btnTwo.setName("btnTwo");
 		btnTwo.setActionCommand("btnTwo");
 		btnTwo.addActionListener(this);
-		btnTwo.setBounds(128, 280, 91, 23);
+		btnTwo.setBounds(109, 388, 91, 23);
 		panel.add(btnTwo);
 		
 		JButton btnThree = new JButton("btnThree");
 		btnThree.setName("btnThree");
 		btnThree.setActionCommand("btnThree");
 		btnThree.addActionListener(this);
-		btnThree.setBounds(128, 325, 91, 23);
+		btnThree.setBounds(109, 433, 91, 23);
 		panel.add(btnThree);
 		
 		JButton btnReset = new JButton("Reset");
@@ -186,6 +233,19 @@ public class SimpleWindow implements ActionListener, MouseListener{
 		btnReset.setBounds(211, 472, 91, 23);
 		btnReset.addActionListener(this);
 		panel.add(btnReset);
+		
+		spinnerOne = new JSpinner();
+		spinnerOne.setModel(new SpinnerNumberModel(new Integer(128), null, null, new Integer(1)));
+		spinnerOne.setBounds(68, 213, 234, 20);
+		panel.add(spinnerOne);
+		
+		spinnerTwo = new JSpinner();
+		spinnerTwo.setBounds(68, 244, 234, 20);
+		panel.add(spinnerTwo);
+		
+		spinnerThree = new JSpinner();
+		spinnerThree.setBounds(68, 275, 234, 20);
+		panel.add(spinnerThree);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmTestHarness.setJMenuBar(menuBar);
@@ -226,6 +286,4 @@ public class SimpleWindow implements ActionListener, MouseListener{
 		// TODO Auto-generated method stub
 		
 	}
-
-
 }
