@@ -1,13 +1,11 @@
 package sandbox;
 
 import java.io.Serializable;
-//import java.util.HashMap;
-import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
 //need to throw address out of bounds error, protection violation
-public class TempMainMemory implements Serializable, MemoryAccessErrorListener,
+public class MainMemory implements Serializable, MemoryAccessErrorListener,
 		MemoryTrapListener {
 
 	private static final long serialVersionUID = 1L;
@@ -21,7 +19,7 @@ public class TempMainMemory implements Serializable, MemoryAccessErrorListener,
 	Core core;
 //	private int allocatedMemory;
 
-	public TempMainMemory(Core core) {
+	public MainMemory(Core core) {
 		this.core = core;
 		core.addMemoryAccessErrorListener(this);
 		core.addMemoryTrapListener(this);

@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.text.JTextComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JCheckBox;
 
 public class SimpleWindow implements ActionListener, MouseListener{
 
@@ -32,6 +33,10 @@ public class SimpleWindow implements ActionListener, MouseListener{
 	private JSpinner spinnerOne;
 	private JSpinner spinnerTwo;
 	private JSpinner spinnerThree;
+	private Core core;
+	int memSize;
+	int protectedMem;
+
 	
 
 	/**
@@ -51,40 +56,13 @@ public class SimpleWindow implements ActionListener, MouseListener{
 	}
 	
 	private void doBtnTwo(){
-		int memSize = (int) spinnerOne.getValue();
-		int protectedMem = (int) spinnerTwo.getValue();
-		Core core = new Core(memSize,protectedMem);
-		
-		core.addMemoryAccessErrorListener(new MemoryAccessErrorListener(){
-			@Override
-			public void memoryAccessError(MemoryAccessErrorEvent me) {
-				System.err.printf("%n%nFatal memory error%n%n");
-				System.err.printf(String.format("Location: %s%n",me.getLocation()));
-				System.err.printf(String.format("%s%n",me.getMessage()));
-				//System.exit(-1);
-			}	
-		});
-		
-		core.addMemoryTrapListener(new MemoryTrapListener (){
-
-			@Override
-			public void memoryTrap(MemoryTrapEvent mte) {
-				txtLog.append(String.format("Memory Trapped%n"));
-				txtLog.append(String.format("Location: %04X%n",mte.getLocation()));
-				txtLog.append(String.format("Type: %s%n%n",mte.getTrap().toString()));
-				
-				JOptionPane.showConfirmDialog(null,
-			             "choose one", "choose one", JOptionPane.YES_NO_OPTION);
-			}
-			
-		});
 
 		txtLog.append(String.format("Mem size: %d, protecedBoundary: %d%n",core.getSize(),core.getProtectedBoundary()));
 		int loc = memSize-7;
-		
+		core.setTrapEnabled(true);
 		core.addTrapLocation(loc, Core.TRAP.DEBUG);
 		
-		core.write(loc+33, (byte)((int)spinnerThree.getValue()));
+		core.write(loc, (byte)((int)spinnerThree.getValue()));
 		 
 //		 txtLog.append(String.format("End: Location %04X, value %d%n",loc,core.read(loc)));
 	}//
@@ -134,7 +112,33 @@ public class SimpleWindow implements ActionListener, MouseListener{
 
 	
 	public void initApp(){
+		 memSize = 128;
+		 protectedMem = 0;
+	  core = new Core(memSize,protectedMem);
 		
+		core.addMemoryAccessErrorListener(new MemoryAccessErrorListener(){
+			@Override
+			public void memoryAccessError(MemoryAccessErrorEvent me) {
+				System.err.printf("%n%nFatal memory error%n%n");
+				System.err.printf(String.format("Location: %s%n",me.getLocation()));
+				System.err.printf(String.format("%s%n",me.getMessage()));
+				//System.exit(-1);
+			}	
+		});
+		
+		core.addMemoryTrapListener(new MemoryTrapListener (){
+
+			@Override
+			public void memoryTrap(MemoryTrapEvent mte) {
+				txtLog.append(String.format("Memory Trapped%n"));
+				txtLog.append(String.format("Location: %04X%n",mte.getLocation()));
+				txtLog.append(String.format("Type: %s%n%n",mte.getTrap().toString()));
+				
+				JOptionPane.showConfirmDialog(null,
+			             "choose one", "choose one", JOptionPane.YES_NO_OPTION);
+			}
+			
+		});	
 	}
 	//------------------------------------------------------------------------
 
@@ -236,16 +240,20 @@ public class SimpleWindow implements ActionListener, MouseListener{
 		
 		spinnerOne = new JSpinner();
 		spinnerOne.setModel(new SpinnerNumberModel(new Integer(128), null, null, new Integer(1)));
-		spinnerOne.setBounds(68, 213, 234, 20);
+		spinnerOne.setBounds(185, 213, 117, 20);
 		panel.add(spinnerOne);
 		
 		spinnerTwo = new JSpinner();
-		spinnerTwo.setBounds(68, 244, 234, 20);
+		spinnerTwo.setBounds(185, 244, 117, 20);
 		panel.add(spinnerTwo);
 		
 		spinnerThree = new JSpinner();
-		spinnerThree.setBounds(68, 275, 234, 20);
+		spinnerThree.setBounds(185, 275, 117, 20);
 		panel.add(spinnerThree);
+		
+		JCheckBox cdEnableTrap = new JCheckBox("Trap Enabled");
+		cdEnableTrap.setBounds(32, 212, 97, 23);
+		panel.add(cdEnableTrap);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmTestHarness.setJMenuBar(menuBar);

@@ -9,6 +9,7 @@ public class Core {
 	private byte[] storage;
 	private int maximumAddress; // maximum address
 	private int protectedBoundary; // highest location in protected area
+	private boolean trapEnabled;
 	private HashMap<Integer, TRAP> trapLocations; // locations that can be
 													// trapped duh!
 
@@ -17,6 +18,7 @@ public class Core {
 	}// Constructor
 
 	public Core(Integer size, Integer protectedBoundary) {
+		this.trapEnabled = false;
 		trapLocations = new HashMap<Integer, TRAP>();
 		if (size <= 0) {
 			System.err.printf("Memory size %d not valid%n", size);
@@ -25,7 +27,8 @@ public class Core {
 
 		storage = new byte[size];
 		maximumAddress = storage.length - 1;
-		if ((protectedBoundary >= maximumAddress) | (protectedBoundary < 0)) {
+
+		if ((protectedBoundary >= maximumAddress) || (protectedBoundary < 0)) {
 			String errorMessage = String
 					.format("Invalid protected highest location: 0X%1$04X - Decimal %1$d   %n"
 							+ "  Memory's highest location is:     0X%2$04X - Decimal %2$d%n"
@@ -62,7 +65,17 @@ public class Core {
 
 	public int getProtectedBoundary() {
 		return protectedBoundary;
-	}//
+	}//getProtectedBoundary
+	
+	public void setTrapEnabled(boolean state){
+		this.trapEnabled = state;
+	}//enableTrap
+	
+	public boolean isTrapEnabled(){
+		return this.isTrapEnabled();
+	}
+	
+	//public boolean
 
 	public void addTrapLocation(int location, TRAP trap) {
 		if (!trapLocations.containsKey(location)) { // Not trapped yet
@@ -91,7 +104,7 @@ public class Core {
 			// out of bounds error
 			fireAccessError(location, "Invalid memory location");
 			checkAddress = false;
-		} else if (trapLocations.containsKey(location)) {
+		} else if (trapEnabled & trapLocations.containsKey(location)) {
 			fireMemoryTrap(location, (trapLocations.get(location)));
 			checkAddress = true;
 		}// if
