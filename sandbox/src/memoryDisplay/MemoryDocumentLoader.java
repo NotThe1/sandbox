@@ -1,4 +1,4 @@
-package box1;
+package memoryDisplay;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;

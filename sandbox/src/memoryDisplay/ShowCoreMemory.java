@@ -1,8 +1,9 @@
-package box1;
+package memoryDisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.FontMetrics;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -11,10 +12,9 @@ import javax.swing.JSplitPane;
 
 import java.awt.Font;
 
-
 import javax.swing.border.LineBorder;
-
-
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.MaskFormatter;
@@ -23,12 +23,15 @@ import javax.swing.text.PlainDocument;
 import java.awt.Color;
 
 import javax.swing.JScrollPane;
+
 import java.awt.Dimension;
 
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
+
+import box1.LMI;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -54,12 +57,16 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 	private final JPanel contentPanel = new JPanel();
 	private JTextArea txtTop;
 	private JTextArea txtBottom;
+	private int lineHeight;
+//	private JScrollPane
 	private Document doc;
 	private StringBuilder lineBuilder;
 	private int currentLineNumber;
 	private int currentStartingLocation;
 	private int maxMemory;
 	private int maxLineNumber;
+	private HashMap<Integer, Byte> changeStagingArea;
+	
 
 	private MaskFormatter format16HexDigits;
 
@@ -126,11 +133,11 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		mdlThread0.start();	
 	}// refresh
 
-	private void openEditPane(MouseEvent me) {
+	private void openEditPane(JTextArea txtArea) {
 //		Object source = me.getSource();
 		int displayLine = 0;
 		try {
-			displayLine = txtTop.getLineOfOffset(txtTop.getCaretPosition());
+			displayLine = txtArea.getLineOfOffset(txtArea.getCaretPosition());
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}// try
@@ -139,6 +146,14 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		ftfEdit.setText(getDisplayForValues(targetAddress));
 		panelEdit.setVisible(true);
 	}// openEditPane
+	
+	private void displayEditValues(){
+		ftfEdit.setText(getDisplayForValues((int)spinnerEdit.getValue()));
+		changeStagingArea.clear();
+		btnCommit.setEnabled(false);
+		btnCommit.setForeground(Color.BLACK);
+
+	}//displayEditValues
 
 	@Override
 	public void propertyChange(PropertyChangeEvent pce) {
@@ -148,17 +163,19 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		String sourceName = ((Component) pce.getSource()).getName();
 		
 		switch (sourceName) {
-		case "spinnerEdit":
-			ftfEdit.setText(getDisplayForValues((int)pce.getNewValue()));
-			break;
+		
+//		case "spinnerEdit":
+//			ftfEdit.setText(getDisplayForValues((int)pce.getNewValue()));
+//			break;
 		case "ftfEdit":
+			changeStagingArea.clear();
 			Scanner scanner = new Scanner((String) ftfEdit.getText()); // ftfEdit.getValue
 			int baseAddress = (int) spinnerEdit.getValue();
 			
 			int value;
 			for (int i = 0; i < SIXTEEN; i++) {
 				value = Integer.valueOf(scanner.next(), 16);
-				pmm[i + baseAddress] = (byte) value;
+				changeStagingArea.put(baseAddress+i,(byte) value);
 			}// for
 			
 			scanner.close();
@@ -177,11 +194,15 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		maxLineNumber = locationToLineNumber(maxMemory);
 		currentLineNumber = maxLineNumber; // TODO!!!!!!
 		currentStartingLocation = 0;
+		changeStagingArea = new HashMap();
+
 		// doc = txtTop.getDocument();
 		doc = new PlainDocument();
 		
 		txtTop.setDocument(doc);
 		txtBottom.setDocument(doc);
+		FontMetrics fontMetrics =  getFontMetrics(txtTop.getFont());
+		lineHeight = fontMetrics.getHeight();
 		lineBuilder = new StringBuilder();
 		refresh();
 
@@ -222,11 +243,21 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 				JPanel panelAddressTop = new JPanel();
 				panelTop1.add(panelAddressTop, BorderLayout.NORTH);
 
-				Hex64KSpinner spinnerTop = new Hex64KSpinner();
+				Hex64KSpinner16 spinnerTop = new Hex64KSpinner16();
+				spinnerTop.setName("spinnerTop");
+				spinnerTop.addChangeListener(new ChangeListener() {
+					@Override
+					public void stateChanged(ChangeEvent ce) {
+						String name = ((Component) ce.getSource()).getName();
+						if ( "spinnerTop".equals(name)){
+							scrollPaneTop.getVerticalScrollBar().setValue(((int)spinnerTop.getValue()/SIXTEEN) *  lineHeight);
+						}//if	
+					}//stateChanged
+				});
 				spinnerTop.setFont(new Font("Courier New", Font.PLAIN, 20));
 				panelAddressTop.add(spinnerTop);
 
-				JScrollPane scrollPaneTop = new JScrollPane();
+				scrollPaneTop = new JScrollPane();
 				panelTop1.add(scrollPaneTop);
 
 				txtTop = new JTextArea();
@@ -234,13 +265,13 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 					@Override
 					public void mouseClicked(MouseEvent me) {
 						if (me.getClickCount() >= 2) {
-							openEditPane(me);
+							openEditPane(txtTop);
 							panelEdit.setVisible(true);
 						}// if
 					}// mouseClicked
 				});
 				txtTop.setEditable(false);
-				txtTop.setFont(new Font("Courier New", Font.PLAIN, 15));
+				txtTop.setFont(new Font("Courier New", Font.PLAIN, 15));  
 				txtTop.setRows(10);
 				txtTop.setColumns(45);
 				scrollPaneTop.setViewportView(txtTop);
@@ -258,14 +289,35 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 				JPanel panelAddressBottom = new JPanel();
 				panelBottom1.add(panelAddressBottom, BorderLayout.NORTH);
 
-				Hex64KSpinner spinnerBottom = new Hex64KSpinner();
+				Hex64KSpinner16 spinnerBottom = new Hex64KSpinner16();
+				spinnerBottom.setName("spinnerBottom");
+				spinnerBottom.addChangeListener(new ChangeListener() {
+					@Override
+					public void stateChanged(ChangeEvent ce) {
+						String name = ((Component) ce.getSource()).getName();
+						if ( "spinnerBottom".equals(name)){
+							scrollPaneBottom.getVerticalScrollBar().setValue(((int)spinnerBottom.getValue()/SIXTEEN) *  lineHeight);
+						}//if	
+					}//stateChanged
+				});
+
 				spinnerBottom.setFont(new Font("Courier New", Font.PLAIN, 20));
 				panelAddressBottom.add(spinnerBottom);
 
-				JScrollPane scrollPaneBottom = new JScrollPane();
+				scrollPaneBottom = new JScrollPane();
 				panelBottom1.add(scrollPaneBottom);
 
 				txtBottom = new JTextArea();
+				txtBottom.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent me) {
+						if (me.getClickCount() >= 2) {
+							openEditPane(txtBottom);
+							panelEdit.setVisible(true);
+						}// if
+					}// mouseClicked
+				});
+
 				txtBottom.setEditable(false);
 				txtBottom.setFont(new Font("Courier New", Font.PLAIN, 15));
 				// panelBottom1.add(txtBottom, BorderLayout.CENTER);
@@ -299,7 +351,17 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		panelEdit.add(label, gbc_label);
 
 		spinnerEdit = new Hex64KSpinner16();
-		spinnerEdit.addPropertyChangeListener("value",this);
+		spinnerEdit.addChangeListener(new ChangeListener(){
+
+			@Override
+			public void stateChanged(ChangeEvent ce) {
+				String name = ((Component) ce.getSource()).getName();
+				if ( "spinnerEdit".equals(name) & panelEdit.isVisible()){
+					displayEditValues();	
+				}//if	
+			}
+			
+		});
 		spinnerEdit.setName("spinnerEdit");
 		spinnerEdit.setFont(new Font("Courier New", Font.PLAIN, 16));
 		GridBagConstraints gbc_spinnerEdit = new GridBagConstraints();
@@ -329,6 +391,29 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		panelEdit.add(ftfEdit, gbc_ftfEdit);
 
 		btnCommit = new JButton("Commit Edit");
+		btnCommit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Set<Integer> locations = changeStagingArea.keySet();
+				if (locations.isEmpty()){
+					return;	// nothing to update
+				}//if
+				
+				for (int location:locations){
+					byte value = changeStagingArea.get(location);
+					pmm[location] = value;
+				}//
+				
+				int lineNumber = (int) spinnerEdit.getValue() / SIXTEEN;
+				MemoryDocumentLoader mdl = new MemoryDocumentLoader(pmm,doc,lineNumber,1);
+				Thread mdlThread0 = new Thread(mdl);
+				mdlThread0.start();	
+				
+				btnCommit.setEnabled(false);
+				changeStagingArea.clear();
+				btnCommit.setForeground(Color.BLACK);
+
+			}
+		});
 		btnCommit.setEnabled(false);
 		btnCommit.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_btnCommit = new GridBagConstraints();
@@ -342,6 +427,8 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 		btnCloseEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnCommit.setEnabled(false);
+				changeStagingArea.clear();
+				btnCommit.setForeground(Color.BLACK);
 				panelEdit.setVisible(false);
 			}
 		});
@@ -364,6 +451,11 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 			}
 			{
 				JButton btnCancel = new JButton("Cancel");
+				btnCancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						//TODO Cancel
+					}
+				});
 				btnCancel.setHorizontalAlignment(SwingConstants.RIGHT);
 				btnCancel.setActionCommand("Cancel");
 				buttonPane.add(btnCancel);
@@ -378,5 +470,7 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 	private Hex64KSpinner16 spinnerEdit;
 	private JButton btnCommit;
 	private JFormattedTextField ftfEdit;
+	private JScrollPane scrollPaneTop;
+	private JScrollPane scrollPaneBottom;
 
 }
