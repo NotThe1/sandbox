@@ -453,7 +453,7 @@ public class ShowCoreMemory extends JDialog implements PropertyChangeListener {
 				JButton btnCancel = new JButton("Cancel");
 				btnCancel.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						//TODO Cancel
+						dispose();
 					}
 				});
 				btnCancel.setHorizontalAlignment(SwingConstants.RIGHT);
