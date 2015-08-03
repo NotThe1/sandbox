@@ -1,7 +1,5 @@
 package box1;
 
-
-
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -10,6 +8,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JScrollPane;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.HashMap;
@@ -17,12 +16,15 @@ import java.util.Set;
 
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -36,7 +38,7 @@ public class DocTest implements DocumentListener {
 
 	private String rawSource;
 	private byte[] byteSource;
-	private JTextArea txtTarget2;
+	private JTextPane txtTarget2;
 	private HashMap<Integer, Byte> memoryImage;
 	private StringBuilder lineBuilder;
 	byte[] pmm;
@@ -60,36 +62,51 @@ public class DocTest implements DocumentListener {
 		});
 	}
 
+	SimpleAttributeSet[] attributeSet() {
+		SimpleAttributeSet[] attrs = new SimpleAttributeSet[3];
+		attrs[0] = new SimpleAttributeSet();
+		StyleConstants.setForeground(attrs[0], Color.black);
+
+		attrs[1] = new SimpleAttributeSet();
+		StyleConstants.setForeground(attrs[1], Color.RED);
+		StyleConstants.setBold(attrs[1], true);
+
+		attrs[2] = new SimpleAttributeSet();
+		StyleConstants.setForeground(attrs[2], Color.BLUE);
+		return attrs;
+	}
+
+	SimpleAttributeSet[] attrs = attributeSet();
+
 	private void appInit() {
 		makeOpcodeMap();
 		OperationStructure test = opcodeMap.get((byte) 0X03);
-		doc = txtTarget1.getDocument();
+		doc = txtTarget2.getDocument();
 		try {
 			byte codeByte;
 			for (int code = 0; code <= 0XFF; code++) {
 				codeByte = (byte) code;
+				doc.insertString(doc.getLength(), String.format("%04X: ", code), attrs[1]);
 				switch (opcodeMap.get(codeByte).getSize()) {
-				case 1:doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode(),null);
+				case 1:
+					doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode(), null);
 					break;
-				case 2:doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode((byte) 0X5A), null);
+				case 2:
+					doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode((byte) 0X5A), null);
 					break;
-				case 3:doc.insertString(doc.getLength(),
-						opcodeMap.get((byte) code).getAssemblerCode((byte) 0X34, (byte) 0XAB), null);
+				case 3:
+					doc.insertString(doc.getLength(),
+							opcodeMap.get((byte) code).getAssemblerCode((byte) 0X34, (byte) 0XAB), null);
 					break;
-				}
-				//
-				// doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode(),null);
-				// doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode((byte) 0X5A), null);
-				//doc.insertString(doc.getLength(),
-				//		opcodeMap.get((byte) code).getAssemblerCode((byte) 0X34, (byte) 0XAB), null);
-			}
+				}// switch
 
+			}// for
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}// try
 
-	}
+	}// appInit
 
 	// check the rotates (not) thru carry
 
@@ -569,7 +586,7 @@ public class DocTest implements DocumentListener {
 		lblTestOfDocument.setHorizontalAlignment(SwingConstants.CENTER);
 		scrollPane.setColumnHeaderView(lblTestOfDocument);
 
-		txtTarget2 = new JTextArea();
+		txtTarget2 = new JTextPane();
 		GridBagConstraints gbc_txtTarget2 = new GridBagConstraints();
 		gbc_txtTarget2.insets = new Insets(0, 0, 5, 0);
 		gbc_txtTarget2.fill = GridBagConstraints.BOTH;
