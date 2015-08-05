@@ -29,11 +29,15 @@ import javax.swing.text.StyleConstants;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
+import javax.swing.JSpinner;
 
 public class DocTest implements DocumentListener {
 
 	private JFrame frame;
 	private JTextArea txtTarget1;
+	private JScrollPane scrollPane;
 	private Document doc;
 
 	private String rawSource;
@@ -77,11 +81,25 @@ public class DocTest implements DocumentListener {
 	}
 
 	SimpleAttributeSet[] attrs = attributeSet();
+	private JPanel panel;
+	private JSpinner spinner;
+	
+	private void line0(){
+		txtTarget1.setCaretPosition(0);
+
+//		scrollPane.getVerticalScrollBar().getValue();
+		scrollPane.getVerticalScrollBar().setValue(0);
+		
+	}
+
 
 	private void appInit() {
 		makeOpcodeMap();
 		OperationStructure test = opcodeMap.get((byte) 0X03);
-		doc = txtTarget2.getDocument();
+//scrollPane.setViewportView(txtTarget1);
+//		doc = (Document) scrollPane.getViewport().getView();
+		doc = txtTarget1.getDocument();
+//		doc.addDocumentListener(this);
 		try {
 			byte codeByte;
 			for (int code = 0; code <= 0XFF; code++) {
@@ -105,6 +123,7 @@ public class DocTest implements DocumentListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}// try
+		line0();
 
 	}// appInit
 
@@ -560,21 +579,33 @@ public class DocTest implements DocumentListener {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 944, 746);
+		frame.setBounds(100, 100, 944, 783);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 0, 484, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 590, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] {30, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[] {10, 10, 70, 30, 590, 0, 30, 0};
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
+		
+		panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "Panel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.insets = new Insets(0, 0, 5, 5);
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 1;
+		gbc_panel.gridy = 2;
+		frame.getContentPane().add(panel, gbc_panel);
+		
+		spinner = new JSpinner();
+		panel.add(spinner);
 
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 1;
-		gbc_scrollPane.gridy = 1;
+		gbc_scrollPane.gridy = 4;
 		frame.getContentPane().add(scrollPane, gbc_scrollPane);
 
 		txtTarget1 = new JTextArea();
@@ -591,25 +622,25 @@ public class DocTest implements DocumentListener {
 		gbc_txtTarget2.insets = new Insets(0, 0, 5, 0);
 		gbc_txtTarget2.fill = GridBagConstraints.BOTH;
 		gbc_txtTarget2.gridx = 2;
-		gbc_txtTarget2.gridy = 1;
+		gbc_txtTarget2.gridy = 4;
 		frame.getContentPane().add(txtTarget2, gbc_txtTarget2);
 
 		JButton btnOne = new JButton("One");
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-
+				scrollPane.getVerticalScrollBar().setValue(0);
 			}
 		});
 		GridBagConstraints gbc_btnOne = new GridBagConstraints();
 		gbc_btnOne.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOne.gridx = 1;
-		gbc_btnOne.gridy = 2;
+		gbc_btnOne.gridy = 5;
 		frame.getContentPane().add(btnOne, gbc_btnOne);
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		System.out.printf("changeUpdate%n");
+	public void changedUpdate(DocumentEvent de) {
+		scrollPane.getVerticalScrollBar().setValue(0);
 
 	}
 
