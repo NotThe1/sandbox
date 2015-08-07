@@ -83,6 +83,7 @@ public class DocTest implements DocumentListener {
 	SimpleAttributeSet[] attrs = attributeSet();
 	private JPanel panel;
 	private JSpinner spinner;
+	private JButton btnNewButton;
 	
 	private void line0(){
 		txtTarget1.setCaretPosition(0);
@@ -599,6 +600,20 @@ public class DocTest implements DocumentListener {
 		
 		spinner = new JSpinner();
 		panel.add(spinner);
+		
+		btnNewButton = new JButton("New button");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String s = "FB2B";
+				Integer t = Integer.parseUnsignedInt(s,16);
+				System.out.printf("X = %s, %04X %n",s,t);
+			}
+		});
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton.gridx = 2;
+		gbc_btnNewButton.gridy = 2;
+		frame.getContentPane().add(btnNewButton, gbc_btnNewButton);
 
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
