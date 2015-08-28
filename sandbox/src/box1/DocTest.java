@@ -13,6 +13,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -29,9 +32,18 @@ import javax.swing.text.StyleConstants;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.JSpinner;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JCheckBoxMenuItem;
 
 public class DocTest implements DocumentListener {
 
@@ -84,6 +96,12 @@ public class DocTest implements DocumentListener {
 	private JPanel panel;
 	private JSpinner spinner;
 	private JButton btnNewButton;
+	private JMenuBar menuBar;
+	private JMenu mnuFile;
+	private JMenuItem mnuFileAdd;
+	private JMenuItem mnuFileRemove;
+	private JPopupMenu popMnuTest1;
+	private JCheckBoxMenuItem chckbxmntmNewCheckItem;
 	
 	private void line0(){
 		txtTarget1.setCaretPosition(0);
@@ -95,6 +113,8 @@ public class DocTest implements DocumentListener {
 
 
 	private void appInit() {
+
+		
 		makeOpcodeMap();
 		OperationStructure test = opcodeMap.get((byte) 0X03);
 //scrollPane.setViewportView(txtTarget1);
@@ -609,6 +629,10 @@ public class DocTest implements DocumentListener {
 				System.out.printf("X = %s, %04X %n",s,t);
 			}
 		});
+		
+		popMnuTest1 = new JPopupMenu();
+		popMnuTest1.setLabel("Test1");
+		addPopup(btnNewButton, popMnuTest1);
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNewButton.gridx = 2;
@@ -651,6 +675,21 @@ public class DocTest implements DocumentListener {
 		gbc_btnOne.gridx = 1;
 		gbc_btnOne.gridy = 5;
 		frame.getContentPane().add(btnOne, gbc_btnOne);
+		
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		mnuFile = new JMenu("File");
+		menuBar.add(mnuFile);
+		
+		mnuFileAdd = new JMenuItem("Add");
+		mnuFile.add(mnuFileAdd);
+		
+		mnuFileRemove = new JMenuItem("Remove");
+		mnuFile.add(mnuFileRemove);
+		
+		chckbxmntmNewCheckItem = new JCheckBoxMenuItem("New check item");
+		mnuFile.add(chckbxmntmNewCheckItem);
 	}
 
 	@Override
@@ -671,4 +710,21 @@ public class DocTest implements DocumentListener {
 
 	}
 
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
+	}
 }
