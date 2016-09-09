@@ -11,11 +11,9 @@ import javax.swing.JScrollPane;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -24,10 +22,21 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyleContext.NamedStyle;
+import javax.swing.text.StyledDocument;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -40,24 +49,31 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 
 public class DocTest implements DocumentListener {
 
 	private JFrame frame;
-	private JTextArea txtTarget1;
+	private JTextPane txtTarget1;
 	private JScrollPane scrollPane;
-	private Document doc;
 
 	private String rawSource;
 	private byte[] byteSource;
-	private JTextPane txtTarget2;
+	private JTextArea txtTarget2;
 	private HashMap<Integer, Byte> memoryImage;
 	private StringBuilder lineBuilder;
 	byte[] pmm;
+	private StyledDocument doc;
+	Style styleDefault, styleHistory, styleCurrent, styleFuture;
+	Style styleCurrentLocation, styleCurrentInstruction, styleCurrentComments;
+	Style styleFutureLocation, styleFutureInstruction, styleFutureComments;
 
 	// /////////////////////////////////////
 	HashMap<Byte, OperationStructure> opcodeMap;
@@ -76,9 +92,117 @@ public class DocTest implements DocumentListener {
 				}
 			}
 		});
-	}
+	}// main
 
-	SimpleAttributeSet[] attributeSet() {
+	private void doNewButton() {
+		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Root Node");
+		DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
+		tree.setModel(treeModel);
+
+		Element docRoot = doc.getDefaultRootElement();
+		int childCount = docRoot.getElementCount();
+		Element childElement;
+		for (int branchIndex = 0; branchIndex < childCount; branchIndex++) {
+			childElement = docRoot.getElement(branchIndex);
+			if ((childElement.getEndOffset() - childElement.getStartOffset()) > 5) {
+				rootNode.add(addBranch(childElement));
+			}// if not empty
+		}// for child elements
+		tree.scrollRowToVisible(25);
+	}// doNewButton
+
+	private DefaultMutableTreeNode addBranch(Element childElement) {
+		String name = childElement.getName();
+		int start = childElement.getStartOffset();
+		int end = childElement.getEndOffset();
+		String id = "";
+		try {
+			id = childElement.getDocument().getText(start, 5);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String branchName = String.format("%s BranchElement(%s) %d,%d", id, name, start, end);
+		DefaultMutableTreeNode branch = new DefaultMutableTreeNode(branchName);
+		Element grandchildElement;
+		if (childElement.getElementCount() != 0) {
+			for (int leafIndex = 0; leafIndex < childElement.getElementCount(); leafIndex++) {
+				grandchildElement = childElement.getElement(leafIndex);
+				branch.add(addLeaf(grandchildElement));
+			}// grandchild Element
+		}// if leaves
+		return branch;
+	}// addBranch
+
+	private DefaultMutableTreeNode addLeaf(Element grandchildElement) {
+		String name = grandchildElement.getName();
+		int start = grandchildElement.getStartOffset();
+		int end = grandchildElement.getEndOffset();
+		String leafName = String.format("\tLeaf Element(%s) %d,%d", name, start, end);
+		DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(leafName);
+		return leaf;
+	}// addLeaf
+
+	private void createNodes(DefaultMutableTreeNode top) {
+		DefaultMutableTreeNode category = null;
+		DefaultMutableTreeNode book = null;
+		category = new DefaultMutableTreeNode("Books for Java Programmers");
+		top.add(category);
+	}// createNodes
+
+	private void walkDocument(StyledDocument doc, JTextArea txtTarget) {
+		javax.swing.text.Element docRoot = doc.getDefaultRootElement();
+		int childCount = docRoot.getElementCount();
+		String rootInfo = String.format("Root:  Leaf - %s, number of chilld elements - %d%n", docRoot.isLeaf(),
+				childCount);
+		txtTarget.append(rootInfo);
+		String childInfo;
+		int elementStart;
+		String lineID = "";
+		int childElementCount;
+		javax.swing.text.Element childElement, grandchildElement;
+		for (int i = 0; i < childCount; i++) {
+			childElement = docRoot.getElement(i);
+			elementStart = childElement.getStartOffset();
+			try {
+				lineID = doc.getText(elementStart, 5);
+			} catch (BadLocationException e) {
+				break;
+				// e.printStackTrace();
+			}
+			childElementCount = childElement.getElementCount();
+			childInfo = String.format("   %3d\t%-4d - %4d\tID:%s\tName: %s%n",
+					i, elementStart, childElement.getEndOffset(), lineID, childElement.getName());
+			txtTarget.append(childInfo);
+
+			for (int j = 0; j < childElementCount; j++) {
+				grandchildElement = childElement.getElement(j);
+				elementStart = grandchildElement.getStartOffset();
+
+				childInfo = String.format("\t   %3d\t%-4d - %4d\tName: %s%n",
+						j, elementStart, grandchildElement.getEndOffset(), grandchildElement.getName());
+				txtTarget.append(childInfo);
+
+				AttributeSet attributeSet = grandchildElement.getAttributes();
+				Enumeration<Object> keys = (Enumeration<Object>) attributeSet.getAttributeNames();
+
+				String attributeInfo;
+				Object value, key;
+				while (keys.hasMoreElements()) {
+					key = keys.nextElement();
+					value = (Object) attributeSet.getAttribute(key);
+					attributeInfo = String.format("\t\t%-25s - %s%n", key.toString(), value.toString());
+					txtTarget.append(attributeInfo);
+				}// while
+				txtTarget.append(System.lineSeparator());
+			}// for grandChild
+
+		}// for child
+		txtTarget.setCaretPosition(0);
+	}// walkDocument
+
+	private SimpleAttributeSet[] attributeSet() {
 		SimpleAttributeSet[] attrs = new SimpleAttributeSet[3];
 		attrs[0] = new SimpleAttributeSet();
 		StyleConstants.setForeground(attrs[0], Color.black);
@@ -92,7 +216,7 @@ public class DocTest implements DocumentListener {
 		return attrs;
 	}
 
-	SimpleAttributeSet[] attrs = attributeSet();
+	private SimpleAttributeSet[] attrs = attributeSet();
 	private JPanel panel;
 	private JSpinner spinner;
 	private JButton btnNewButton;
@@ -102,30 +226,33 @@ public class DocTest implements DocumentListener {
 	private JMenuItem mnuFileRemove;
 	private JPopupMenu popMnuTest1;
 	private JCheckBoxMenuItem chckbxmntmNewCheckItem;
-	
-	private void line0(){
+	private JScrollPane scrollPane_1;
+	private JPanel panelRaw;
+	private JTabbedPane tabbedPane;
+	private JPanel panelTree;
+	private JScrollPane scrollPane_2;
+	private JTree tree;
+	private JLabel lblNewLabel;
+
+	private void line0() {
 		txtTarget1.setCaretPosition(0);
 
-//		scrollPane.getVerticalScrollBar().getValue();
+		// scrollPane.getVerticalScrollBar().getValue();
 		scrollPane.getVerticalScrollBar().setValue(0);
-		
-	}
 
+	}// line0
 
 	private void appInit() {
-
-		
 		makeOpcodeMap();
 		OperationStructure test = opcodeMap.get((byte) 0X03);
-//scrollPane.setViewportView(txtTarget1);
-//		doc = (Document) scrollPane.getViewport().getView();
-		doc = txtTarget1.getDocument();
-//		doc.addDocumentListener(this);
+		doc = (StyledDocument) txtTarget1.getDocument();
+		makeStyles(doc);
 		try {
 			byte codeByte;
 			for (int code = 0; code <= 0XFF; code++) {
 				codeByte = (byte) code;
-				doc.insertString(doc.getLength(), String.format("%04X: ", code), attrs[1]);
+				doc.insertString(doc.getLength(), String.format("%04X: ", code), styleCurrentInstruction);
+				// doc.insertString(doc.getLength(), String.format("%04X: ", code), attrs[1]);
 				switch (opcodeMap.get(codeByte).getSize()) {
 				case 1:
 					doc.insertString(doc.getLength(), opcodeMap.get((byte) code).getAssemblerCode(), null);
@@ -145,8 +272,73 @@ public class DocTest implements DocumentListener {
 			e.printStackTrace();
 		}// try
 		line0();
+		walkDocument(doc, txtTarget2);
 
 	}// appInit
+		// ------------------------------------------------------------------
+
+	private void makeStyles(StyledDocument doc) {
+		Color colorLocation = Color.BLUE;
+		Color colorInstruction = Color.RED;
+		Color colorComments = Color.GREEN;
+
+		String DEFAULT = StyleContext.DEFAULT_STYLE;
+		styleDefault = (Style) doc.getStyle(StyleContext.DEFAULT_STYLE);
+		StyleConstants.setFontFamily(styleDefault, "Courier New");
+		StyleConstants.setFontSize(styleDefault, 16);
+		doc.addStyle(DEFAULT, null);
+
+		String HISTORY = "History";
+		styleHistory = doc.getStyle(DEFAULT);
+		StyleConstants.setForeground(styleHistory, Color.GRAY);
+		doc.addStyle(HISTORY, null);
+
+		String CURRENT = "Current";
+		styleCurrent = doc.getStyle(DEFAULT);
+		StyleConstants.setBold(styleCurrent, true);
+		StyleConstants.setBackground(styleDefault, Color.YELLOW);
+		doc.addStyle(CURRENT, null);
+
+		String CURRENT_LOCATION = "CurrentLocation";
+		styleCurrentLocation = doc.getStyle(CURRENT);
+		StyleConstants.setForeground(styleCurrentLocation, colorLocation);
+		doc.addStyle(CURRENT_LOCATION, null);
+
+		String CURRENT_INSTRUCTION = "CurrentInstruction";
+		styleCurrentInstruction = doc.getStyle(CURRENT);
+		StyleConstants.setForeground(styleCurrentLocation, colorInstruction);
+		doc.addStyle(CURRENT_INSTRUCTION, null);
+
+		String CURRENT_COMMENTS = "CurrentComments";
+		styleCurrentComments = doc.getStyle(CURRENT);
+		StyleConstants.setForeground(styleCurrentLocation, colorComments);
+		doc.addStyle(CURRENT_COMMENTS, null);
+
+		String FUTURE = "Future";
+		styleFuture = doc.getStyle(DEFAULT);
+		doc.addStyle(FUTURE, null);
+
+		String FUTURE_LOCATION = "FutureLocation";
+		styleFutureLocation = doc.getStyle(FUTURE);
+		StyleConstants.setForeground(styleFutureLocation, colorLocation);
+		doc.addStyle(FUTURE_LOCATION, null);
+
+		String FUTURE_INSTRUCTION = "FutureInstruction";
+		styleFutureInstruction = doc.getStyle(FUTURE);
+		StyleConstants.setForeground(styleFutureInstruction, colorInstruction);
+		doc.addStyle(FUTURE_INSTRUCTION, null);
+
+		String FUTURE_COMMENTS = "FutureComments";
+		styleFutureComments = doc.getStyle(FUTURE);
+		StyleConstants.setForeground(styleFutureComments, colorComments);
+		doc.addStyle(FUTURE_COMMENTS, null);
+
+		// StyleConstants.setForeground(style,Color.GREEN);
+		// doc.addStyle("styleBlack", null);
+		// Style x = doc.getStyle(BOLD_ITALIC);
+
+	}//
+		// ------------------------------------------------------------------
 
 	// check the rotates (not) thru carry
 
@@ -603,51 +795,52 @@ public class DocTest implements DocumentListener {
 		frame.setBounds(100, 100, 944, 783);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] {30, 0, 0, 0};
-		gridBagLayout.rowHeights = new int[] {10, 10, 70, 30, 590, 0, 30, 0};
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 400, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 70, 590, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
-		
+
 		panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Panel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.insets = new Insets(0, 0, 5, 5);
 		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 2;
+		gbc_panel.gridx = 0;
+		gbc_panel.gridy = 0;
 		frame.getContentPane().add(panel, gbc_panel);
-		
+
 		spinner = new JSpinner();
 		panel.add(spinner);
-		
+
 		btnNewButton = new JButton("New button");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String s = "FB2B";
-				Integer t = Integer.parseUnsignedInt(s,16);
-				System.out.printf("X = %s, %04X %n",s,t);
+				// String s = "FB2B";
+				// Integer t = Integer.parseUnsignedInt(s,16);
+				// System.out.printf("X = %s, %04X %n",s,t);
+				doNewButton();
 			}
 		});
-		
+
 		popMnuTest1 = new JPopupMenu();
 		popMnuTest1.setLabel("Test1");
 		addPopup(btnNewButton, popMnuTest1);
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton.gridx = 2;
-		gbc_btnNewButton.gridy = 2;
+		gbc_btnNewButton.gridx = 1;
+		gbc_btnNewButton.gridy = 0;
 		frame.getContentPane().add(btnNewButton, gbc_btnNewButton);
 
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane.gridx = 1;
-		gbc_scrollPane.gridy = 4;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 1;
 		frame.getContentPane().add(scrollPane, gbc_scrollPane);
 
-		txtTarget1 = new JTextArea();
+		txtTarget1 = new JTextPane();
 
 		txtTarget1.setFont(new Font("Courier New", Font.PLAIN, 14));
 		scrollPane.setViewportView(txtTarget1);
@@ -656,13 +849,55 @@ public class DocTest implements DocumentListener {
 		lblTestOfDocument.setHorizontalAlignment(SwingConstants.CENTER);
 		scrollPane.setColumnHeaderView(lblTestOfDocument);
 
-		txtTarget2 = new JTextPane();
-		GridBagConstraints gbc_txtTarget2 = new GridBagConstraints();
-		gbc_txtTarget2.insets = new Insets(0, 0, 5, 0);
-		gbc_txtTarget2.fill = GridBagConstraints.BOTH;
-		gbc_txtTarget2.gridx = 2;
-		gbc_txtTarget2.gridy = 4;
-		frame.getContentPane().add(txtTarget2, gbc_txtTarget2);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
+		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
+		gbc_tabbedPane.insets = new Insets(0, 0, 5, 0);
+		gbc_tabbedPane.gridx = 1;
+		gbc_tabbedPane.gridy = 1;
+		frame.getContentPane().add(tabbedPane, gbc_tabbedPane);
+
+		panelTree = new JPanel();
+		tabbedPane.addTab("Tree", null, panelTree, null);
+		GridBagLayout gbl_panelTree = new GridBagLayout();
+		gbl_panelTree.columnWidths = new int[] { 0, 0 };
+		gbl_panelTree.rowHeights = new int[] { 0, 0 };
+		gbl_panelTree.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_panelTree.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
+		panelTree.setLayout(gbl_panelTree);
+
+		scrollPane_2 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_2 = new GridBagConstraints();
+		gbc_scrollPane_2.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_2.gridx = 0;
+		gbc_scrollPane_2.gridy = 0;
+		panelTree.add(scrollPane_2, gbc_scrollPane_2);
+
+		tree = new JTree();
+		tree.setShowsRootHandles(true);
+		scrollPane_2.setViewportView(tree);
+
+		panelRaw = new JPanel();
+		tabbedPane.addTab("Raw", null, panelRaw, null);
+		GridBagLayout gbl_panelRaw = new GridBagLayout();
+		gbl_panelRaw.columnWidths = new int[] { 0, 0 };
+		gbl_panelRaw.rowHeights = new int[] { 590, 0 };
+		gbl_panelRaw.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_panelRaw.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panelRaw.setLayout(gbl_panelRaw);
+
+		scrollPane_1 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
+		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_1.gridx = 0;
+		gbc_scrollPane_1.gridy = 0;
+		panelRaw.add(scrollPane_1, gbc_scrollPane_1);
+
+		txtTarget2 = new JTextArea();
+		scrollPane_1.setViewportView(txtTarget2);
+
+		lblNewLabel = new JLabel("Testing for Styles");
+		scrollPane_1.setColumnHeaderView(lblNewLabel);
 
 		JButton btnOne = new JButton("One");
 		btnOne.addActionListener(new ActionListener() {
@@ -671,23 +906,23 @@ public class DocTest implements DocumentListener {
 			}
 		});
 		GridBagConstraints gbc_btnOne = new GridBagConstraints();
-		gbc_btnOne.insets = new Insets(0, 0, 5, 5);
-		gbc_btnOne.gridx = 1;
-		gbc_btnOne.gridy = 5;
+		gbc_btnOne.insets = new Insets(0, 0, 0, 5);
+		gbc_btnOne.gridx = 0;
+		gbc_btnOne.gridy = 2;
 		frame.getContentPane().add(btnOne, gbc_btnOne);
-		
+
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
-		
+
 		mnuFile = new JMenu("File");
 		menuBar.add(mnuFile);
-		
+
 		mnuFileAdd = new JMenuItem("Add");
 		mnuFile.add(mnuFileAdd);
-		
+
 		mnuFileRemove = new JMenuItem("Remove");
 		mnuFile.add(mnuFileRemove);
-		
+
 		chckbxmntmNewCheckItem = new JCheckBoxMenuItem("New check item");
 		mnuFile.add(chckbxmntmNewCheckItem);
 	}
@@ -717,11 +952,13 @@ public class DocTest implements DocumentListener {
 					showMenu(e);
 				}
 			}
+
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					showMenu(e);
 				}
 			}
+
 			private void showMenu(MouseEvent e) {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
