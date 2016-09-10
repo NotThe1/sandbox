@@ -1,7 +1,7 @@
 package menus;
 
-import java.awt.Component;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
 import javax.swing.JMenu;
@@ -17,18 +17,18 @@ import javax.swing.JToolBar.Separator;
  *
  */
 
-public class MenuFilesUtility {
+public class MenuUtility {
 	static Separator exitSeparator;
 	static Separator fileSeparator;
 
-	public static final String SEPARATOR_EXIT = "separatorExit";
+	// public static final String SEPARATOR_EXIT = "separatorExit";
 	public static final String RECENT_FILES_START = "recentFilesStart";
-	public static final String RECENT_FILES_END = "recentFiles";
-	private static final String NUMBER_DELIM = ")";
+	public static final String RECENT_FILES_END = "recentFilesEnd";
+	private static final String NUMBER_DELIM = ":";
 
 	// private static final String NUMBER_DELIM_REDEX = "\\"
 
-	public MenuFilesUtility() {
+	public MenuUtility() {
 		// TODO Auto-generated constructor stub
 	}//
 
@@ -60,18 +60,26 @@ public class MenuFilesUtility {
 				break;
 			}// if
 		}// for
-
+		Integer removeIndex = null;
 		int fileIndex = 2;
-		String[] menuTexts;
-		String menuText;
+		String menuText, menuActionCommand;
 		for (int j = filesMenuStart; j < filesMenuEnd; j++) {
-			menuTexts = ((AbstractButton) menu.getMenuComponent(j)).getText().split("\\" + NUMBER_DELIM);
-			menuText = String.format("%2d %s%s", fileIndex++, NUMBER_DELIM, menuTexts[1]);
+			menuActionCommand = ((AbstractButton) menu.getMenuComponent(j)).getActionCommand();
+			if (menuActionCommand.equals(file.getAbsolutePath())) {
+				removeIndex = j; // remember for later
+				break;
+			}
+			menuText = String.format("%2d%s  %s", fileIndex++, NUMBER_DELIM, menuActionCommand);
 			((AbstractButton) menu.getMenuComponent(j)).setText(menuText);
 		}// for
 
-		menuText = String.format("%2d %s %s", 1, NUMBER_DELIM, file.getAbsolutePath());
+		if (removeIndex != null) {
+			menu.remove(removeIndex);
+		}// if remove
+
+		menuText = String.format("%2d%s  %s", 1, NUMBER_DELIM, file.getAbsolutePath());
 		JMenuItem newMenu = new JMenuItem(menuText);
+		newMenu.setActionCommand(file.getAbsolutePath());
 		menu.insert(newMenu, filesMenuStart);
 
 		return newMenu;
@@ -79,7 +87,9 @@ public class MenuFilesUtility {
 
 	/**
 	 * Clears the recent File list and sets visible false for Separator Start,Separator End, and menu clearRecentFiles
-	 * @param menu is the menu the recent File list is on
+	 * 
+	 * @param menu
+	 *            is the menu the recent File list is on
 	 */
 	public static void clearList(JMenu menu) {
 		int menuCount = menu.getItemCount();
@@ -89,21 +99,44 @@ public class MenuFilesUtility {
 		for (int i = 0; i < menuCount; i++) {
 			if (menu.getMenuComponent(i).getName() == RECENT_FILES_START) {
 				menu.getMenuComponent(i).setVisible(false); // Separator start
-				filesMenuStart = i ;
+				filesMenuStart = i + 1;
 			}// if
 			if (menu.getMenuComponent(i).getName() == RECENT_FILES_END) {
-				menu.getMenuComponent(i + 1).setVisible(false);// Separator end
-				menu.getMenuComponent(i + 2).setVisible(false);// menu Empty
+				menu.getMenuComponent(i).setVisible(false);// Separator end
+				menu.getMenuComponent(i + 1).setVisible(false);// menu Empty
 
-				filesMenuEnd = i+1;
+				filesMenuEnd = i - 1;
 				break;
 			}// if
 		}// for
-		
-		for (int j = filesMenuEnd; j > filesMenuStart; j--){
+
+		for (int j = filesMenuEnd; j >= filesMenuStart; j--) {
 			menu.remove(j);
 		}//
+			// int k = filesMenuEnd;
+		// menu.remove(k--);
+	}//clearList
+	
+	public static ArrayList<String> getFilePaths(JMenu menu){
+		ArrayList<String> filePaths = new ArrayList<String>();
+		int menuCount = menu.getItemCount();
+		boolean isFile = false;
 
-	}
+		for (int i = 0; i < menuCount; i++) {
+			if (menu.getMenuComponent(i).getName() == RECENT_FILES_START) {
+				isFile = true;
+				continue; //start collecting paths
+			}// if
+			if (menu.getMenuComponent(i).getName() == RECENT_FILES_END) {
+				break;	// all done
+			}// if
+			if (isFile){
+				
+			filePaths.add(((AbstractButton) menu.getMenuComponent(i)).getActionCommand()+ System.lineSeparator());	
+			}//if isFile
+		}// for
+
+		return filePaths;
+	}//getFilePaths
 
 }// class MenuFilesUtility

@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -29,9 +30,12 @@ import javax.swing.JSeparator;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
 
 public class AddFilesToMenu {
 
@@ -40,7 +44,7 @@ public class AddFilesToMenu {
 	private JButton btnTwo;
 	private JButton btnThree;
 	private JButton btnFour;
-	
+
 	File activeFile;
 
 	/**
@@ -54,21 +58,22 @@ public class AddFilesToMenu {
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
-				}//try
-			}//run
+				}// try
+			}// run
 		});
 	}// main
-	
-	private void addFileToMenu(JMenu menu, File file){
-		
-	}//addFileToMenu
+
+	private void addFileToMenu(JMenu menu, File file) {
+
+	}// addFileToMenu
 
 	/* Standard Stuff */
-	
-	private void doFileNew(){
-		
-	}//doFileNew
-	private void doFileOpen(){
+
+	private void doFileNew() {
+
+	}// doFileNew
+
+	private void doFileOpen() {
 		JFileChooser fc = new JFileChooser(System.getProperty("user.home", "."));
 		fc.setMultiSelectionEnabled(false);
 		if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
@@ -76,30 +81,37 @@ public class AddFilesToMenu {
 		}// if quit - get out
 		activeFile = fc.getSelectedFile();
 		frmTemplate.setTitle(TITLE + ": " + activeFile.getName());
-		MenuFilesUtility.addFile(mnuFile, activeFile);
-	}//doFileOpen
-	private void doFileSave(){
-		
-	}//doFileSave
-	private void doFileSaveAs(){
-		
-	}//doFileSaveAs
-	private void doFilePrint(){
-		
-	}//doFilePrint
-	private void doFileExit(){
+		MenuUtility.addFile(mnuFile, activeFile);
+	}// doFileOpen
+
+	private void doFileSave() {
+
+	}// doFileSave
+
+	private void doFileSaveAs() {
+
+	}// doFileSaveAs
+
+	private void doFilePrint() {
+
+	}// doFilePrint
+
+	private void doFileExit() {
 		appClose();
 		System.exit(0);
-	}//doFileExit
-	private void doEditCut(){
-		
-	}//doEditCut
-	private void doEditCopy(){
-		
-	}//doEditCopy
-	private void doEditPaste(){
-		
-	}//doEditPaste
+	}// doFileExit
+
+	private void doEditCut() {
+
+	}// doEditCut
+
+	private void doEditCopy() {
+
+	}// doEditCopy
+
+	private void doEditPaste() {
+
+	}// doEditPaste
 
 	private void appClose() {
 		Preferences myPrefs = Preferences.userNodeForPackage(AddFilesToMenu.class);
@@ -110,7 +122,7 @@ public class AddFilesToMenu {
 		myPrefs.putInt("LocX", point.x);
 		myPrefs.putInt("LocY", point.y);
 		myPrefs = null;
-	}//appClose
+	}// appClose
 
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(AddFilesToMenu.class);
@@ -138,7 +150,7 @@ public class AddFilesToMenu {
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		frmTemplate.getContentPane().setLayout(gridBagLayout);
-		
+
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		GridBagConstraints gbc_toolBar = new GridBagConstraints();
@@ -147,27 +159,56 @@ public class AddFilesToMenu {
 		gbc_toolBar.gridx = 0;
 		gbc_toolBar.gridy = 0;
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
-		
+
 		btnOne = new JButton("1");
+		btnOne.setToolTipText("Add 3 files to the menu");
+		btnOne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				File file = new File("C:\\Users\\admin\\TestLogger3.log");
+				MenuUtility.addFile(mnuFile, file);
+				file = new File("C:\\Users\\admin\\TestLogger2.log");
+				MenuUtility.addFile(mnuFile, file);
+				file = new File("C:\\Users\\admin\\TestLogger1.log");
+				MenuUtility.addFile(mnuFile, file);
+			}// action Performed
+		});
 		btnOne.setMaximumSize(new Dimension(30, 20));
 		btnOne.setPreferredSize(new Dimension(30, 20));
 		toolBar.add(btnOne);
-		
+
 		btnTwo = new JButton("2");
+		btnTwo.setToolTipText("Get File Paths");
+		btnTwo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AbstractDocument doc = (AbstractDocument) textPane.getDocument();
+				ArrayList<String> filePaths = MenuUtility.getFilePaths(mnuFile);
+
+				try {
+					doc.replace(0, doc.getLength(), "", null);
+					for (String filePath : filePaths) {
+						doc.insertString(doc.getLength(), filePath, null);
+					}
+				} catch (BadLocationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+
+				}
+			}
+		});
 		btnTwo.setPreferredSize(new Dimension(30, 20));
 		btnTwo.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnTwo);
-		
+
 		btnThree = new JButton("3");
 		btnThree.setPreferredSize(new Dimension(30, 20));
 		btnThree.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnThree);
-		
+
 		btnFour = new JButton("4");
 		btnFour.setPreferredSize(new Dimension(30, 20));
 		btnFour.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnFour);
-		
+
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setDividerSize(10);
 		splitPane.setOneTouchExpandable(true);
@@ -178,24 +219,24 @@ public class AddFilesToMenu {
 		gbc_splitPane.gridx = 0;
 		gbc_splitPane.gridy = 1;
 		frmTemplate.getContentPane().add(splitPane, gbc_splitPane);
-		
+
 		JSplitPane splitPane_1 = new JSplitPane();
 		splitPane.setRightComponent(splitPane_1);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane_1.setLeftComponent(scrollPane);
-		
-		JTextPane textPane = new JTextPane();
+
+		textPane = new JTextPane();
 		scrollPane.setViewportView(textPane);
 		splitPane_1.setDividerLocation(200);
 		splitPane.setDividerLocation(60);
 
 		JMenuBar menuBar = new JMenuBar();
 		frmTemplate.setJMenuBar(menuBar);
-		
+
 		mnuFile = new JMenu("File");
 		menuBar.add(mnuFile);
-		
+
 		JMenuItem mnuFileNew = new JMenuItem("New");
 		mnuFileNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -203,7 +244,7 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuFile.add(mnuFileNew);
-		
+
 		JMenuItem mnuFileOpen = new JMenuItem("Open...");
 		mnuFileOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -211,10 +252,10 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuFile.add(mnuFileOpen);
-		
+
 		JSeparator separator = new JSeparator();
 		mnuFile.add(separator);
-		
+
 		JMenuItem mnuFileSave = new JMenuItem("Save...");
 		mnuFileSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -222,7 +263,7 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuFile.add(mnuFileSave);
-		
+
 		JMenuItem mnuFileSaveAs = new JMenuItem("Save As...");
 		mnuFileSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -230,10 +271,10 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuFile.add(mnuFileSaveAs);
-		
+
 		JSeparator separator_2 = new JSeparator();
 		mnuFile.add(separator_2);
-		
+
 		JMenuItem mnuFilePrint = new JMenuItem("Print...");
 		mnuFilePrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -241,42 +282,40 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuFile.add(mnuFilePrint);
-		
+
 		JSeparator recentFilesStart = new JSeparator();
 		recentFilesStart.setVisible(false);
-		recentFilesStart.setName(MenuFilesUtility.RECENT_FILES_START);
+		recentFilesStart.setName(MenuUtility.RECENT_FILES_START);
 		mnuFile.add(recentFilesStart);
-		
+
 		JSeparator recentFileEnd = new JSeparator();
 		recentFileEnd.setVisible(false);
-		recentFileEnd.setName(MenuFilesUtility.RECENT_FILES_END);
+		recentFileEnd.setName(MenuUtility.RECENT_FILES_END);
 		mnuFile.add(recentFileEnd);
-		
+
 		JMenuItem mnuFileExit = new JMenuItem("Exit");
 		mnuFileExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doFileExit();
 			}
 		});
-		
-		
+
 		JMenuItem mnuFileEmptyRecentFiles = new JMenuItem("Empty Recent Files");
 		mnuFileEmptyRecentFiles.setVisible(false);
 		mnuFileEmptyRecentFiles.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				MenuFilesUtility.clearList(mnuFile);
+				MenuUtility.clearList(mnuFile);
 			}//
 		});
 		mnuFile.add(mnuFileEmptyRecentFiles);
-		
+
 		JSeparator separator_1 = new JSeparator();
 		mnuFile.add(separator_1);
 		mnuFile.add(mnuFileExit);
-		
-		
+
 		JMenu mnuEdit = new JMenu("Edit");
 		menuBar.add(mnuEdit);
-		
+
 		JMenuItem mnuEditCut = new JMenuItem("Cut");
 		mnuEditCut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -284,7 +323,7 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuEdit.add(mnuEditCut);
-		
+
 		JMenuItem mnuEditCopy = new JMenuItem("Copy");
 		mnuEditCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -292,7 +331,7 @@ public class AddFilesToMenu {
 			}
 		});
 		mnuEdit.add(mnuEditCopy);
-		
+
 		JMenuItem mnuEditPaste = new JMenuItem("Paste");
 		mnuEditPaste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -301,7 +340,6 @@ public class AddFilesToMenu {
 		});
 		mnuEdit.add(mnuEditPaste);
 
-		
 		frmTemplate.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
@@ -309,8 +347,9 @@ public class AddFilesToMenu {
 			}
 		});
 	}// initialize
-	
+
 	private static final String TITLE = "Add Files To Menu";
 	private JMenu mnuFile;
+	private JTextPane textPane;
 
 }// class GUItemplate
