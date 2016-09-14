@@ -6,19 +6,29 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
+
 import javax.swing.JFrame;
+
 import java.awt.GridBagLayout;
+
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
+
 import java.awt.GridBagConstraints;
+
 import javax.swing.JPanel;
+
 import java.awt.Insets;
+
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
+
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 
@@ -29,6 +39,7 @@ public class HexEditPanelDriver {
 	private JButton btnTwo;
 	private JButton btnThree;
 	private JButton btnFour;
+	private HexEditPanel hexEditPanel;
 
 	/**
 	 * Launch the application.
@@ -90,7 +101,7 @@ public class HexEditPanelDriver {
 
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPanelDriver.class);
-		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
+		frmTemplate.setSize(774, 532);
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;
 	}// appInit
@@ -125,16 +136,46 @@ public class HexEditPanelDriver {
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
 		
 		btnOne = new JButton("1");
+		btnOne.setToolTipText("Load file");
+		btnOne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				hexEditPanel.loadDocument(new File( "C:\\Users\\admin\\TestLogger08.log"));
+			}//actionPerformed
+		});
 		btnOne.setMaximumSize(new Dimension(30, 20));
 		btnOne.setPreferredSize(new Dimension(30, 20));
 		toolBar.add(btnOne);
 		
 		btnTwo = new JButton("2");
+		btnTwo.setToolTipText("Load byte array");
+		btnTwo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				byte[] core = new byte[]{ (byte) 0X00, (byte) 0X01, (byte) 0X02, (byte) 0X03,
+						 (byte) 0X04, (byte) 0X05, (byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B,
+						 (byte) 0X0C, (byte) 0X0D, (byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13,
+						 (byte) 0X14, (byte) 0X15, (byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B,
+						 (byte) 0X1C, (byte) 0X1D, (byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36,
+						 (byte) 0X01, (byte) 0X21, (byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE,
+						 (byte) 0X09, (byte) 0XD2, (byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E,
+						 (byte) 0X17, (byte) 0XC2, (byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00,
+						 (byte) 0X21, (byte) 0X48, (byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23,
+						 (byte) 0X46, (byte) 0X23, (byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA,
+						 (byte) 0X3F, (byte) 0X01, (byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70,
+						 (byte) 0X2B, (byte) 0X5E, (byte) 0X71, (byte) 0X2B, (byte) 0X72, (byte) 0X2B};
+				hexEditPanel.loadDocument(core,0X1100);
+			}//actionPerformed
+		});
 		btnTwo.setPreferredSize(new Dimension(30, 20));
 		btnTwo.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnTwo);
 		
 		btnThree = new JButton("3");
+		btnThree.setToolTipText("unLoadDocumen to file ");
+		btnThree.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				hexEditPanel.unLoadDocument(new File( "C:\\Users\\admin\\TestLoggerXX.log"));
+			}
+		});
 		btnThree.setPreferredSize(new Dimension(30, 20));
 		btnThree.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnThree);
@@ -153,6 +194,9 @@ public class HexEditPanelDriver {
 		gbc_splitPane.gridx = 0;
 		gbc_splitPane.gridy = 1;
 		frmTemplate.getContentPane().add(splitPane, gbc_splitPane);
+		
+		hexEditPanel = new HexEditPanel();
+		splitPane.setRightComponent(hexEditPanel);
 		splitPane.setDividerLocation(75);
 
 		JMenuBar menuBar = new JMenuBar();

@@ -25,104 +25,199 @@ import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Scanner;
+
+import javax.swing.SwingConstants;
 
 public class HexEditPanel extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+
 	private int addressSize;
+	private int startingAddress;
+	private long dataSize;
 
 	String addressFormat;
 	String dataFormat;;
-	String hexCharacterFormat;
+	String hexCharacterFormat = "%02X ";
 
-	public void loadDocument(byte[] sourceData) {
-		setFormats(sourceData.length);
+	public int getStartingAddress() {
+		return this.startingAddress;
+	}// getStartingAddress
+
+	public int getDataSize() {
+		return (int) this.dataSize;
+	}// getDataSize
+
+	public int unLoadDocument(File destinationFile) {
+		byte[] data = parseDocument(doc);
+		ByteBuffer dataOut = ByteBuffer.wrap(data);
+
+		try {
+			FileOutputStream fout = new FileOutputStream(destinationFile);
+			FileChannel fc = fout.getChannel();
+			fc.write(dataOut);
+			fc.close();
+			fout.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}//try block
+		return -1;
+	}//unLoadDocument
+
+	public byte[] unLoadDocument() {
+		return parseDocument(doc);
+	}//
+
+	private byte[] parseDocument(StyledDocument doc) {
+		byte[] thisData = new byte[(int) dataSize];
+		Scanner sc = null;
+		try {
+			sc = new Scanner(doc.getText(0, doc.getLength()));
+			int index = 0;
+			while (sc.hasNextLine()) {
+				sc.next();
+				while (sc.hasNextInt(16)) {
+					thisData[index++] = (byte) sc.nextInt(16);
+				}// while int
+				sc.nextLine();
+			}// while line
+			sc.close();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+
+		return thisData;
+	}
+
+	public void loadDocument(byte[] sourceData, int startingAddress) {
+		this.startingAddress = startingAddress;
+		this.dataSize = sourceData.length;
+		prepareDoc(doc, dataSize);
+		byte[] myBuff = new byte[BYTES_PER_LINE];
+		int srcPos = 0;
+		int bytesToRead = BYTES_PER_LINE;
+		int originalNumberOfBytes = sourceData.length;
+		int bytesRemaining = originalNumberOfBytes;
+
+		int bufferAddress = this.startingAddress;
+		while (bytesToRead == 16) {
+			bytesToRead = (bytesRemaining >= bytesToRead) ? BYTES_PER_LINE : bytesRemaining;
+			System.arraycopy(sourceData, srcPos, myBuff, 0, bytesToRead);
+			bufferAddress = processLine(myBuff, bytesToRead, bufferAddress);
+			// for (int i = 0; i < bytesToRead; i++) {
+			// System.out.printf("i: %d, myBuff: %02X%n", i, myBuff[i]);
+			// }// for
+			srcPos += bytesToRead;
+			bytesRemaining = originalNumberOfBytes - srcPos;
+
+		}// while
+		finishDoc(doc, bytesToRead);
 	}// loadDocument byte[]
 
 	public void loadDocument(File sourceFile) {
-		setFormats(sourceFile.length());
+		this.startingAddress = 0;
+		this.dataSize = sourceFile.length();
+		prepareDoc(doc, dataSize);
 		FileInputStream fin = null;
 
 		try {
 			fin = new FileInputStream(sourceFile);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			//
 			e.printStackTrace();
 		}// try
-
 		FileChannel sourceChannel = fin.getChannel();
-		ByteBuffer sourceBuffer = ByteBuffer.allocate(BYTES_PER_LINE);
+
+		byte[] sourceArray = new byte[BYTES_PER_LINE];
+		ByteBuffer sourceBuffer = ByteBuffer.wrap(sourceArray);
+		// ++++++
 
 		int bytesRead = 16;
-		// No address Bias with a File.
-		// int bufferAddress = addressBias;
-		int bufferAddress = 0;
-		;
-		// No address Bias with a File.
+		int bufferAddress = this.startingAddress;
 
-		StringBuilder sbData = new StringBuilder();
-		String bufferAddressStr = null;
-		String dataStr = null;
-		String asciiStr = null;
-
-		resetDocumentFilter(doc);
-		resetNavigationFilter();
-		clearDocument(doc);
-		// int lastData = 0;
 		while (bytesRead == 16) {
-			sbData.setLength(0);
 			try {
 				bytesRead = sourceChannel.read(sourceBuffer);
 				if (bytesRead == -1) {
 					break;
 				}// no need to add to the doc
-
-				for (int i = 0; i < bytesRead; i++) {
-					if ((i % 8) == 0) {
-						sbData.append(SPACE);
-					}// if data extra space
-					sbData.append(String.format(hexCharacterFormat, sourceBuffer.get(i)));
-				}// for
-
-				bufferAddressStr = String.format(addressFormat, bufferAddress);
-				dataStr = String.format(dataFormat, sbData.toString());
-				sourceBuffer.rewind();
-				asciiStr = getASCII(sourceBuffer, bytesRead);
-
-				doc.insertString(doc.getLength(), bufferAddressStr, addressAttributes);
-				doc.insertString(doc.getLength(), dataStr, dataAttributes);
-				doc.insertString(doc.getLength(), asciiStr, asciiAttributes);
-
-				// System.out.printf("%s", bufferAddressStr);
-				// System.out.printf("%s", dataStr);
-				// System.out.printf("%s", asciiStr);
-
+				bufferAddress = processLine(sourceArray, bytesRead, bufferAddress);
 				sourceBuffer.clear();
-				bufferAddress += bytesRead;
-			} catch (IOException | BadLocationException e) {
-				// TODO Auto-generated catch block
+			} catch (IOException e) {
+				//
 				e.printStackTrace();
 			}// try read
 		}// while
+			// System.out.printf("bytesRead: %d  ", bytesRead);
+		finishDoc(doc, bytesRead);
+	}// loadDocument
+
+	private void finishDoc(StyledDocument doc, int bytesRead) {
 		setDocumentFilter(doc);
 		setNavigationFilter(doc, bytesRead);
 		textPane.setCaretPosition(0);
-		// System.out.printf("bytesRead: %d  ", bytesRead);
-	}// loadDocument
+	}// finishDoc
+
+	private void prepareDoc(StyledDocument doc, long srcSize) {
+		setFormats(srcSize);
+		resetDocumentFilter(doc);
+		resetNavigationFilter();
+		clearDocument(doc);
+
+	}
+
+	private int processLine(byte[] rawData, int bytesRead, int bufferAddress) {//
+		StringBuilder sbData = new StringBuilder();
+		for (int i = 0; i < bytesRead; i++) {
+			if ((i % 8) == 0) {
+				sbData.append(SPACE);
+			}// if data extra space
+				// sbData.append(String.format(hexCharacterFormat, sourceBuffer.get(i)));
+			sbData.append(String.format(hexCharacterFormat, rawData[i]));
+			// System.out.printf("sourceArray[%2d]: %02X%n", i, rawData[i]);
+		}// for
+
+		String bufferAddressStr = String.format(addressFormat, bufferAddress);
+		String dataStr = String.format(dataFormat, sbData.toString());
+		// sourceBuffer.rewind();
+		String asciiStr = getASCII(rawData, bytesRead);
+
+		try {
+			doc.insertString(doc.getLength(), bufferAddressStr, addressAttributes);
+			doc.insertString(doc.getLength(), dataStr, dataAttributes);
+			doc.insertString(doc.getLength(), asciiStr, asciiAttributes);
+		} catch (BadLocationException e) {
+			//
+			e.printStackTrace();
+		}
+
+		// System.out.printf("%s", bufferAddressStr);
+		// System.out.printf("%s", dataStr);
+		// System.out.printf("%s", asciiStr);
+
+		// sourceBuffer.clear();
+		return bufferAddress += bytesRead;
+
+	}
 
 	private void setFormats(long addSize) {
 		adjustAddressSize(addSize);
 		addressFormat = "%0" + this.addressSize + "X: ";
 		dataFormat = "%-" + ((BYTES_PER_LINE * 3) + 2) + "s";
-		hexCharacterFormat = "%02X ";
 	}
 
-	private String getASCII(ByteBuffer sourceBuffer, int size) {
+	private String getASCII(byte[] rawData, int size) {
 		StringBuilder sbASCII = new StringBuilder(ASCII_DATA_SEPARATOR);
 		char c;
 		for (int i = 0; i < size; i++) {
-			c = (char) sourceBuffer.get(i);
+			c = (char) rawData[i];
 			sbASCII.append((c >= 0X20) && (c <= 0X7F) ? c : NON_PRINTABLE_CHAR);
 		}// for
 		sbASCII.append(System.lineSeparator());
@@ -203,7 +298,7 @@ public class HexEditPanel extends JPanel {
 		try {
 			doc.remove(0, doc.getLength());
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
+			//
 			e.printStackTrace();
 		}
 	}// clearDocument
@@ -239,7 +334,7 @@ public class HexEditPanel extends JPanel {
 	 */
 	public void initialize() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 750 };
+		gridBagLayout.columnWidths = new int[] { 770 };
 		gridBagLayout.rowWeights = new double[] { 1.0 };
 		gridBagLayout.columnWeights = new double[] { 0.0 };
 		setLayout(gridBagLayout);
@@ -254,8 +349,10 @@ public class HexEditPanel extends JPanel {
 		textPane = new JTextPane();
 		scrollPane.setViewportView(textPane);
 
-		lblNewLabel = new JLabel("0000:   01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F   12234567 890abcdef");
-		lblNewLabel.setFont(new Font("Courier New", Font.PLAIN, 17));
+		lblNewLabel = new JLabel("       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ");
+		lblNewLabel.setForeground(new Color(135, 206, 235));
+		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNewLabel.setFont(new Font("Courier New", Font.BOLD, 16));
 		scrollPane.setColumnHeaderView(lblNewLabel);
 	}// initialize
 
