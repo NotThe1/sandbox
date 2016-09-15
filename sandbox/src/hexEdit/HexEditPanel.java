@@ -42,7 +42,7 @@ public class HexEditPanel extends JPanel {
 	private long dataSize;
 
 	String addressFormat;
-	String dataFormat;;
+	String dataFormat = "%-" + ((BYTES_PER_LINE * 3) + 2) + "s";
 	String hexCharacterFormat = "%02X ";
 
 	public int getStartingAddress() {
@@ -210,8 +210,7 @@ public class HexEditPanel extends JPanel {
 	private void setFormats(long addSize) {
 		adjustAddressSize(addSize);
 		addressFormat = "%0" + this.addressSize + "X: ";
-		dataFormat = "%-" + ((BYTES_PER_LINE * 3) + 2) + "s";
-	}
+	}//setFormats
 
 	private String getASCII(byte[] rawData, int size) {
 		StringBuilder sbASCII = new StringBuilder(ASCII_DATA_SEPARATOR);
@@ -228,12 +227,16 @@ public class HexEditPanel extends JPanel {
 		int addressSizeCurrent = this.addressSize;
 		if (size <= ADDRESS_4_MAX) {
 			setAddressSize(Math.max(ADDRESS_4, addressSizeCurrent));
+			lblDocHeader.setText(DOC_HEADER);
 		} else if (size <= ADDRESS_6_MAX) {
 			setAddressSize(Math.max(ADDRESS_6, addressSizeCurrent));
+			lblDocHeader.setText(SPACE + SPACE  + DOC_HEADER);
 		} else if (size <= ADDRESS_8_MAX) {
 			setAddressSize(Math.max(ADDRESS_8, addressSizeCurrent));
+			lblDocHeader.setText(SPACE + SPACE + SPACE + SPACE + DOC_HEADER);
 		} else {
 			this.addressSize = ADDRESS_4;
+			lblDocHeader.setText(DOC_HEADER);
 		}// if fileSize
 	}// adjustAddressSize
 
@@ -336,7 +339,7 @@ public class HexEditPanel extends JPanel {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 770 };
 		gridBagLayout.rowWeights = new double[] { 1.0 };
-		gridBagLayout.columnWeights = new double[] { 0.0 };
+		gridBagLayout.columnWeights = new double[] { 1.0 };
 		setLayout(gridBagLayout);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -349,14 +352,14 @@ public class HexEditPanel extends JPanel {
 		textPane = new JTextPane();
 		scrollPane.setViewportView(textPane);
 
-		lblNewLabel = new JLabel("       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ");
-		lblNewLabel.setForeground(new Color(135, 206, 235));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNewLabel.setFont(new Font("Courier New", Font.BOLD, 16));
-		scrollPane.setColumnHeaderView(lblNewLabel);
+		lblDocHeader = new JLabel(DOC_HEADER);
+		lblDocHeader.setForeground(new Color(135, 206, 235));
+		lblDocHeader.setHorizontalAlignment(SwingConstants.LEFT);
+		lblDocHeader.setFont(new Font("Courier New", Font.BOLD, 16));
+		scrollPane.setColumnHeaderView(lblDocHeader);
 	}// initialize
 
-	private JLabel lblNewLabel;
+	private JLabel lblDocHeader;
 	private SimpleAttributeSet addressAttributes;
 	private SimpleAttributeSet dataAttributes;
 	private SimpleAttributeSet asciiAttributes;
@@ -369,6 +372,7 @@ public class HexEditPanel extends JPanel {
 	private static final String NON_PRINTABLE_CHAR = ".";
 	private static final int BYTES_PER_LINE = 16;
 	private static final int DEFAULT_ADDRESS_SIZE = 4;
+	private static final String DOC_HEADER = "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ";
 
 	private static final int ADDRESS_4 = 4;
 	private static final int ADDRESS_6 = 6;
