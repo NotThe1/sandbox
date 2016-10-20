@@ -1,10 +1,14 @@
 package reflectionStuff;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -12,24 +16,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.prefs.Preferences;
 
-import javax.swing.JFrame;
-
-import java.awt.GridBagLayout;
-
 import javax.swing.Icon;
-import javax.swing.JMenuBar;
-import javax.swing.JButton;
-
-import java.awt.GridBagConstraints;
-
 import javax.swing.ImageIcon;
-
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import java.awt.Color;
 
 
 public class Reflec1 {
@@ -66,7 +59,7 @@ public class Reflec1 {
 		myPrefs = null;
 	}
 
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(Reflec1.class);
 		frmReflec.setSize(435,512);
