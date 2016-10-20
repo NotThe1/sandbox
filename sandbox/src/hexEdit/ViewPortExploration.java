@@ -49,10 +49,12 @@ public class ViewPortExploration {
 	private JSpinner spinner1;
 	private JSpinner spinner2;
 	private JSpinner spinner3;
-//	private String fontName = "Arielcc";
-//	private String fontName = "Courier New";
-//	private String fontName = "Tahoma";
+	// private String fontName = "Arielcc";
+	// private String fontName = "Courier New";
+	// private String fontName = "Tahoma";
 	private String fontName;
+	private JLabel lblFontName;
+
 	/**
 	 * Launch the application.
 	 */
@@ -101,7 +103,12 @@ public class ViewPortExploration {
 	}// doEditCut
 
 	private void doEditCopy() {
-
+		JFontChooser fontChooser = new JFontChooser();
+		int result = fontChooser.showDialog(null);
+		if (result == JFontChooser.OK_OPTION) {
+			Font font = fontChooser.getSelectedFont();
+			System.out.println("Selected Font : " + font);
+		}
 	}// doEditCopy
 
 	private void doEditPaste() {
@@ -118,34 +125,47 @@ public class ViewPortExploration {
 		myPrefs.putInt("LocY", point.y);
 		myPrefs = null;
 	}// appClose
-	
-	private void calcViewDim(JTextPane textPane,JScrollPane scrollPane){
+
+	private void calcViewDim(JTextPane textPane, JScrollPane scrollPane) {
 		
+		scrollPane.getVerticalScrollBar().setValue(0);
+
 		logPane.setText(null);
-		textPane.setFont(new Font("Tahoma", Font.PLAIN, (int) spinner2.getValue()));
+//		textPane.setFont(new Font("Tahoma", Font.PLAIN, (int) spinner2.getValue()));
+		
+		lblFontName.setText(textPane.getFont().getName());
 		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-		Font font = textPane.getFont(); 
+		Font font = textPane.getFont();
 		
-		String msg = String.format("Font size = %d%n%n", font.getSize());
+//		spinner2.setValue(font.getSize());
+
+		String msg = String.format("<-------------------------------------------------------------->%n%n");
 		logPane.append(msg);
 		
+		 msg = String.format("Font Name = %s%n%n", font.getFontName());
+		logPane.append(msg);
+		
+		 msg = String.format("Font size = %d%n%n", font.getSize());
+		logPane.append(msg);
+
 		textPane.getFontMetrics(font).getHeight();
-		msg = String.format("textPane.getFontMetrics(font).getHeight() = %d%n%n", textPane.getFontMetrics(font).getHeight());
+		msg = String.format("...(font).getHeight() = %d%n%n",textPane.getFontMetrics(font).getHeight());
 		logPane.append(msg);
-		
-		 msg = String.format("scrollBar.getValue() = %d%n", scrollBar.getValue());
-		logPane.append(msg);
-		
-		 msg = String.format("scrollBar.getMaximum() = %d%n%n", scrollBar.getMaximum());
-		logPane.append(msg);
-		
-		 msg = String.format("scrollBar.getVisibleAmount() = %d%n", scrollBar.getVisibleAmount());
-		logPane.append(msg);
-		
-//		 msg = String.format("scrollPane.getViewport().getHeight() = %d%n", scrollPane.getViewport().getHeight());
+
+//		msg = String.format("scrollBar.getValue() = %d%n", scrollBar.getValue());
 //		logPane.append(msg);
-//		
-		
+
+		msg = String.format("scrollBar.getMaximum() = %d%n%n", scrollBar.getMaximum());
+		logPane.append(msg);
+
+//		msg = String.format("scrollBar.getVisibleAmount() = %d%n", scrollBar.getVisibleAmount());
+//		logPane.append(msg);
+
+		// msg = String.format("scrollPane.getViewport().getHeight() = %d%n",
+		// scrollPane.getViewport().getHeight());
+		// logPane.append(msg);
+		//
+
 	}
 
 	private void appInit() {
@@ -155,7 +175,7 @@ public class ViewPortExploration {
 		myPrefs = null;
 
 		doc = textPane.getStyledDocument();
-//		String aLine;
+		// String aLine;
 		try {
 			doc.remove(0, doc.getLength());
 			for (int i = 0; i < 1000; i++) {
@@ -165,8 +185,7 @@ public class ViewPortExploration {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
+//		calcViewDim(textPane, scrollPane);
 	}// appInit
 
 	public ViewPortExploration() {
@@ -188,6 +207,14 @@ public class ViewPortExploration {
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		frmTemplate.getContentPane().setLayout(gridBagLayout);
+		
+		lblFontName = new JLabel("New label");
+		GridBagConstraints gbc_lblFontName = new GridBagConstraints();
+		gbc_lblFontName.anchor = GridBagConstraints.SOUTHWEST;
+		gbc_lblFontName.insets = new Insets(0, 0, 5, 5);
+		gbc_lblFontName.gridx = 0;
+		gbc_lblFontName.gridy = 1;
+		frmTemplate.getContentPane().add(lblFontName, gbc_lblFontName);
 
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
@@ -203,10 +230,7 @@ public class ViewPortExploration {
 		btnOne.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				fontName = textPane.getFont().getFontName();
-				textPane.setFont(new Font(fontName, Font.PLAIN, (int) spinner2.getValue()));
-				calcViewDim( textPane, scrollPane);				
-				calcViewDim( textPane, scrollPane);				
+				calcViewDim(textPane, scrollPane);
 			}
 		});
 		btnOne.setMaximumSize(new Dimension(30, 20));
@@ -230,7 +254,8 @@ public class ViewPortExploration {
 		btnThree.setToolTipText("New Font");
 		btnThree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textPane.setFont(new Font(fontName, Font.PLAIN, (int) spinner2.getValue()));
+				Font font = textPane.getFont();
+				textPane.setFont(new Font(font.getFontName(), font.getStyle(), (int) spinner2.getValue()));
 			}
 		});
 		btnThree.setPreferredSize(new Dimension(30, 20));
@@ -238,10 +263,43 @@ public class ViewPortExploration {
 		toolBar.add(btnThree);
 
 		btnFour = new JButton("4");
+		btnFour.setToolTipText("Change Font");
+		btnFour.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				javax.swing.SwingUtilities.invokeLater(new Runnable(){
+					public void run(){
+						Font font = null;
+						JFontChooser fontChooser = new JFontChooser();
+						int result = fontChooser.showDialog(null);
+						if (result == JFontChooser.OK_OPTION) {
+							 font = fontChooser.getSelectedFont();
+							//System.out.println("Selected Font : " + font);
+							textPane.setFont(font);
+							textPane.repaint();
+							calcViewDim(textPane, scrollPane);
+							
+						}//if
+
+					}
+				});
+//				Font font = null;;
+//				JFontChooser fontChooser = new JFontChooser();
+//				int result = fontChooser.showDialog(null);
+//				if (result == JFontChooser.OK_OPTION) {
+//					 font = fontChooser.getSelectedFont();
+//					System.out.println("Selected Font : " + font);
+//					textPane.setFont(font);
+//					textPane.repaint();
+//					calcViewDim(textPane, scrollPane);
+//					
+//				}//if
+				
+			}//actionPerformed
+		});
 		btnFour.setPreferredSize(new Dimension(30, 20));
 		btnFour.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnFour);
-		
+
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.insets = new Insets(0, 0, 5, 5);
@@ -250,12 +308,12 @@ public class ViewPortExploration {
 		gbc_panel.gridy = 2;
 		frmTemplate.getContentPane().add(panel, gbc_panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0};
-		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.columnWidths = new int[] { 0, 0, 0 };
+		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_panel.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
-		
+
 		spinner1 = new JSpinner();
 		spinner1.setPreferredSize(new Dimension(50, 20));
 		GridBagConstraints gbc_spinner1 = new GridBagConstraints();
@@ -264,14 +322,14 @@ public class ViewPortExploration {
 		gbc_spinner1.gridx = 0;
 		gbc_spinner1.gridy = 1;
 		panel.add(spinner1, gbc_spinner1);
-		
+
 		JLabel lblBarPosition = new JLabel("Bar position");
 		GridBagConstraints gbc_lblBarPosition = new GridBagConstraints();
 		gbc_lblBarPosition.insets = new Insets(0, 0, 5, 0);
 		gbc_lblBarPosition.gridx = 1;
 		gbc_lblBarPosition.gridy = 1;
 		panel.add(lblBarPosition, gbc_lblBarPosition);
-		
+
 		spinner2 = new JSpinner();
 		spinner2.setModel(new SpinnerNumberModel(new Integer(5), new Integer(5), null, new Integer(1)));
 		spinner2.setPreferredSize(new Dimension(50, 20));
@@ -281,14 +339,14 @@ public class ViewPortExploration {
 		gbc_spinner2.gridx = 0;
 		gbc_spinner2.gridy = 2;
 		panel.add(spinner2, gbc_spinner2);
-		
+
 		JLabel lblFontSize = new JLabel("Font Size");
 		GridBagConstraints gbc_lblFontSize = new GridBagConstraints();
 		gbc_lblFontSize.insets = new Insets(0, 0, 5, 0);
 		gbc_lblFontSize.gridx = 1;
 		gbc_lblFontSize.gridy = 2;
 		panel.add(lblFontSize, gbc_lblFontSize);
-		
+
 		spinner3 = new JSpinner();
 		spinner3.setPreferredSize(new Dimension(50, 20));
 		GridBagConstraints gbc_spinner3 = new GridBagConstraints();
@@ -296,12 +354,12 @@ public class ViewPortExploration {
 		gbc_spinner3.gridx = 0;
 		gbc_spinner3.gridy = 3;
 		panel.add(spinner3, gbc_spinner3);
-		
+
 		logPane = new JTextArea();
 		logPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(arg0.getClickCount()>1){
+				if (arg0.getClickCount() > 1) {
 					logPane.setText(null);
 				}
 			}
@@ -322,15 +380,15 @@ public class ViewPortExploration {
 		frmTemplate.getContentPane().add(scrollPane, gbc_scrollPane);
 
 		textPane = new JTextPane();
-		textPane.setFont(new Font("Symbol", Font.PLAIN, 94));
+		textPane.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		scrollPane.setViewportView(textPane);
 
 		JLabel lblColumnHeader = new JLabel("Column Header");
 		lblColumnHeader.setHorizontalAlignment(SwingConstants.CENTER);
-//		scrollPane.setColumnHeaderView(lblColumnHeader);
+		// scrollPane.setColumnHeaderView(lblColumnHeader);
 
 		JLabel lblRowHeader = new JLabel("Row Header");
-//		scrollPane.setRowHeaderView(lblRowHeader);
+		// scrollPane.setRowHeaderView(lblRowHeader);
 
 		JMenuBar menuBar = new JMenuBar();
 		frmTemplate.setJMenuBar(menuBar);
