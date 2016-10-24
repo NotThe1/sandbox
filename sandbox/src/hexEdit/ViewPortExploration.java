@@ -15,6 +15,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
+import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,7 +37,7 @@ import javax.swing.text.StyledDocument;
 
 public class ViewPortExploration {
 
-	private StyledDocument doc;
+	private StyledDocument doc ;
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -190,6 +191,7 @@ public class ViewPortExploration {
 			doc.remove(0, doc.getLength());
 			for (int i = 0; i < numberOfRows; i++) {
 				doc.insertString(doc.getLength(), String.format("%04d%n", i+1), null);
+//				doc.insertString(doc.getLength(), String.format("%n", i+1), null);
 			}
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -330,6 +332,21 @@ public class ViewPortExploration {
 		button5.setPreferredSize(new Dimension(30, 20));
 		button5.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(button5);
+		
+		JButton button = new JButton("6");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				BoundedRangeModel model = scrollPane.getVerticalScrollBar().getModel();
+				Font font = textPane.getFont();
+
+				int fontHeight = textPane.getFontMetrics(font).getHeight();
+				model.setMaximum((int)spinner3.getValue() * fontHeight);
+			}
+		});
+		button.setToolTipText("Set Bar Model");
+		button.setPreferredSize(new Dimension(30, 20));
+		button.setMaximumSize(new Dimension(30, 20));
+		toolBar.add(button);
 
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
