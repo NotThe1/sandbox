@@ -598,14 +598,14 @@ public class TestScrollBehavior implements AdjustmentListener {
 		Adjustable source = evt.getAdjustable();
 		if (evt.getValueIsAdjusting()) {
 			return;
-		}
+		}//if
 
 		int orient = source.getOrientation();
 		if (orient == Adjustable.HORIZONTAL) {
 			System.out.println("from horizontal scrollbar");
 		} else {
 			System.out.println("from vertical scrollbar");
-		}
+		}//if Orientation
 		
 		 int type = evt.getAdjustmentType();
 		    switch (type) {
@@ -624,10 +624,9 @@ public class TestScrollBehavior implements AdjustmentListener {
 		    case AdjustmentEvent.TRACK:
 		      System.out.println("The knob on the scrollbar was dragged");
 		      break;
-		    }
-		
+		    }//switch
 		
 
-	}
+	}//adjustmentValueChanged
 
 }// class GUItemplate

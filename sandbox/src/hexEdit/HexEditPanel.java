@@ -1,27 +1,9 @@
 package hexEdit;
 
 import java.awt.Color;
-import java.awt.GridBagLayout;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import java.awt.GridBagConstraints;
-
-import javax.swing.JTextPane;
-import javax.swing.JLabel;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import utilities.HexEditDocumentFilter;
-import utilities.HexEditNavigationFilter;
-
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +13,21 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import utilities.HexEditDocumentFilter;
+import utilities.HexEditNavigationFilter;
 
 public class HexEditPanel extends JPanel {
 
@@ -352,7 +348,7 @@ public class HexEditPanel extends JPanel {
 		textPane = new JTextPane();
 		scrollPane.setViewportView(textPane);
 
-		lblDocHeader = new JLabel(DOC_HEADER);
+		lblDocHeader = new JLabel("       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ");
 		lblDocHeader.setForeground(new Color(135, 206, 235));
 		lblDocHeader.setHorizontalAlignment(SwingConstants.LEFT);
 		lblDocHeader.setFont(new Font("Courier New", Font.BOLD, 16));
