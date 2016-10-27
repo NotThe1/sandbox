@@ -334,6 +334,8 @@ public class NoScrollPane implements AdjustmentListener {
 		scrollBar.addAdjustmentListener(this);
 	}// appInit
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
 	public NoScrollPane() {
 		initialize();
 		appInit();

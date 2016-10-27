@@ -31,6 +31,7 @@ public class HexEditPanelSBDriver {
 	private JButton btnThree;
 	private JButton btnFour;
 	private JSplitPane splitPane1;
+	byte[] source;
 
 	/**
 	 * Launch the application.
@@ -125,7 +126,7 @@ public class HexEditPanelSBDriver {
 	/* Standard Stuff */
 
 	private void doBtnOne() {
-
+		hexEditPanel.loadDocument(core);
 	}// doBtnOne
 
 	private void doBtnTwo() {
@@ -197,8 +198,14 @@ public class HexEditPanelSBDriver {
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
-
-		hexEditPanel.loadDocument(core);
+		int sourceSize =(66 * 1024) -1;
+		source = new byte[sourceSize];
+		
+		for (int i = 0; i < sourceSize; i++){
+			source[i] = (byte) (i % 256);
+		}//for
+		hexEditPanel.loadDocument(source);
+//		hexEditPanel.loadDocument(core);
 		
 	}// appInit
 
