@@ -8,8 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.nio.ByteBuffer;
 
 import javax.swing.BoundedRangeModel;
@@ -20,12 +20,15 @@ import javax.swing.JScrollBar;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class HexEditPanelSB extends JPanel implements AdjustmentListener {
+import utilities.HexEditNavigationFilter;
+
+public class HexEditPanelSB extends JPanel implements AdjustmentListener,ComponentListener {
 	private ByteBuffer source;
 	private static int currentLineStart;
 	private int currentMax;
@@ -168,10 +171,36 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 
 	private void prepareDoc(StyledDocument doc, long srcSize) {
 		setFormats(srcSize);
-		// resetDocumentFilter(doc);
-		// resetNavigationFilter();
+		 resetDocumentFilter(doc);
+		 resetNavigationFilter();
 		// clearDocument(doc);
 	}// prepareDoc
+	
+	private void resetDocumentFilter(StyledDocument doc) {
+		((AbstractDocument) doc).setDocumentFilter(null);
+	}// resetDocumentFilter
+
+	private void setDocumentFilter(StyledDocument doc) {
+		
+		// System.out.printf("[setDocumentFilter]\t0 address end = %d %n", addressEnd);
+		// System.out.printf("[setDocumentFilter]\t1 data end = %d %n", dataEnd);
+		// System.out.printf("[setDocumentFilter]\t1 ASCII end = %d %n", asciiEnd);
+
+		HexEditDocumentFilterSB hexFilter = new HexEditDocumentFilterSB(doc, addressSize);
+		hexFilter.setAsciiAttributes(asciiAttributes);
+		hexFilter.setDataAttributes(dataAttributes);
+		((AbstractDocument) doc).setDocumentFilter(hexFilter);
+	}// setDocumentFilter
+
+	private void resetNavigationFilter() {
+		textPane.setNavigationFilter(null);
+	}// resetDocumentFilter
+
+	private void setNavigationFilter(StyledDocument doc, int lastDataCount) {
+		HexEditNavigationFilter hexNavigationFilter = new HexEditNavigationFilter(doc, lastDataCount);
+		textPane.setNavigationFilter(hexNavigationFilter);
+	}// resetDocumentFilter
+
 
 	public void loadDocument(byte[] sourceArray) {
 		this.source = ByteBuffer.wrap(sourceArray);
@@ -187,6 +216,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 				fillPane();
 			}// run
 		});
+		setDocumentFilter(doc);
 	}// loadDocument
 
 	private void setExtent(int amount, BoundedRangeModel model) {
@@ -221,6 +251,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 				setMax(max, model);
 				setValue(0, model);
 				setExtent(extent, model);
+				scrollBar.setBlockIncrement(extent-2);
 				// -
 //				System.out.printf("Max = %d%n", model.getMaximum());
 //				System.out.printf("Min = %d%n", model.getMinimum());
@@ -307,14 +338,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 		add(lblDocHeader, gbc_lblDocHeader);
 
 		textPane = new JTextPane();
-		textPane.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent arg0) {
-				// logMessage("Resized",1);
-				setUpScrollBar();
-				fillPane();
-			}
-		});
+		textPane.addComponentListener(this);
+
 		textPane.setFont(new Font("Courier New", Font.PLAIN, 16));
 		GridBagConstraints gbc_textPane = new GridBagConstraints();
 		gbc_textPane.insets = new Insets(0, 0, 0, 5);
@@ -335,7 +360,15 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 		gbc_scrollBar.gridy = 1;
 		add(scrollBar, gbc_scrollBar);
 
-	}
+	}//initialize
+	
+	@Override
+	public void componentResized(ComponentEvent comonentEvent) {
+		setUpScrollBar();
+		fillPane();
+	}//componentResized
+
+
 
 	@Override
 	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
@@ -356,7 +389,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 
 	}// adjustmentValueChanged
 
-	private static final int BYTES_PER_LINE = 16;
+	public static final int BYTES_PER_LINE = 16;
 	private static final String SPACE = " ";
 	private static final String ASCII_DATA_SEPARATOR = SPACE + SPACE;
 	private static final String NON_PRINTABLE_CHAR = ".";
@@ -372,5 +405,20 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener {
 
 	private static final String DOC_HEADER = "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ";
 	private JLabel lblDocHeader_1;
+
+	@Override
+	public void componentHidden(ComponentEvent arg0) {
+		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void componentShown(ComponentEvent arg0) {
+		// TODO Auto-generated method stub	
+	}
 
 }// class HexEditPanelSB

@@ -24,6 +24,8 @@ import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
 
 public class HexEditPanelSBDriver {
+	
+	int sourceSize =(16 * 1024) -9;
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -31,7 +33,8 @@ public class HexEditPanelSBDriver {
 	private JButton btnThree;
 	private JButton btnFour;
 	private JSplitPane splitPane1;
-	byte[] source;
+	private byte[] source;
+	private HexEditPanelSB hexEditPanel;
 
 	/**
 	 * Launch the application.
@@ -49,68 +52,6 @@ public class HexEditPanelSBDriver {
 		});
 	}// main
 
-	byte[] core = new byte[] { (byte) 0X00, (byte) 0X01, (byte) 0X02, (byte) 0X03, (byte) 0X04, (byte) 0X05,
-			(byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B, (byte) 0X0C, (byte) 0X0D,
-			(byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13, (byte) 0X14, (byte) 0X15,
-			(byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B, (byte) 0X1C, (byte) 0X1D,
-			(byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36, (byte) 0X01, (byte) 0X21,
-			(byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE, (byte) 0X09, (byte) 0XD2,
-			(byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E, (byte) 0X17, (byte) 0XC2,
-			(byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00, (byte) 0X21, (byte) 0X48,
-			(byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23, (byte) 0X46, (byte) 0X23,
-			(byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA, (byte) 0X3F, (byte) 0X01,
-			(byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70, (byte) 0X2B, (byte) 0X5E,
-			(byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B, (byte) 0X0C, (byte) 0X0D,
-			(byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13, (byte) 0X14, (byte) 0X15,
-			(byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B, (byte) 0X1C, (byte) 0X1D,
-			(byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36, (byte) 0X01, (byte) 0X21,
-			(byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE, (byte) 0X09, (byte) 0XD2,
-			(byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E, (byte) 0X17, (byte) 0XC2,
-			(byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00, (byte) 0X21, (byte) 0X48,
-			(byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23, (byte) 0X46, (byte) 0X23,
-			(byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA, (byte) 0X3F, (byte) 0X01,
-			(byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70, (byte) 0X2B, (byte) 0X5E,
-			(byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B, (byte) 0X0C, (byte) 0X0D,
-			(byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13, (byte) 0X14, (byte) 0X15,
-			(byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B, (byte) 0X1C, (byte) 0X1D,
-			(byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36, (byte) 0X01, (byte) 0X21,
-			(byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE, (byte) 0X09, (byte) 0XD2,
-			(byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E, (byte) 0X17, (byte) 0XC2,
-			(byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00, (byte) 0X21, (byte) 0X48,
-			(byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23, (byte) 0X46, (byte) 0X23,
-			(byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA, (byte) 0X3F, (byte) 0X01,
-			(byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70, (byte) 0X2B, (byte) 0X5E,
-			(byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B, (byte) 0X0C, (byte) 0X0D,
-			(byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13, (byte) 0X14, (byte) 0X15,
-			(byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B, (byte) 0X1C, (byte) 0X1D,
-			(byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36, (byte) 0X01, (byte) 0X21,
-			(byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE, (byte) 0X09, (byte) 0XD2,
-			(byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E, (byte) 0X17, (byte) 0XC2,
-			(byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00, (byte) 0X21, (byte) 0X48,
-			(byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23, (byte) 0X46, (byte) 0X23,
-			(byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA, (byte) 0X3F, (byte) 0X01,
-			(byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70, (byte) 0X2B, (byte) 0X5E,
-			(byte) 0X06, (byte) 0X07, (byte) 0X08, (byte) 0X09, (byte) 0X0A, (byte) 0X0B, (byte) 0X0C, (byte) 0X0D,
-			(byte) 0X0E, (byte) 0X0F, (byte) 0X10, (byte) 0X11, (byte) 0X12, (byte) 0X13, (byte) 0X14, (byte) 0X15,
-			(byte) 0X16, (byte) 0X17, (byte) 0X18, (byte) 0X19, (byte) 0X1A, (byte) 0X1B, (byte) 0X1C, (byte) 0X1D,
-			(byte) 0X1E, (byte) 0X1F, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X36, (byte) 0X01, (byte) 0X21,
-			(byte) 0X47, (byte) 0X01, (byte) 0X36, (byte) 0X00, (byte) 0X7E, (byte) 0XFE, (byte) 0X09, (byte) 0XD2,
-			(byte) 0X19, (byte) 0X01, (byte) 0X21, (byte) 0X46, (byte) 0X01, (byte) 0X7E, (byte) 0X17, (byte) 0XC2,
-			(byte) 0X00, (byte) 0X01, (byte) 0XFF, (byte) 0X5F, (byte) 0X16, (byte) 0X00, (byte) 0X21, (byte) 0X48,
-			(byte) 0X01, (byte) 0X19, (byte) 0X19, (byte) 0X4E, (byte) 0X79, (byte) 0X23, (byte) 0X46, (byte) 0X23,
-			(byte) 0X96, (byte) 0X57, (byte) 0X78, (byte) 0X23, (byte) 0X9E, (byte) 0XDA, (byte) 0X3F, (byte) 0X01,
-			(byte) 0XB2, (byte) 0XCA, (byte) 0X3F, (byte) 0X01, (byte) 0X56, (byte) 0X70, (byte) 0X2B, (byte) 0X5E,
-			(byte) 0X71, (byte) 0X2B, (byte) 0X72, (byte) 0X2B };
-	
-	
-	
-	
-	
-	
-	
-	
-	private HexEditPanelSB hexEditPanel;
-
 	private void logMessage(String label, String message) {
 		String msg = String.format(label + " = %s%n", message);
 		System.out.println(msg);
@@ -126,7 +67,7 @@ public class HexEditPanelSBDriver {
 	/* Standard Stuff */
 
 	private void doBtnOne() {
-		hexEditPanel.loadDocument(core);
+		
 	}// doBtnOne
 
 	private void doBtnTwo() {
@@ -198,7 +139,7 @@ public class HexEditPanelSBDriver {
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
-		int sourceSize =(66 * 1024) -1;
+		
 		source = new byte[sourceSize];
 		
 		for (int i = 0; i < sourceSize; i++){
