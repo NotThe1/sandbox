@@ -13,38 +13,42 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 //	public HexEditDocumentFilter() {
 //		// TODO Auto-generated constructor stub
 //	}
-	StyledDocument doc;
-	int addressEnd, dataEnd, asciiEnd;
-	int row, column, elementPosition;
-	boolean isAddress, isData, isASCII;
-	boolean isInsert;
-	Pattern hexPattern;
-	int[] columnTypeTable;
-	Integer[] dataToAsciiTable;
+	private StyledDocument doc;
+	private int  dataEnd, asciiEnd;//addressEnd,
+	private int row, column, elementPosition;
+	private boolean isAddress, isData, isASCII;
+	private boolean isInsert;
+	private Pattern hexPattern;
+	private int[] columnTypeTable;
+	private Integer[] dataToAsciiTable;
 
-	AttributeSet attrData;
-	AttributeSet attrASCII;
+	private AttributeSet attrData;
+	private AttributeSet attrASCII;
 	
-	public HexEditDocumentFilterSB(StyledDocument doc, int addressSize){
+	private HexEditMetrics hexMetrics;
+	
+	public HexEditDocumentFilterSB(StyledDocument doc, HexEditMetrics hexMetrics){
 		this.doc = doc;
+		this.hexMetrics= hexMetrics;
+		
 		this.attrData = null;
 		this.attrASCII = null;
-		this.addressEnd = addressSize + 2;
-		this.dataEnd = addressEnd + (BYTES_PER_LINE * 3) + 2;
+//		this.addressEnd = addressSize + 2;
+//		this.dataEnd = addressEnd + (BYTES_PER_LINE * 3) + 2;
 		this.asciiEnd = dataEnd + BYTES_PER_LINE + 4;
 		appInit();
 
 	}//Constructor
 
-	public HexEditDocumentFilterSB(StyledDocument doc, int addressEnd, int dataEnd, int asciiEnd) {
-		this.doc = doc;
-		this.attrData = null;
-		this.attrASCII = null;
-		this.addressEnd = addressEnd;
-		this.dataEnd = dataEnd;
-		this.asciiEnd = asciiEnd;
-		appInit();
-	}// Constructor
+//	public HexEditDocumentFilterSB(StyledDocument doc, int addressEnd, int dataEnd, int asciiEnd) {
+//		this.doc = doc;
+//		this.attrData = null;
+//		this.attrASCII = null;
+//		this.addressEnd = addressEnd;
+//		this.dataEnd = dataEnd;
+//		this.asciiEnd = asciiEnd;
+//		appInit();
+//	}// Constructor
 
 	public void setDataAttributes(AttributeSet attrData) {
 		this.attrData = attrData;
@@ -56,8 +60,9 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 
 	public void appInit() {
 		hexPattern = Pattern.compile(PATTERN_HEX);
-		columnTypeTable = makeColumnTable(this.addressEnd, this.asciiEnd);
-		dataToAsciiTable = makeDataToAsciiTable(this.addressEnd, this.dataEnd, this.asciiEnd);
+		columnTypeTable = makeColumnTable();
+		dataToAsciiTable = makeDataToAsciiTable();
+				
 
 	}// appInit
 
@@ -154,23 +159,32 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 		return text.matches(PATTERN_HEX);
 	}// isTextHex
 
-	private int[] makeColumnTable(int endAddress, int endASCII) {
-		int[] ans = new int[endASCII];
+	private int[] makeColumnTable() {
+		int[] ans = new int[hexMetrics.getAsciiEnd()+2];
 		int colPosition = 0;
-		for (; colPosition < endAddress - 1; colPosition++) {
+		for (; colPosition < hexMetrics.getAddressEnd() ; colPosition++) {
 			ans[colPosition] = ADDR;
 		}// for Address
-		ans[colPosition++] = BLANK; // make space after colon move the cursor
+		
+		for (; colPosition < hexMetrics.getAddressBlockEnd() ; colPosition++) {
+			ans[colPosition] = BLANK;
+		}// for  colon and Address PAD
+		
+//		ans[colPosition++] = BLANK; // make space after colon move the cursor
 
-		int[] dataKinds = new int[] { BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2,
+		int[] dataKinds = new int[] {  HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2,
 				BLANK,
 				HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, BLANK,
 				HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK,
-				HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK };
+				HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2, BLANK, HEX1, HEX2,  };
 		System.arraycopy(dataKinds, 0, ans, colPosition, dataKinds.length);
 		colPosition += dataKinds.length;
+		
+		for (; colPosition < hexMetrics.getDataBlockEnd()-1 ; colPosition++) {
+			ans[colPosition] = BLANK;
+		}// for  Data PAD
 
-		int[] asciiKinds = new int[] { BLANK, BLANK,
+		int[] asciiKinds = new int[] { 
 				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII,
 				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII_WRAP,
 				EOL, EOL };
@@ -179,10 +193,10 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 		return ans;
 	}// makeColumnTable
 
-	private Integer[] makeDataToAsciiTable(int endAddress, int endData, int endASCII) {
-		Integer[] ans = new Integer[endASCII];
+	private Integer[] makeDataToAsciiTable() {
+		Integer[] ans = new Integer[hexMetrics.getAsciiEnd()];
 		int colPosition = 0;
-		for (; colPosition < endAddress; colPosition++) {
+		for (; colPosition < hexMetrics.getAddressBlockEnd(); colPosition++) {
 			ans[colPosition] = null;
 		}// for Address
 

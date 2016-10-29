@@ -5,61 +5,99 @@ import javax.swing.text.NavigationFilter;
 import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 
-public class HexEditNavigationFilterSB extends NavigationFilter{
+public class HexEditNavigationFilterSB extends NavigationFilter {
 
-	public HexEditNavigationFilterSB() {
-		// TODO Auto-generated constructor stub
-	}
+	
+	private HexEditMetrics hexMetrics;
+
 
 	private int dataStart = 0;
-	// private int dataEnd = 0;
 	private int asciiStart = 0;
-	// private int asciiEnd = 0;
+	
 	private StyledDocument doc;
 	private int[] columnTable;
-	// private int firstDataColumn;
+	
 	private int lastDataEnd = 0;
 	private int lastAsciiStart = 0;
 	private int lastAsciiEnd = 0;
 
-	public HexEditNavigationFilterSB(StyledDocument doc, int lastDataCount) {
+	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
 		this.doc = doc;
-		Element paragraphElement = doc.getParagraphElement(0);
-
-		Element dataElement = paragraphElement.getElement(1);
-		this.dataStart = dataElement.getStartOffset() + 1;
-		dataElement = paragraphElement.getElement(2);
-		this.asciiStart = dataElement.getStartOffset() + 2;
-
-		columnTable = makeColumnTable(this.dataStart, paragraphElement.getEndOffset());
-
+		this.hexMetrics= hexMetrics;
+		
+		this.dataStart = hexMetrics.getDataStart();
+		this.lastAsciiStart = hexMetrics.getAsciiStart();
+		
+		columnTable = makeColumnTable();
+		
+	}//Constructor
+	
+	public HexEditNavigationFilterSB(StyledDocument doc, int addressSize) {
+//		this.doc = doc;
+//		this.dataStart = addressSize + 3;
+//		this.asciiStart = dataStart + (BYTES_PER_LINE * 3) + 3;
+//		columnTable = makeColumnTable(this.dataStart,this.asciiStart + BYTES_PER_LINE+2);
+//		
+//		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//		int lastDataCount = 16;
+//
+//		
+//		int lastDataStart = this.dataStart;
+//		int index = lastDataCount <= 7 ? 0 : 1;
+//		index += (lastDataCount * 3);
+//
+//		lastDataEnd = lastDataStart + index;
+//
+//		lastAsciiStart = this.asciiStart;
+//		lastAsciiEnd = lastAsciiStart + lastDataCount - 1;
+//
+//		if (lastDataCount == -1) {
+//			lastAsciiEnd = Integer.MAX_VALUE;
+//			lastDataEnd = Integer.MAX_VALUE;
+//		} // if
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		
+	}//Constructor
 
-		Element lastElement = doc.getParagraphElement(doc.getLength() - 1);
-		int lastDataStart = lastElement.getElement(1).getStartOffset();
-		int index = lastDataCount <= 7 ? 0 : 1;
-		index += (lastDataCount * 3);
-
-		lastDataEnd = lastDataStart + index;
-
-		lastAsciiStart = lastElement.getElement(2).getStartOffset() + 2;
-		lastAsciiEnd = lastAsciiStart + lastDataCount - 1;
-
-		if (lastDataCount == -1) {
-			lastAsciiEnd = Integer.MAX_VALUE;
-			lastDataEnd = Integer.MAX_VALUE;
-		}// if
-
-	}// Constructor
+//	public HexEditNavigationFilterSB(StyledDocument doc, int lastDataCount) {
+//		this.doc = doc;
+//		Element paragraphElement = doc.getParagraphElement(0);
+//
+//		Element dataElement = paragraphElement.getElement(1);
+//		this.dataStart = dataElement.getStartOffset() + 1;
+//		dataElement = paragraphElement.getElement(2);
+//		this.asciiStart = dataElement.getStartOffset() + 2;
+//
+//		columnTable = makeColumnTable(this.dataStart, paragraphElement.getEndOffset());
+//
+//		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
+//		Element lastElement = doc.getParagraphElement(doc.getLength() - 1);
+//		int lastDataStart = lastElement.getElement(1).getStartOffset();
+//		int index = lastDataCount <= 7 ? 0 : 1;
+//		index += (lastDataCount * 3);
+//
+//		lastDataEnd = lastDataStart + index;
+//
+//		lastAsciiStart = lastElement.getElement(2).getStartOffset() + 2;
+//		lastAsciiEnd = lastAsciiStart + lastDataCount - 1;
+//
+//		if (lastDataCount == -1) {
+//			lastAsciiEnd = Integer.MAX_VALUE;
+//			lastDataEnd = Integer.MAX_VALUE;
+//		} // if
+//
+//	}// Constructor
 
 	public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
 		// check if past end of document
-		if (dot > lastAsciiEnd) {
-			return; // past the ASCII
-		}// if
-		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
-			return;
-		}// past the last data , before the ASCII
+//		if (dot > lastAsciiEnd) {
+//			return; // past the ASCII
+//		} // if
+//		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
+//			return;
+//		} // past the last data , before the ASCII
 
 		Element paragraphElement = doc.getParagraphElement(dot);
 		int column = dot - paragraphElement.getStartOffset();
@@ -67,7 +105,8 @@ public class HexEditNavigationFilterSB extends NavigationFilter{
 		int position = dot;
 		switch (columnType) {
 		case ADDR:
-			position = paragraphElement.getStartOffset() + this.dataStart;
+//			position = paragraphElement.getStartOffset() + this.dataStart;
+			position = paragraphElement.getStartOffset() + this.dataStart-1;
 			break;
 		case NORMAL:
 			position = dot;
@@ -79,7 +118,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter{
 			position = dot + 2;
 			break;
 		case DATA_WRAP:
-			position = paragraphElement.getEndOffset() + this.dataStart;
+			position = paragraphElement.getEndOffset() + this.dataStart-1;
 			break;
 		case ASCII_WRAP:
 			System.out.printf("%s%n", "ASCII Wrap");
@@ -99,22 +138,23 @@ public class HexEditNavigationFilterSB extends NavigationFilter{
 		// } else {
 		// fb.setDot(dot, bias);
 		// }//
-		System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, dataStart);
+		System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, this.dataStart);
 	}// moveDot
 		// -----------------------------------------------------------
 
-	private int[] makeColumnTable(int dataStart, int lineSize) {
-		int[] ans = new int[lineSize];
+	private int[] makeColumnTable() {
+		int[] ans = new int[hexMetrics.getAsciiEnd()+2];
 		int columnPosition = 0;
-		for (; columnPosition < dataStart; columnPosition++) {
+		for (; columnPosition < hexMetrics.getAddressBlockEnd(); columnPosition++) {
 			ans[columnPosition] = ADDR;
-		}// Address
+		} // Address
+		
 		int[] dataPattern = new int[] { NORMAL, NORMAL, BLANK_1 };
 		int dataPatternLength = dataPattern.length;
 		for (int i = 0; i < 8; i++) {
 			System.arraycopy(dataPattern, 0, ans, columnPosition, dataPatternLength);
 			columnPosition += dataPatternLength;
-		}// first 8 data
+		} // first 8 data
 
 		// adjust for extra space
 		columnPosition -= 2;
@@ -125,18 +165,26 @@ public class HexEditNavigationFilterSB extends NavigationFilter{
 		for (int i = 0; i < 8; i++) {
 			System.arraycopy(dataPattern, 0, ans, columnPosition, dataPatternLength);
 			columnPosition += dataPatternLength;
-		}// second 8 data
+		} // second 8 data
 
 		// adjust for end of data
 		columnPosition -= 2;
 		ans[columnPosition++] = NORMAL;
 		ans[columnPosition++] = DATA_WRAP;
 		ans[columnPosition++] = BLANK_2;
+		
+		
 
-		for (int i = 0; i < 17; i++) {
-			ans[columnPosition++] = NORMAL;
-		}// ASCII
+//		for (int i = 0; i < 17; i++) {
+//			ans[columnPosition++] = NORMAL;
+//		} // ASCII
 			// End of Line
+		
+		for (; columnPosition < hexMetrics.getAsciiEnd(); columnPosition++) {
+			ans[columnPosition] = NORMAL;
+		} // Address
+
+		
 		ans[columnPosition++] = ASCII_WRAP;
 		ans[columnPosition++] = ASCII_WRAP;
 
@@ -151,5 +199,8 @@ public class HexEditNavigationFilterSB extends NavigationFilter{
 
 	private static final int BLANK_1 = 7;
 	private static final int BLANK_2 = 8;
+	
+	private final static int BYTES_PER_LINE = HexEditPanelSB.BYTES_PER_LINE;
+
 
 }// class HexEditNavigationFilter

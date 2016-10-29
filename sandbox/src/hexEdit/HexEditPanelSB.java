@@ -26,16 +26,21 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import utilities.HexEditNavigationFilter;
 
 public class HexEditPanelSB extends JPanel implements AdjustmentListener,ComponentListener {
+	private static final long serialVersionUID = 1L;
+	
 	private ByteBuffer source;
+	private int addressSize;
+	
 	private static int currentLineStart;
 	private int currentMax;
 	private int currentExtent;
+	
 	private StyledDocument doc;
-
-	private int addressSize;
+	private HexEditDocumentFilterSB hexFilter;
+	private HexEditNavigationFilterSB hexNavigationFilter;
+	private HexEditMetrics hexMetrics;
 
 	private String addressFormat;
 	private String dataFormat = "%-" + ((BYTES_PER_LINE * 3) + 2) + "s";
@@ -54,6 +59,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 			return;
 		}//if nothing to display
 		
+		clearFilters();		// suspend doc filter
 		try {
 			doc.remove(0, doc.getLength());
 		} catch (BadLocationException e) {
@@ -77,6 +83,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 			} // if
 			bytesToRead = Math.min(source.remaining(), BYTES_PER_LINE);
 		} // for
+		restoreFilters();
 	}// fillPane
 
 	private int processLine(byte[] rawData, int bytesRead, int bufferAddress) {//
@@ -171,38 +178,50 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 
 	private void prepareDoc(StyledDocument doc, long srcSize) {
 		setFormats(srcSize);
-		 resetDocumentFilter(doc);
-		 resetNavigationFilter();
+		clearFilters();
 		// clearDocument(doc);
 	}// prepareDoc
 	
-	private void resetDocumentFilter(StyledDocument doc) {
-		((AbstractDocument) doc).setDocumentFilter(null);
-	}// resetDocumentFilter
+//	private void resetDocumentFilter(StyledDocument doc) {
+//		((AbstractDocument) doc).setDocumentFilter(null);
+//	}// resetDocumentFilter
 
 	private void setDocumentFilter(StyledDocument doc) {
-		
-		// System.out.printf("[setDocumentFilter]\t0 address end = %d %n", addressEnd);
-		// System.out.printf("[setDocumentFilter]\t1 data end = %d %n", dataEnd);
-		// System.out.printf("[setDocumentFilter]\t1 ASCII end = %d %n", asciiEnd);
 
-		HexEditDocumentFilterSB hexFilter = new HexEditDocumentFilterSB(doc, addressSize);
+		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
 		((AbstractDocument) doc).setDocumentFilter(hexFilter);
 	}// setDocumentFilter
 
-	private void resetNavigationFilter() {
+//	private void resetNavigationFilter() {
+//		textPane.setNavigationFilter(null);
+//	}// resetDocumentFilter
+	
+	private void clearFilters(){
+		((AbstractDocument) doc).setDocumentFilter(null);
 		textPane.setNavigationFilter(null);
-	}// resetDocumentFilter
+	}//clearFilters
+	
+	private void restoreFilters(){
+		((AbstractDocument) doc).setDocumentFilter(hexFilter);
+		textPane.setNavigationFilter(hexNavigationFilter);
+	}//restoreFilters
+	
 
-	private void setNavigationFilter(StyledDocument doc, int lastDataCount) {
-		HexEditNavigationFilter hexNavigationFilter = new HexEditNavigationFilter(doc, lastDataCount);
+//	private void setNavigationFilter( doc, int lastDataCount) {
+//		HexEditNavigationFilter hexNavigationFilter = new HexEditNavigationFilter(doc, lastDataCount);
+//		textPane.setNavigationFilter(hexNavigationFilter);
+//	}// resetDocumentFilter
+
+
+	private void setNavigationFilter(StyledDocument doc) {
+		 hexNavigationFilter = new HexEditNavigationFilterSB(doc, hexMetrics);
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// resetDocumentFilter
 
-
 	public void loadDocument(byte[] sourceArray) {
+		
 		this.source = ByteBuffer.wrap(sourceArray);
 
 		setUpScrollBar();
@@ -216,8 +235,18 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 				fillPane();
 			}// run
 		});
+		
+		calcHexMetrics(sourceArray.length);
 		setDocumentFilter(doc);
+		setNavigationFilter(doc);
 	}// loadDocument
+	
+	private void calcHexMetrics(long sourceSize){
+		if (hexMetrics != null){
+			hexMetrics = null;
+		}//
+		hexMetrics = new HexEditMetrics(sourceSize);
+	}
 
 	private void setExtent(int amount, BoundedRangeModel model) {
 		model.setExtent(amount);
