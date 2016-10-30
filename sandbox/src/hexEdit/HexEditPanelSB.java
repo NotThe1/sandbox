@@ -191,6 +191,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
+//		hexFilter = null;
 		((AbstractDocument) doc).setDocumentFilter(hexFilter);
 	}// setDocumentFilter
 

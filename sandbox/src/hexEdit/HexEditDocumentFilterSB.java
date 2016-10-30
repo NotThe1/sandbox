@@ -27,6 +27,8 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 	
 	private HexEditMetrics hexMetrics;
 	
+	private boolean innerFlag = false;
+	
 	public HexEditDocumentFilterSB(StyledDocument doc, HexEditMetrics hexMetrics){
 		this.doc = doc;
 		this.hexMetrics= hexMetrics;
@@ -80,13 +82,14 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 	public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
 			throws BadLocationException {
 //		System.out.printf("[replace]\toffset: %d ,length: %d, text: %s %n", offset, length, text);
-
 		int netLength = length == 0 ? 1 : length;// length of 0 equals a insert; length of 1 equals a replace
 
 		int columnPosition = getColumnPosition(offset);
 		Integer newCharacterIndex = null;
 		Integer newDataIndex = null;
 		int columnType = columnTypeTable[columnPosition];
+		System.out.printf("replace:: position: offset: %d, netLength: %d, text: %s, columnType: %d%n", offset, netLength, text, columnType);
+
 		switch (columnType) {
 		case ADDR: // do nothing
 		case EOL: // ignore
@@ -108,7 +111,6 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 		default:
 
 		}// switch - columnType
-
 		fb.replace(offset, netLength, text, attrs);
 
 		// handle simultaneous change of data/ASCII display
@@ -122,7 +124,8 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 					docOffset);
 		}// if newCharacterIndex
 
-		if (newDataIndex != null) {
+//		if (newDataIndex != null) {
+		if (columnType == ASCII){
 			byte[] hexValues = text.getBytes();
 			String hexData = String.format("%02X", hexValues[0]);
 			int docOffset = offset + newDataIndex;
@@ -160,13 +163,13 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 	}// isTextHex
 
 	private int[] makeColumnTable() {
-		int[] ans = new int[hexMetrics.getAsciiEnd()+2];
+		int[] ans = new int[hexMetrics.getAsciiEnd()+4];
 		int colPosition = 0;
-		for (; colPosition < hexMetrics.getAddressEnd() ; colPosition++) {
+		for (; colPosition < hexMetrics.getAddressEnd()+1 ; colPosition++) {
 			ans[colPosition] = ADDR;
 		}// for Address
 		
-		for (; colPosition < hexMetrics.getAddressBlockEnd() ; colPosition++) {
+		for (; colPosition < hexMetrics.getDataStart() ; colPosition++) {
 			ans[colPosition] = BLANK;
 		}// for  colon and Address PAD
 		
@@ -180,13 +183,13 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 		System.arraycopy(dataKinds, 0, ans, colPosition, dataKinds.length);
 		colPosition += dataKinds.length;
 		
-		for (; colPosition < hexMetrics.getDataBlockEnd()-1 ; colPosition++) {
+		for (; colPosition < hexMetrics.getAsciiStart() ; colPosition++) {
 			ans[colPosition] = BLANK;
 		}// for  Data PAD
 
 		int[] asciiKinds = new int[] { 
 				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII,
-				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII_WRAP,
+				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII,
 				EOL, EOL };
 		System.arraycopy(asciiKinds, 0, ans, colPosition, asciiKinds.length);
 
@@ -194,26 +197,38 @@ public class HexEditDocumentFilterSB extends DocumentFilter{
 	}// makeColumnTable
 
 	private Integer[] makeDataToAsciiTable() {
-		Integer[] ans = new Integer[hexMetrics.getAsciiEnd()];
+		Integer[] ans = new Integer[hexMetrics.getAsciiEnd()+2];
 		int colPosition = 0;
 		for (; colPosition < hexMetrics.getAddressBlockEnd(); colPosition++) {
 			ans[colPosition] = null;
 		}// for Address
 
-		Integer[] dataToASCII = new Integer[] { null, 51, 50, null, 49, 48, null, 47, 46, null,
-				45, 44, null, 43, 42, null, 41, 40, null, 39, 38, null, 37, 36, null, null,
-				34, 33, null, 32, 31, null, 30, 29, null, 28, 27, null, 26, 25, null,
-				24, 23, null, 22, 21, null, 20, 19, null };
+		int gap = hexMetrics.getDataBlockEnd()-hexMetrics.getDataStart()+1;
+		
+		Integer[] dataToASCII = new Integer[] { null, gap-0, gap-1, null, gap-2, gap-3, null, gap-4, gap-5, null,
+				gap-6, gap-7, null, gap-8, gap-9, null, gap-10, gap-11, null, gap-12, gap-13, null, gap-14, gap-15, null, null,
+				gap-17, gap-18, null, gap-19, gap-20, null, gap-21, gap-22, null, gap-23, gap-24, null, gap-25, gap-26, null,
+				gap-27, gap-28, null, gap-29, gap-30, null, gap-31, gap-32, null };
 
 		for (int i = 0; i < dataToASCII.length - 1; i++) {
 			ans[i + colPosition] = dataToASCII[i];
 		}// for dataToASCII
 		colPosition += dataToASCII.length;
+		
+		
 
-		Integer[] asciiToData = new Integer[] { null, null, -51, -49, -47, -45, -43, -41, -39, -37,
+//		Integer[] asciiToData = new Integer[] { null, null, -51, -49, -47, -45, -43, -41, -39, -37,
+//		-34, -32, -30, -28, -26, -24, -22, -20 };
+		
+		Integer[] asciiToData = new Integer[] {null, null, -51, -49, -47, -45, -43, -41, -39, -37,
 				-34, -32, -30, -28, -26, -24, -22, -20 };
+		
+//		gap = gap-1;
+//		Integer[] asciiToData = new Integer[] { null, null, -(gap+1), -(gap-2),  -(gap-3),  -(gap-5), -(gap-7),
+//				 -(gap-9),  -(gap-11), -(gap-13), -(gap-16), -(gap-18), -(gap-20),  -(gap-22), -(gap-24), -(gap-26),
+//				 -(gap-28), -(gap-30) };
 
-		for (int j = 0; j < asciiToData.length - 1; j++) {
+		for (int j = 0; j < asciiToData.length ; j++) {
 			ans[j + colPosition] = asciiToData[j];
 		}// for asciiToData
 

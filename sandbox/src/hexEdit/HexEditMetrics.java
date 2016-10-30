@@ -26,13 +26,13 @@ public class HexEditMetrics {
 	
 	private void setValues(){
 //		this.docHeader = getDocHeader();
-		this.addressEnd =this.addressSize;
+		this.addressEnd =this.addressSize-1;
 		this.addressBlockEnd = this.addressEnd + ADDRESS_PAD;
 		this.dataStart = this.addressBlockEnd +1;
-		this.dataEnd = this.dataStart + (3 * BYTES_PER_LINE);
+		this.dataEnd = this.dataStart + (3 * BYTES_PER_LINE)-1;
 		this.dataBlockEnd = this.dataEnd + DATA_PAD;
 		this.asciiStart = this.dataBlockEnd+1;
-		this.asciiEnd = this.asciiStart + BYTES_PER_LINE;
+		this.asciiEnd = this.asciiStart + BYTES_PER_LINE-1;
 	}//setValues
 	
 	public int getAddressSize(){
