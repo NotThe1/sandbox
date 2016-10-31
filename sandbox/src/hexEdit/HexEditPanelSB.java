@@ -79,11 +79,15 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 			processLine(activeLine, bytesToRead, sourceIndex);
 			sourceIndex += bytesToRead;
 			if (bytesToRead < BYTES_PER_LINE) {
+//				System.out.printf("[fillPane] sourceIndex: %d, bytesToRead: %d (%2X)%n", sourceIndex,bytesToRead,bytesToRead);
+
 				break;
 			} // if
 			bytesToRead = Math.min(source.remaining(), BYTES_PER_LINE);
 		} // for
 		restoreFilters();
+		hexNavigationFilter.setLastLine(bytesToRead,linesToDisplay-1);
+		System.out.printf("[fillPane] sourceIndex: %d, bytesToRead: %d (%2X)%n", sourceIndex,bytesToRead,bytesToRead);
 	}// fillPane
 
 	private int processLine(byte[] rawData, int bytesRead, int bufferAddress) {//

@@ -23,6 +23,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private int lastDataEnd = 0;
 	private int lastAsciiStart = 0;
 	private int lastAsciiEnd = 0;
+	private int fullLineLength;
 
 	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
 		this.doc = doc;
@@ -33,18 +34,33 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		
 		columnTable = makeColumnTable();
 		
+		fullLineLength = hexMetrics.getAsciiEnd() + System.lineSeparator().length();
+		
 	}//Constructor
+	
+	public void setLastLine(int bytesRead, int linesRead){
+		int bytesBeforeLastLine = linesRead * fullLineLength;
+		lastAsciiStart = bytesBeforeLastLine + this.asciiStart;
+		lastAsciiEnd = bytesBeforeLastLine + (this.asciiStart + bytesRead) + 2;
+		
+		lastDataEnd = bytesBeforeLastLine + (this.dataStart + (3 * bytesRead))+2;
+		lastDataEnd = bytesRead < 8 ? lastDataEnd: lastDataEnd + 1;
+		System.out.printf("[setLastLine] lastAsciiEnd: %d,lastDataEnd: %d %n",lastAsciiEnd,lastDataEnd);
+	}//setLastLine
 	
 
 
 	public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
 		// check if past end of document
-//		if (dot > lastAsciiEnd) {
-//			return; // past the ASCII
-//		} // if
-//		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
-//			return;
-//		} // past the last data , before the ASCII
+		if (dot > lastAsciiEnd) {
+			return; // past the ASCII
+		} // if
+		
+		int a = 0;
+		
+		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
+			return;
+		} // past the last data , before the ASCII
 
 		Element paragraphElement = doc.getParagraphElement(dot);
 		int column = dot - paragraphElement.getStartOffset();

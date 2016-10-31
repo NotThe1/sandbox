@@ -25,7 +25,7 @@ import javax.swing.border.BevelBorder;
 
 public class HexEditPanelSBDriver {
 	
-	int sourceSize =(16 * 1024) -9;
+	int sourceSize =(4 * 256) -9;
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
