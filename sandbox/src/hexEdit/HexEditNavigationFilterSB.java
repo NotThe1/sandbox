@@ -17,6 +17,9 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private StyledDocument doc;
 	private int[] columnTable;
 	
+	private int priorColumn;
+	private int priorPosition;
+	
 	private int lastDataEnd = 0;
 	private int lastAsciiStart = 0;
 	private int lastAsciiEnd = 0;
@@ -47,45 +50,46 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		int column = dot - paragraphElement.getStartOffset();
 		int columnType = columnTable[column];
 		int position = dot;
-		System.out.printf("setDot: dot:  %d,columnType:  %d,position:  %d%n" , dot, columnType, position);
 		
+		System.out.printf("[setDot] dot:  %d,columnType:  %d,position:  %d%n" , dot, columnType, position);
 		
-		
+			
 		switch (columnType) {
-		case ADDR:
-//			position = paragraphElement.getStartOffset() + this.dataStart;
+		case ADDR:		//0
 			position = paragraphElement.getStartOffset() + this.dataStart;
 			break;
-		case NORMAL:
+		case NORMAL:	//1
 			position = dot;
 			break;
-		case BLANK_1:
-			position = dot + 1;
+		case BLANK_1:	//7
+			//fix double call to setPos from DocumentFilter.FilteBypass
+			if((priorColumn == (hexMetrics.getAsciiStart() +1)) & (column ==(hexMetrics.getDataBlockEnd()) )){
+				position = priorPosition-2;
+			}else{
+				position = dot + 1;
+			}//if		
 			break;
-		case BLANK_2:
+		case BLANK_2:	//8
 			position = dot + 2;
 			break;
-		case DATA_WRAP:
+		case DATA_WRAP:	//3
 			position = paragraphElement.getEndOffset() + this.dataStart;
 			break;
-		case ASCII_WRAP:
+		case ASCII_WRAP:	//4
 			System.out.printf("%s%n", "ASCII Wrap");
 			position = paragraphElement.getEndOffset() + this.asciiStart;
 			break;
 		default:
 			position = dot;
+			break;
 		}// switch
-
+		priorColumn = column;
+		priorPosition = position;
 		fb.setDot(position, bias);
+
 	}// setDot
 
 	public void moveDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
-
-		// if (dot < dataStart) {
-		// fb.setDot(dataStart, bias);
-		// } else {
-		// fb.setDot(dot, bias);
-		// }//
 		System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, this.dataStart);
 	}// moveDot
 		// -----------------------------------------------------------
@@ -122,18 +126,11 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		ans[columnPosition++] = BLANK_2;
 		ans[columnPosition++] = BLANK_1;
 		
-		
-
 		for (int i = 0; i < BYTES_PER_LINE; i++) {
 			ans[columnPosition++] = NORMAL;
 		} // ASCII
 			// End of Line
-		
-//		for (; columnPosition < hexMetrics.getAsciiEnd()+1; columnPosition++) {
-//			ans[columnPosition] = NORMAL;
-//		} // Address
-
-		
+				
 		ans[columnPosition++] = ASCII_WRAP;
 		ans[columnPosition++] = ASCII_WRAP;
 
