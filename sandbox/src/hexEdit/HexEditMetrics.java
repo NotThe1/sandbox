@@ -9,6 +9,7 @@ public class HexEditMetrics {
 	private int dataBlockEnd;
 	private int asciiStart;
 	private int asciiEnd;
+	private int lineLength;
 //	private String docHeader;
 	
 	public HexEditMetrics(long sourceSize){			
@@ -33,6 +34,7 @@ public class HexEditMetrics {
 		this.dataBlockEnd = this.dataEnd + DATA_PAD;
 		this.asciiStart = this.dataBlockEnd+1;
 		this.asciiEnd = this.asciiStart + BYTES_PER_LINE-1;
+		this.lineLength = this.asciiEnd + System.lineSeparator().length()+1;
 	}//setValues
 	
 	public int getAddressSize(){
@@ -65,6 +67,10 @@ public class HexEditMetrics {
 	public int getAsciiEnd(){
 		return this.asciiEnd;
 	}//getDataStart
+	
+	public int getLineLength(){
+		return this.lineLength;
+	}//getLineLength
 	
 	public String getDocHeader(){
 		 String  header= "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ";

@@ -1,5 +1,10 @@
 package hexEdit;
 
+// Known problem - if last line has more than two bytes displayed,
+// entering data from the ASCII data on the last full line will skip the first two bytes of the last line.
+// You can back arrow to them if needed.
+
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -26,17 +31,16 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-
-public class HexEditPanelSB extends JPanel implements AdjustmentListener,ComponentListener {
+public class HexEditPanelSB extends JPanel implements AdjustmentListener, ComponentListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private ByteBuffer source;
 	private int addressSize;
-	
+
 	private static int currentLineStart;
 	private int currentMax;
 	private int currentExtent;
-	
+
 	private StyledDocument doc;
 	private HexEditDocumentFilterSB hexFilter;
 	private HexEditNavigationFilterSB hexNavigationFilter;
@@ -55,18 +59,19 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 	private JLabel lblDocHeader;
 
 	private void fillPane() {
-		if (currentExtent==0){
+		if (currentExtent == 0) {
 			return;
-		}//if nothing to display
-		
-		clearFilters();		// suspend doc filter
+		} // if nothing to display
+
+		clearFilters(); // suspend doc filter
 		try {
 			doc.remove(0, doc.getLength());
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} // try
-//		System.out.printf("FillPane: currentStartLine = %d%n", currentLineStart);
+		// System.out.printf("FillPane: currentStartLine = %d%n",
+		// currentLineStart);
 		int sourceIndex = currentLineStart * BYTES_PER_LINE; // address to
 																// display
 		byte[] activeLine = new byte[BYTES_PER_LINE];
@@ -79,15 +84,20 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 			processLine(activeLine, bytesToRead, sourceIndex);
 			sourceIndex += bytesToRead;
 			if (bytesToRead < BYTES_PER_LINE) {
-//				System.out.printf("[fillPane] sourceIndex: %d, bytesToRead: %d (%2X)%n", sourceIndex,bytesToRead,bytesToRead);
+				// System.out.printf("[fillPane] sourceIndex: %d, bytesToRead:
+				// %d (%2X)%n", sourceIndex,bytesToRead,bytesToRead);
 
 				break;
 			} // if
 			bytesToRead = Math.min(source.remaining(), BYTES_PER_LINE);
+			if (bytesToRead == 0){
+				bytesToRead = BYTES_PER_LINE;
+				break;
+			}
 		} // for
 		restoreFilters();
-		hexNavigationFilter.setLastLine(bytesToRead,linesToDisplay-1);
-		System.out.printf("[fillPane] sourceIndex: %d, bytesToRead: %d (%2X)%n", sourceIndex,bytesToRead,bytesToRead);
+		hexNavigationFilter.setLastLine(bytesToRead, linesToDisplay - 1);
+		System.out.printf("[fillPane]  bytesToRead: %d,linesToDisplay: %d%n", bytesToRead, linesToDisplay - 1);
 	}// fillPane
 
 	private int processLine(byte[] rawData, int bytesRead, int bufferAddress) {//
@@ -185,48 +195,47 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 		clearFilters();
 		// clearDocument(doc);
 	}// prepareDoc
-	
-//	private void resetDocumentFilter(StyledDocument doc) {
-//		((AbstractDocument) doc).setDocumentFilter(null);
-//	}// resetDocumentFilter
+
+	// private void resetDocumentFilter(StyledDocument doc) {
+	// ((AbstractDocument) doc).setDocumentFilter(null);
+	// }// resetDocumentFilter
 
 	private void setDocumentFilter(StyledDocument doc) {
 
 		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
-//		hexFilter = null;
+		// hexFilter = null;
 		((AbstractDocument) doc).setDocumentFilter(hexFilter);
 	}// setDocumentFilter
 
-//	private void resetNavigationFilter() {
-//		textPane.setNavigationFilter(null);
-//	}// resetDocumentFilter
-	
-	private void clearFilters(){
+	// private void resetNavigationFilter() {
+	// textPane.setNavigationFilter(null);
+	// }// resetDocumentFilter
+
+	private void clearFilters() {
 		((AbstractDocument) doc).setDocumentFilter(null);
 		textPane.setNavigationFilter(null);
-	}//clearFilters
-	
-	private void restoreFilters(){
+	}// clearFilters
+
+	private void restoreFilters() {
 		((AbstractDocument) doc).setDocumentFilter(hexFilter);
 		textPane.setNavigationFilter(hexNavigationFilter);
-	}//restoreFilters
-	
+	}// restoreFilters
 
-//	private void setNavigationFilter( doc, int lastDataCount) {
-//		HexEditNavigationFilter hexNavigationFilter = new HexEditNavigationFilter(doc, lastDataCount);
-//		textPane.setNavigationFilter(hexNavigationFilter);
-//	}// resetDocumentFilter
-
+	// private void setNavigationFilter( doc, int lastDataCount) {
+	// HexEditNavigationFilter hexNavigationFilter = new
+	// HexEditNavigationFilter(doc, lastDataCount);
+	// textPane.setNavigationFilter(hexNavigationFilter);
+	// }// resetDocumentFilter
 
 	private void setNavigationFilter(StyledDocument doc) {
-		 hexNavigationFilter = new HexEditNavigationFilterSB(doc, hexMetrics);
+		hexNavigationFilter = new HexEditNavigationFilterSB(doc, hexMetrics);
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// resetDocumentFilter
 
 	public void loadDocument(byte[] sourceArray) {
-		
+
 		this.source = ByteBuffer.wrap(sourceArray);
 
 		setUpScrollBar();
@@ -240,16 +249,16 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 				fillPane();
 			}// run
 		});
-		
+
 		calcHexMetrics(sourceArray.length);
 		setDocumentFilter(doc);
 		setNavigationFilter(doc);
 	}// loadDocument
-	
-	private void calcHexMetrics(long sourceSize){
-		if (hexMetrics != null){
+
+	private void calcHexMetrics(long sourceSize) {
+		if (hexMetrics != null) {
 			hexMetrics = null;
-		}//
+		} //
 		hexMetrics = new HexEditMetrics(sourceSize);
 	}
 
@@ -273,9 +282,12 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 
 	private void setUpScrollBar() {
 		// int fontHeight = calcFontHeight(thisTextPane);
-
+		if (source == null) {
+			return;
+		}
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				
 
 				int max = maximumNumberOfRows(textPane);
 				int extent = calcExtent(textPane);
@@ -285,12 +297,12 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 				setMax(max, model);
 				setValue(0, model);
 				setExtent(extent, model);
-				scrollBar.setBlockIncrement(extent-2);
+				scrollBar.setBlockIncrement(extent - 2);
 				// -
-//				System.out.printf("Max = %d%n", model.getMaximum());
-//				System.out.printf("Min = %d%n", model.getMinimum());
-//				System.out.printf("Extent = %d%n", model.getExtent());
-//				System.out.printf("Value = %d%n", model.getValue());
+				// System.out.printf("Max = %d%n", model.getMaximum());
+				// System.out.printf("Min = %d%n", model.getMinimum());
+				// System.out.printf("Extent = %d%n", model.getExtent());
+				// System.out.printf("Value = %d%n", model.getValue());
 				// --
 
 			}// run
@@ -394,15 +406,13 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 		gbc_scrollBar.gridy = 1;
 		add(scrollBar, gbc_scrollBar);
 
-	}//initialize
-	
+	}// initialize
+
 	@Override
 	public void componentResized(ComponentEvent comonentEvent) {
 		setUpScrollBar();
 		fillPane();
-	}//componentResized
-
-
+	}// componentResized
 
 	@Override
 	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
@@ -412,7 +422,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 
 		if (adjustmentEvent.getAdjustmentType() != AdjustmentEvent.TRACK) {
 			return;
-		}//if
+		} // if
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -442,7 +452,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -452,7 +462,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener,Compone
 
 	@Override
 	public void componentShown(ComponentEvent arg0) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
 	}
 
 }// class HexEditPanelSB

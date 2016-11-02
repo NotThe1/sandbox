@@ -23,7 +23,10 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private int lastDataEnd = 0;
 	private int lastAsciiStart = 0;
 	private int lastAsciiEnd = 0;
-	private int fullLineLength;
+	private int lineLength;
+	
+	private boolean asciiWrap = false;
+	private int asciiCount = 0;
 
 	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
 		this.doc = doc;
@@ -34,24 +37,32 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		
 		columnTable = makeColumnTable();
 		
-		fullLineLength = hexMetrics.getAsciiEnd() + System.lineSeparator().length();
+		lineLength = hexMetrics.getLineLength();
 		
 	}//Constructor
 	
 	public void setLastLine(int bytesRead, int linesRead){
-		int bytesBeforeLastLine = linesRead * fullLineLength;
-		lastAsciiStart = bytesBeforeLastLine + this.asciiStart;
-		lastAsciiEnd = bytesBeforeLastLine + (this.asciiStart + bytesRead) + 2;
+		int bytesBeforeLastLine = (linesRead * lineLength);
 		
-		lastDataEnd = bytesBeforeLastLine + (this.dataStart + (3 * bytesRead))+2;
+		lastAsciiStart = bytesBeforeLastLine + this.asciiStart;
+		lastAsciiEnd = lastAsciiStart + bytesRead -1 ;
+		
+		lastDataEnd = bytesBeforeLastLine + this.dataStart + (3 * (bytesRead-1))+2;
 		lastDataEnd = bytesRead < 8 ? lastDataEnd: lastDataEnd + 1;
-		System.out.printf("[setLastLine] lastAsciiEnd: %d,lastDataEnd: %d %n",lastAsciiEnd,lastDataEnd);
+		
+		System.out.printf("%n[setLastLine] bytesRead: %d,linesRead: %d %n",bytesRead,linesRead);
+		System.out.printf("[setLastLine] lineLength: %d %n",lineLength);
+		System.out.printf("[setLastLine] bytesBeforeLastLine: %d %n",bytesBeforeLastLine);
+		System.out.printf("[setLastLine] lastAsciiStart: %d,lastAsciiEnd: %d %n",lastAsciiStart,lastAsciiEnd);
+		System.out.printf("[setLastLine] lastDataEnd: %d %n%n",lastDataEnd);
+		
 	}//setLastLine
 	
 
 
 	public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
 		// check if past end of document
+		
 		if (dot > lastAsciiEnd) {
 			return; // past the ASCII
 		} // if
@@ -59,6 +70,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		int a = 0;
 		
 		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
+			
 			return;
 		} // past the last data , before the ASCII
 
@@ -94,6 +106,8 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		case ASCII_WRAP:	//4
 			System.out.printf("%s%n", "ASCII Wrap");
 			position = paragraphElement.getEndOffset() + this.asciiStart;
+			asciiWrap = true;
+			asciiCount = 1;
 			break;
 		default:
 			position = dot;
