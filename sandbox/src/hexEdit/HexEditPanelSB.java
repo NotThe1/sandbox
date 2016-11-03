@@ -1,9 +1,9 @@
 package hexEdit;
 
 // Known problem - if last line has more than two bytes displayed,
+
 // entering data from the ASCII data on the last full line will skip the first two bytes of the last line.
 // You can back arrow to them if needed.
-
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,6 +16,8 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.nio.ByteBuffer;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.JLabel;
@@ -58,6 +60,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private JScrollBar scrollBar;
 	private JLabel lblDocHeader;
 
+	private SortedMap<Integer, Byte> changes;
+
 	private void fillPane() {
 		if (currentExtent == 0) {
 			return;
@@ -70,8 +74,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} // try
-		// System.out.printf("FillPane: currentStartLine = %d%n",
-		// currentLineStart);
+			// System.out.printf("FillPane: currentStartLine = %d%n",
+			// currentLineStart);
 		int sourceIndex = currentLineStart * BYTES_PER_LINE; // address to
 																// display
 		byte[] activeLine = new byte[BYTES_PER_LINE];
@@ -81,7 +85,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		source.position(sourceIndex);
 		for (int i = 0; i < linesToDisplay; i++) {
 			source.get(activeLine, 0, bytesToRead);
-			processLine(activeLine, bytesToRead, sourceIndex);
+			byte[] processedData = applyChanges(activeLine, bytesToRead, sourceIndex);
+			processLine(processedData, bytesToRead, sourceIndex);
 			sourceIndex += bytesToRead;
 			if (bytesToRead < BYTES_PER_LINE) {
 				// System.out.printf("[fillPane] sourceIndex: %d, bytesToRead:
@@ -90,15 +95,29 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 				break;
 			} // if
 			bytesToRead = Math.min(source.remaining(), BYTES_PER_LINE);
-			if (bytesToRead == 0){
+			if (bytesToRead == 0) {
 				bytesToRead = BYTES_PER_LINE;
 				break;
 			}
 		} // for
 		restoreFilters();
 		hexNavigationFilter.setLastLine(bytesToRead, linesToDisplay - 1);
-		System.out.printf("[fillPane]  bytesToRead: %d,linesToDisplay: %d%n", bytesToRead, linesToDisplay - 1);
+		// System.out.printf("[fillPane] bytesToRead: %d,linesToDisplay: %d%n",
+		// bytesToRead, linesToDisplay - 1);
 	}// fillPane
+
+	private byte[] applyChanges(byte[] rawData, int bytesRead, int bufferAddress) {
+		byte[] ans = rawData.clone();
+		SortedMap<Integer, Byte> rowChanges = changes.subMap(bufferAddress, bufferAddress + bytesRead);
+
+		if (rowChanges.size() != 0) {
+			System.out.printf("[applyChanges]: %n");
+			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k,v));
+
+			rowChanges.forEach((k, v) -> ans[(int) k - bufferAddress] = (byte) v);
+		} // if need to update
+		return ans;
+	}
 
 	private int processLine(byte[] rawData, int bytesRead, int bufferAddress) {//
 		StringBuilder sbData = new StringBuilder();
@@ -202,7 +221,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 	private void setDocumentFilter(StyledDocument doc) {
 
-		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics);
+		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics, changes);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
 		// hexFilter = null;
@@ -236,6 +255,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 	public void loadDocument(byte[] sourceArray) {
 
+		changes.clear();
 		this.source = ByteBuffer.wrap(sourceArray);
 
 		setUpScrollBar();
@@ -287,7 +307,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		}
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				
 
 				int max = maximumNumberOfRows(textPane);
 				int extent = calcExtent(textPane);
@@ -359,7 +378,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private void appInit() {
 		doc = textPane.getStyledDocument();
 		makeStyles();
-
+		changes = new TreeMap<Integer, Byte>();
 	}// appInit
 
 	private void initialize() {

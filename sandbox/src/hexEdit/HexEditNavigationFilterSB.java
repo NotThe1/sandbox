@@ -25,8 +25,8 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private int lastAsciiEnd = 0;
 	private int lineLength;
 	
-	private boolean asciiWrap = false;
 	private int asciiCount = 0;
+	
 
 	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
 		this.doc = doc;
@@ -50,11 +50,11 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		lastDataEnd = bytesBeforeLastLine + this.dataStart + (3 * (bytesRead-1))+2;
 		lastDataEnd = bytesRead < 8 ? lastDataEnd: lastDataEnd + 1;
 		
-		System.out.printf("%n[setLastLine] bytesRead: %d,linesRead: %d %n",bytesRead,linesRead);
-		System.out.printf("[setLastLine] lineLength: %d %n",lineLength);
-		System.out.printf("[setLastLine] bytesBeforeLastLine: %d %n",bytesBeforeLastLine);
-		System.out.printf("[setLastLine] lastAsciiStart: %d,lastAsciiEnd: %d %n",lastAsciiStart,lastAsciiEnd);
-		System.out.printf("[setLastLine] lastDataEnd: %d %n%n",lastDataEnd);
+//		System.out.printf("%n[setLastLine] bytesRead: %d,linesRead: %d %n",bytesRead,linesRead);
+//		System.out.printf("[setLastLine] lineLength: %d %n",lineLength);
+//		System.out.printf("[setLastLine] bytesBeforeLastLine: %d %n",bytesBeforeLastLine);
+//		System.out.printf("[setLastLine] lastAsciiStart: %d,lastAsciiEnd: %d %n",lastAsciiStart,lastAsciiEnd);
+//		System.out.printf("[setLastLine] lastDataEnd: %d %n%n",lastDataEnd);
 		
 	}//setLastLine
 	
@@ -79,7 +79,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		int columnType = columnTable[column];
 		int position = dot;
 		
-		System.out.printf("[setDot] dot:  %d,columnType:  %d,position:  %d%n" , dot, columnType, position);
+//		System.out.printf("[setDot] dot:  %d,columnType:  %d,position:  %d%n" , dot, columnType, position);
 		
 			
 		switch (columnType) {
@@ -106,7 +106,6 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		case ASCII_WRAP:	//4
 			System.out.printf("%s%n", "ASCII Wrap");
 			position = paragraphElement.getEndOffset() + this.asciiStart;
-			asciiWrap = true;
 			asciiCount = 1;
 			break;
 		default:

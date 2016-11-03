@@ -1,6 +1,6 @@
 package hexEdit;
 
-import java.util.regex.Pattern;
+import java.util.SortedMap;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -10,34 +10,30 @@ import javax.swing.text.StyledDocument;
 
 public class HexEditDocumentFilterSB extends DocumentFilter {
 
-	// public HexEditDocumentFilter() {
-	// // TODO Auto-generated constructor stub
-	// }
 	private StyledDocument doc;
-	private int dataEnd, asciiEnd;// addressEnd,
-	private int row, column, elementPosition;
-	private boolean isAddress, isData, isASCII;
-	private boolean isInsert;
-	private Pattern hexPattern;
+	private int row; // , column, elementPosition;
+	private int addressSize;
+
 	private int[] columnTypeTable;
 	private Integer[] dataToAsciiTable;
+	private Integer[] sourceColumnTable;
 
 	private AttributeSet attrData;
 	private AttributeSet attrASCII;
 
 	private HexEditMetrics hexMetrics;
+	private SortedMap<Integer,Byte> changes;
+	// private boolean innerFlag = false;
 
-	private boolean innerFlag = false;
-
-	public HexEditDocumentFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
+	public HexEditDocumentFilterSB(StyledDocument doc, HexEditMetrics hexMetrics,SortedMap<Integer,Byte> changes) {
 		this.doc = doc;
 		this.hexMetrics = hexMetrics;
+		this.changes= changes;
 
 		this.attrData = null;
 		this.attrASCII = null;
-		// this.addressEnd = addressSize + 2;
-		// this.dataEnd = addressEnd + (BYTES_PER_LINE * 3) + 2;
-		this.asciiEnd = dataEnd + BYTES_PER_LINE + 4;
+		
+		this.addressSize = hexMetrics.getAddressSize();
 		appInit();
 
 	}// Constructor
@@ -50,11 +46,10 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 		this.attrASCII = attrASCII;
 	}// setDataAttributes
 
-	public void appInit() {
-		hexPattern = Pattern.compile(PATTERN_HEX);
+	private void appInit() {
 		columnTypeTable = makeColumnTable();
 		dataToAsciiTable = makeDataToAsciiTable();
-
+		sourceColumnTable = makeSourceColumnTable();
 	}// appInit
 
 	public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr)
@@ -70,24 +65,26 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 
 	public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
 			throws BadLocationException {
-		System.out.printf("[replace]\toffset: %d ,length: %d, text: %s %n", offset, length, text);
-		int netLength = length == 0 ? 1 : length;// length of 0 equals a insert;
-													// length of 1 equals a
-													// replace
+		// System.out.printf("[replace]\toffset: %d ,length: %d, text: %s %n",
+		// offset, length, text);
+
+		// length of 0 equals a insert length of 1 equals a replace
+		int netLength = length == 0 ? 1 : length;
 
 		int columnPosition = getColumnPosition(offset);
 		Integer newCharacterIndex = null;
-		Integer newDataIndex = null;
+		int docOffset = 0;
+		Integer sourceColumn = sourceColumnTable[columnPosition];
+
 		int columnType = columnTypeTable[columnPosition];
-		System.out.printf("replace:: position: offset: %d, netLength: %d, text: %s, columnType: %d, innerFlag %s%n",
-				offset, netLength, text, columnType, innerFlag);
+
+		byte newValue = 0;
+
+		// System.out.printf("replace:: position: offset: %d, netLength: %d,
+		// text: %s, columnType: %d, innerFlag %s%n",
+		// offset, netLength, text, columnType, innerFlag);
 
 		switch (columnType) {
-		case ADDR: // do nothing
-		case EOL: // ignore
-			return;
-		case BLANK:
-			break;
 		case HEX1:
 		case HEX2:
 			if (!isTextHex(text)) {
@@ -95,39 +92,63 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 			} // if - want only hex characters
 			text = text.toUpperCase();
 			newCharacterIndex = dataToAsciiTable[columnPosition];
+
+			fb.replace(offset, netLength, text, attrs);
+
+			int targetOffset = (columnType == HEX1) ? offset : offset - 1;
+			// String newChar = convertToPrintable(targetOffset);
+			int value = getValueAtOffset(targetOffset);
+			String newChar = convertToPrintable1(value);
+			newValue = (byte) (value & 0XFF);
+			docOffset = offset + newCharacterIndex;
+
+			fb.replace(docOffset, 1, newChar, attrASCII);
 			break;
 		case ASCII:
-			newDataIndex = dataToAsciiTable[columnPosition];
-			innerFlag = true;
-			break;
+			newCharacterIndex = dataToAsciiTable[columnPosition];
 
-		default:
+			fb.replace(offset, netLength, text, attrs);
 
-		}// switch - columnType
-		fb.replace(offset, netLength, text, attrs);
-
-		// handle simultaneous change of data/ASCII display
-		if (newCharacterIndex != null) {
-			int targetOffset = (columnType == HEX1) ? offset : offset - 1;
-			String newChar = convertToPrintable(targetOffset);
-			int docOffset = offset + newCharacterIndex;
-			fb.replace(docOffset, 1, newChar, attrASCII);
-			System.out.printf("Add - \"%s\" into location %d%n", newChar, docOffset);
-			System.out.printf("offset: %d ,newCharacterIndex: %d ,docOffset %d %n", offset, newCharacterIndex,
-					docOffset);
-		} // if newCharacterIndex
-
-		if (columnType == ASCII) {
 			byte[] hexValues = text.getBytes();
-			String hexData = String.format("%02X", hexValues[0]);
-			int docOffset = offset + newDataIndex;
+			newValue = hexValues[0];
+			String hexData = String.format("%02X", newValue);
+			docOffset = offset + newCharacterIndex;
 
 			fb.replace(docOffset, 2, hexData, attrData);
-			System.out.printf("hexData = %s %n", hexData);
-
-		} // if newDataIndex
-
+			break;
+		case ADDR: // do nothing
+		case EOL: // ignore
+		case BLANK:
+			return;
+		default:
+		}// switch - columnType
+		
+//		System.out.printf("[replace] hexValue: %02X", newValue);
+//		System.out.printf("[replace] columnType: %d, columnPosition: %d, sourceColumn: %d%n", columnType,
+//				columnPosition, sourceColumn);
+//		
+//		System.out.printf("[replace] sourceIndex: %02X", getSourceIndex(offset,sourceColumn));
+		changes.put(getSourceIndex(offset,sourceColumn), newValue);
+		
+		if (changes.size() != 0) {
+			System.out.printf("[replace]: %n");
+			changes.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k,v));
+		} // if need to update
+	
 	}// replace
+	
+	private int getSourceIndex(int docPosition,int columnIndex){
+		Element rowElement = doc.getParagraphElement(docPosition);
+		String addressStr = null;
+		try {
+			 addressStr = doc.getText(rowElement.getStartOffset(), this.addressSize);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int rowAddress =Integer.valueOf(addressStr,16);
+		return rowAddress + columnIndex;
+	}//
 
 	private int getColumnPosition(int offset) {
 		Element rootElement = doc.getDefaultRootElement();
@@ -136,12 +157,27 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 		return offset - paragraphElement.getStartOffset();
 	}// getColumnPosition
 
-	public String convertToPrintable(int offset) {
+	private int getValueAtOffset(int offset) {
 		String HexString = null;
 		try {
 			HexString = doc.getText(offset, 2).trim();
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Integer.valueOf(HexString, 16);
+	}// getValueAtOffset
+
+	private String convertToPrintable1(int value) {
+		char[] c = new char[1];
+		c[0] = (char) (value & 0XFF);
+		return ((c[0] >= 0X20) && (c[0] <= 0X7F)) ? new String(c) : NON_PRINTABLE_CHAR;
+	}// convertToPrintable1
+
+	private String convertToPrintable(int offset) {
+		String HexString = null;
+		try {
+			HexString = doc.getText(offset, 2).trim();
+		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 		Integer i = Integer.valueOf(HexString, 16);
@@ -226,6 +262,16 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 		return ans;
 	}// makeDataToAsciiTable
 
+	private Integer[] makeSourceColumnTable() {
+
+		Integer[] ans = new Integer[] { null, null, null, null, null, null, null, 0, 0, null, 1, 1, null, 2, 2, null, 3,
+				3, null, 4, 4, null, 5, 5, null, 6, 6, null, 7, 7, null, null, 8, 8, null, 9, 9, null, 10, 10, null, 11,
+				11, null, 12, 12, null, 13, 13, null, 14, 14, null, 15, 15, null, null, null, 0, 1, 2, 3, 4, 5, 6, 7, 8,
+				9, 10, 11, 12, 13, 14, 15, null, null };
+		return ans;
+
+	}
+
 	private final static String PATTERN_HEX = "[A-F|a-f|0-9]+";
 	// private static String PATTERN_PRINTABLE =
 	// "^([a-zA-Z0-9!@#$%^&amp;*()-_=+;:'&quot;|~`&lt;&gt;?/{}]{1,1})$";
@@ -236,12 +282,7 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 	private final static int HEX1 = 1;
 	private final static int HEX2 = 2;
 	private final static int ASCII = 3;
-
 	private final static int BLANK = 5;
-
 	private final static int EOL = 10;
-	private final static int ASCII_WRAP = 11;
-
-	private final static int BYTES_PER_LINE = HexEditPanelSB.BYTES_PER_LINE;
 
 }// class HexEditDocumentFilter
