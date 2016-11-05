@@ -6,29 +6,39 @@ package hexEdit;
 // You can back arrow to them if needed.
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.nio.ByteBuffer;
+import java.text.ParseException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextPane;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -112,7 +122,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 		if (rowChanges.size() != 0) {
 			System.out.printf("[applyChanges]: %n");
-			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k,v));
+			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
 
 			rowChanges.forEach((k, v) -> ans[(int) k - bufferAddress] = (byte) v);
 		} // if need to update
@@ -172,20 +182,64 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 	private void adjustAddressSize(long size) {
 		int addressSizeCurrent = this.addressSize;
+		int maxValue = ADDRESS_4_MAX;
+
 		if (size <= ADDRESS_4_MAX) {
-			setAddressSize(Math.max(ADDRESS_4, addressSizeCurrent));
-			lblDocHeader.setText(DOC_HEADER);
+			maxValue = ADDRESS_4_MAX;
+			this.addressSize= ADDRESS_4;
+//			setAddressSize(Math.max(ADDRESS_4, addressSizeCurrent));
+			// lblDocHeader.setText(DOC_HEADER);
 		} else if (size <= ADDRESS_6_MAX) {
-			setAddressSize(Math.max(ADDRESS_6, addressSizeCurrent));
-			lblDocHeader.setText(SPACE + SPACE + DOC_HEADER);
+			maxValue = ADDRESS_6_MAX;
+			this.addressSize= ADDRESS_6;
+//			setAddressSize(Math.max(ADDRESS_6, addressSizeCurrent));
+			// lblDocHeader.setText(SPACE + SPACE + DOC_HEADER);
 		} else if (size <= ADDRESS_8_MAX) {
-			setAddressSize(Math.max(ADDRESS_8, addressSizeCurrent));
-			lblDocHeader.setText(SPACE + SPACE + SPACE + SPACE + DOC_HEADER);
+			maxValue = ADDRESS_8_MAX;
+			this.addressSize= ADDRESS_8;
+//			setAddressSize(Math.max(ADDRESS_8, addressSizeCurrent));
+			// lblDocHeader.setText(SPACE + SPACE + SPACE + SPACE + DOC_HEADER);
 		} else {
+			maxValue = 0XFFFF;
 			this.addressSize = ADDRESS_4;
-			lblDocHeader.setText(DOC_HEADER);
+			// lblDocHeader.setText(DOC_HEADER);
 		} // if fileSize
+		
+		adjustHeaderAndSpinner( maxValue);
+
+
 	}// adjustAddressSize
+	
+	private void adjustHeaderAndSpinner(int maxValue){
+		byte[] address = new byte[] {(byte) 0X3A,(byte) 0X20,(byte) 0X20,
+				(byte) 0X00,(byte) 0X00,(byte) 0X00,(byte) 0X00,
+				(byte) 0X00,(byte) 0X00,(byte) 0X00,(byte) 0X00};
+		
+		Font font = lblDocHeader.getFont();
+		int width = lblDocHeader.getFontMetrics(font).bytesWidth(address, 0, this.addressSize + 2);
+		
+		Rectangle recSpinner  = spinnerAddress.getBounds();
+		recSpinner.width = width;
+		spinnerAddress.setBounds(recSpinner);
+		
+		int x = recSpinner.x + recSpinner.width + lblDocHeader.getFontMetrics(font).bytesWidth(address, 0,  1);
+		Rectangle recLabel = lblDocHeader.getBounds();
+		recLabel.x =x;
+		lblDocHeader.setBounds(recLabel);
+		
+		spinnerAddress.updateUI();
+		lblDocHeader.updateUI();
+
+
+
+		
+		SpinnerNumberModel model = new SpinnerNumberModel(0, 0, maxValue - 1, 1);
+		spinnerAddress.setModel(model);
+		JSpinner.DefaultEditor editor = (DefaultEditor) spinnerAddress.getEditor();
+		JFormattedTextField ftf = editor.getTextField();
+		ftf.setFormatterFactory(new MyFormatterFactory(this.addressSize));
+		
+	}//adjustHeaderAndSpinner
 
 	public void setAddressSize(int addressSize) {
 
@@ -390,17 +444,28 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
+		panelHeader = new JPanel();
+		panelHeader.setLayout(null);
+		GridBagConstraints gbc_panelHeader = new GridBagConstraints();
+		gbc_panelHeader.fill = GridBagConstraints.BOTH;
+		gbc_panelHeader.insets = new Insets(0, 0, 5, 5);
+		gbc_panelHeader.gridx = 0;
+		gbc_panelHeader.gridy = 0;
+		add(panelHeader, gbc_panelHeader);
+
 		lblDocHeader = new JLabel();
-		lblDocHeader.setForeground(new Color(105, 105, 105));
+		lblDocHeader.setBounds(74, 1, 480, 20);
+		panelHeader.add(lblDocHeader);
+		lblDocHeader.setText("00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F");
+		lblDocHeader.setForeground(new Color(0, 100, 0));
 		lblDocHeader.setHorizontalAlignment(SwingConstants.LEFT);
 		lblDocHeader.setFont(new Font("Courier New", Font.BOLD, 16));
-		GridBagConstraints gbc_lblDocHeader = new GridBagConstraints();
-		gbc_lblDocHeader.fill = GridBagConstraints.VERTICAL;
-		gbc_lblDocHeader.anchor = GridBagConstraints.WEST;
-		gbc_lblDocHeader.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDocHeader.gridx = 0;
-		gbc_lblDocHeader.gridy = 0;
-		add(lblDocHeader, gbc_lblDocHeader);
+
+		spinnerAddress = new JSpinner();
+		spinnerAddress.setAlignmentX(Component.LEFT_ALIGNMENT);
+		spinnerAddress.setFont(new Font("Courier New", Font.PLAIN, 16));
+		spinnerAddress.setBounds(1, 1, 72, 20);
+		panelHeader.add(spinnerAddress);
 
 		textPane = new JTextPane();
 		textPane.addComponentListener(this);
@@ -466,22 +531,65 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private static final int ADDRESS_8_MAX = Integer.MAX_VALUE; // 7FFF FFFF
 																// 2,147,483,647
 
-	private static final String DOC_HEADER = "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ";
+	private static final String DOC_HEADER = "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F";
 	private JLabel lblDocHeader_1;
+	private JPanel panelHeader;
+	private JSpinner spinnerAddress;
 
+	// ----------------------------not
+	// implemented--------------------------------------------------------------
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
-	}
+	}// componentHidden
 
 	@Override
 	public void componentMoved(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
-	}
+	}// componentMoved
 
 	@Override
 	public void componentShown(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
-	}
+	}// componentShown
+		// ----------------------------not
+		// implemented--------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------------------------
+	private static class HexFormatter extends DefaultFormatter {
+		private static final long serialVersionUID = 1L;
+		private int addressLength;
+		private String addressFormat;
+
+		public HexFormatter(int addressLength){
+			this.addressLength= addressLength;
+			this.addressFormat= "%0" + addressLength + "X";
+		}
+
+		public Object stringToValue(String text) throws ParseException {
+			try {
+				return Integer.valueOf(text, 16);
+			} catch (NumberFormatException nfe) {
+				throw new ParseException(text, 0);
+			} // try
+		}// stringToValue
+
+		public String valueToString(Object value) throws ParseException {
+			return String.format(this.addressFormat, value);
+		}// valueToString
+	}// class HexFormatter
+
+	private static class MyFormatterFactory extends DefaultFormatterFactory {
+		private int addressLength;
+		public MyFormatterFactory(int addressLength){
+			this.addressLength= addressLength;
+		}//Constructor
+		public AbstractFormatter getDefaultFormatter() {
+			return new HexFormatter(addressLength);
+		}// getDefaultFormatter
+	}// class MyFormatterFactory
+		// ----------------------------------------------------------------------------------------------------------
 
 }// class HexEditPanelSB
