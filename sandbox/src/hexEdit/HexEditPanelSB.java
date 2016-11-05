@@ -35,6 +35,8 @@ import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
@@ -43,7 +45,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class HexEditPanelSB extends JPanel implements AdjustmentListener, ComponentListener {
+public class HexEditPanelSB extends JPanel implements AdjustmentListener, ComponentListener, ChangeListener {
 	private static final long serialVersionUID = 1L;
 
 	private ByteBuffer source;
@@ -81,7 +83,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		try {
 			doc.remove(0, doc.getLength());
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		} // try
 			// System.out.printf("FillPane: currentStartLine = %d%n",
@@ -135,15 +137,12 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			if ((i % 8) == 0) {
 				sbData.append(SPACE);
 			} // if data extra space
-				// sbData.append(String.format(hexCharacterFormat,
-				// sourceBuffer.get(i)));
 			sbData.append(String.format(hexCharacterFormat, rawData[i]));
 			// System.out.printf("sourceArray[%2d]: %02X%n", i, rawData[i]);
 		} // for
 
 		String bufferAddressStr = String.format(addressFormat, bufferAddress);
 		String dataStr = String.format(dataFormat, sbData.toString());
-		// sourceBuffer.rewind();
 		String asciiStr = getASCII(rawData, bytesRead);
 
 		try {
@@ -181,65 +180,53 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// setFormats
 
 	private void adjustAddressSize(long size) {
-		int addressSizeCurrent = this.addressSize;
+		this.addressSize = ADDRESS_4;
 		int maxValue = ADDRESS_4_MAX;
 
 		if (size <= ADDRESS_4_MAX) {
 			maxValue = ADDRESS_4_MAX;
-			this.addressSize= ADDRESS_4;
-//			setAddressSize(Math.max(ADDRESS_4, addressSizeCurrent));
-			// lblDocHeader.setText(DOC_HEADER);
+			this.addressSize = ADDRESS_4;
 		} else if (size <= ADDRESS_6_MAX) {
 			maxValue = ADDRESS_6_MAX;
-			this.addressSize= ADDRESS_6;
-//			setAddressSize(Math.max(ADDRESS_6, addressSizeCurrent));
-			// lblDocHeader.setText(SPACE + SPACE + DOC_HEADER);
+			this.addressSize = ADDRESS_6;
 		} else if (size <= ADDRESS_8_MAX) {
 			maxValue = ADDRESS_8_MAX;
-			this.addressSize= ADDRESS_8;
-//			setAddressSize(Math.max(ADDRESS_8, addressSizeCurrent));
-			// lblDocHeader.setText(SPACE + SPACE + SPACE + SPACE + DOC_HEADER);
+			this.addressSize = ADDRESS_8;
 		} else {
 			maxValue = 0XFFFF;
 			this.addressSize = ADDRESS_4;
-			// lblDocHeader.setText(DOC_HEADER);
 		} // if fileSize
-		
-		adjustHeaderAndSpinner( maxValue);
 
+		adjustHeaderAndSpinner(maxValue);
 
 	}// adjustAddressSize
-	
-	private void adjustHeaderAndSpinner(int maxValue){
-		byte[] address = new byte[] {(byte) 0X3A,(byte) 0X20,(byte) 0X20,
-				(byte) 0X00,(byte) 0X00,(byte) 0X00,(byte) 0X00,
-				(byte) 0X00,(byte) 0X00,(byte) 0X00,(byte) 0X00};
-		
+
+	private void adjustHeaderAndSpinner(int maxValue) {
+		byte[] address = new byte[] { (byte) 0X3A, (byte) 0X20, (byte) 0X20, (byte) 0X00, (byte) 0X00, (byte) 0X00,
+				(byte) 0X00, (byte) 0X00, (byte) 0X00, (byte) 0X00, (byte) 0X00 };
+
 		Font font = lblDocHeader.getFont();
 		int width = lblDocHeader.getFontMetrics(font).bytesWidth(address, 0, this.addressSize + 2);
-		
-		Rectangle recSpinner  = spinnerAddress.getBounds();
+
+		Rectangle recSpinner = spinnerAddress.getBounds();
 		recSpinner.width = width;
 		spinnerAddress.setBounds(recSpinner);
-		
-		int x = recSpinner.x + recSpinner.width + lblDocHeader.getFontMetrics(font).bytesWidth(address, 0,  1);
+
+		int x = recSpinner.x + recSpinner.width + lblDocHeader.getFontMetrics(font).bytesWidth(address, 0, 1);
 		Rectangle recLabel = lblDocHeader.getBounds();
-		recLabel.x =x;
+		recLabel.x = x;
 		lblDocHeader.setBounds(recLabel);
-		
+
 		spinnerAddress.updateUI();
 		lblDocHeader.updateUI();
 
-
-
-		
 		SpinnerNumberModel model = new SpinnerNumberModel(0, 0, maxValue - 1, 1);
 		spinnerAddress.setModel(model);
 		JSpinner.DefaultEditor editor = (DefaultEditor) spinnerAddress.getEditor();
 		JFormattedTextField ftf = editor.getTextField();
 		ftf.setFormatterFactory(new MyFormatterFactory(this.addressSize));
-		
-	}//adjustHeaderAndSpinner
+
+	}// adjustHeaderAndSpinner
 
 	public void setAddressSize(int addressSize) {
 
@@ -296,19 +283,12 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// restoreFilters
 
-	// private void setNavigationFilter( doc, int lastDataCount) {
-	// HexEditNavigationFilter hexNavigationFilter = new
-	// HexEditNavigationFilter(doc, lastDataCount);
-	// textPane.setNavigationFilter(hexNavigationFilter);
-	// }// resetDocumentFilter
-
 	private void setNavigationFilter(StyledDocument doc) {
 		hexNavigationFilter = new HexEditNavigationFilterSB(doc, hexMetrics);
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// resetDocumentFilter
 
 	public void loadDocument(byte[] sourceArray) {
-
 		changes.clear();
 		this.source = ByteBuffer.wrap(sourceArray);
 
@@ -334,7 +314,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			hexMetrics = null;
 		} //
 		hexMetrics = new HexEditMetrics(sourceSize);
-	}
+	}// calcHexMetrics
 
 	private void setExtent(int amount, BoundedRangeModel model) {
 		model.setExtent(amount);
@@ -355,13 +335,11 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// setValue
 
 	private void setUpScrollBar() {
-		// int fontHeight = calcFontHeight(thisTextPane);
 		if (source == null) {
 			return;
-		}
+		} // if
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-
 				int max = maximumNumberOfRows(textPane);
 				int extent = calcExtent(textPane);
 
@@ -377,7 +355,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 				// System.out.printf("Extent = %d%n", model.getExtent());
 				// System.out.printf("Value = %d%n", model.getValue());
 				// --
-
 			}// run
 		});
 
@@ -386,7 +363,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private int calcUsableHeight(JTextPane thisPane) {
 		Insets insets = thisPane.getInsets();
 		Dimension dimension = thisPane.getSize();
-		int ans = dimension.height - (insets.bottom + insets.top);
 		return dimension.height - (insets.bottom + insets.top);
 	}// calcUsableHeight
 
@@ -398,12 +374,10 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private int calcExtent(JTextPane thisPane) {
 		int useableHeight = calcUsableHeight(thisPane);
 		int fontHeight = calcFontHeight(thisPane);
-		int ans = (int) (useableHeight / fontHeight);
 		return (int) (useableHeight / fontHeight);
 	}// calcExtent
 
 	private int maximumNumberOfRows(JTextPane thisTextPane) {
-		// return (int) spinnerRows.getValue();
 		return (source.limit() / BYTES_PER_LINE) + 1;
 	}// maximumNumberOfRows
 
@@ -462,6 +436,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		lblDocHeader.setFont(new Font("Courier New", Font.BOLD, 16));
 
 		spinnerAddress = new JSpinner();
+		spinnerAddress.addChangeListener(this);
+		spinnerAddress.setToolTipText("Tab out to move to new address");
 		spinnerAddress.setAlignmentX(Component.LEFT_ALIGNMENT);
 		spinnerAddress.setFont(new Font("Courier New", Font.PLAIN, 16));
 		spinnerAddress.setBounds(1, 1, 72, 20);
@@ -531,8 +507,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private static final int ADDRESS_8_MAX = Integer.MAX_VALUE; // 7FFF FFFF
 																// 2,147,483,647
 
-	private static final String DOC_HEADER = "       00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F";
-	private JLabel lblDocHeader_1;
 	private JPanel panelHeader;
 	private JSpinner spinnerAddress;
 
@@ -552,21 +526,17 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	public void componentShown(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
 	}// componentShown
-		// ----------------------------not
-		// implemented--------------------------------------------------------------
 
 	// ----------------------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------------------
 	private static class HexFormatter extends DefaultFormatter {
 		private static final long serialVersionUID = 1L;
-		private int addressLength;
 		private String addressFormat;
 
-		public HexFormatter(int addressLength){
-			this.addressLength= addressLength;
-			this.addressFormat= "%0" + addressLength + "X";
-		}
+		public HexFormatter(int addressLength) {
+			this.addressFormat = "%0" + addressLength + "X";
+		}// Constructor
 
 		public Object stringToValue(String text) throws ParseException {
 			try {
@@ -582,14 +552,40 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// class HexFormatter
 
 	private static class MyFormatterFactory extends DefaultFormatterFactory {
+		private static final long serialVersionUID = 1L;
 		private int addressLength;
-		public MyFormatterFactory(int addressLength){
-			this.addressLength= addressLength;
-		}//Constructor
+
+		public MyFormatterFactory(int addressLength) {
+			this.addressLength = addressLength;
+		}// Constructor
+
 		public AbstractFormatter getDefaultFormatter() {
 			return new HexFormatter(addressLength);
 		}// getDefaultFormatter
 	}// class MyFormatterFactory
 		// ----------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void stateChanged(ChangeEvent changeEvent) {
+		if (!changeEvent.getSource().equals(spinnerAddress)) {
+			return;
+		} // if
+		int value = (int) spinnerAddress.getValue();
+		int targetValue = value / BYTES_PER_LINE;
+
+		if (targetValue == (int) scrollBar.getValue()) {
+			return; // same line
+		} //
+
+		scrollBar.setValue(targetValue);
+
+		System.out.printf("[focusLost] spinnerValue: %d (%X)%n", value, value);
+		int valueSB = (int) scrollBar.getValue();
+		System.out.printf("[focusLost] scrollBar Value: %d (%X)%n", valueSB, valueSB);
+
+		int maxSB = (int) scrollBar.getValue();
+		System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB, maxSB);
+
+	}
 
 }// class HexEditPanelSB

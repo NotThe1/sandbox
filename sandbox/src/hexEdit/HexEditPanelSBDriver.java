@@ -433,6 +433,4 @@ public class HexEditPanelSBDriver {
 		});
 	}// initialize
 
-
-	
 }// class GUItemplate
