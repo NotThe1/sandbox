@@ -42,6 +42,7 @@ public class HexEditPanelDriver {
 	private JSpinner spinnerRows;
 	private JLabel lblPlus;
 	private JSpinner spinnerPlus;
+	private HexEditPanel hexEditPanel_1;
 
 	/**
 	 * Launch the application.
@@ -85,14 +86,9 @@ public class HexEditPanelDriver {
 	}// doBtnOne
 
 	private void doBtnTwo() {
-		byte[] unloadedData = hexEditPanel.unloadDocument();
+		byte[] unloadedData = hexEditPanel.unloadDocument();	
+		hexEditPanel_1.loadDocument(unloadedData);
 		
-		for ( int i = 0; i < HexEditMetrics.BYTES_PER_LINE; i++){
-			System.out.printf("[unloadedData] byte %d: %02X%n", i,unloadedData[i]);
-		}//for
-		
-		
-
 	}// doBtnTwo
 
 	private void doBtnThree() {
@@ -158,7 +154,7 @@ public class HexEditPanelDriver {
 
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPanelDriver.class);
-		frmTemplate.setSize(1096, 462);
+		frmTemplate.setSize(1096, 516);
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		spinnerRows.setValue((int) myPrefs.getInt("Rows", 10));
@@ -208,7 +204,7 @@ public class HexEditPanelDriver {
 		btnOne.setPreferredSize(new Dimension(50, 20));
 		toolBar.add(btnOne);
 
-		btnTwo = new JButton("2");
+		btnTwo = new JButton("Unload");
 		btnTwo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnTwo();
@@ -316,20 +312,32 @@ public class HexEditPanelDriver {
 		JPanel panelRight = new JPanel();
 		splitPane1.setRightComponent(panelRight);
 		GridBagLayout gbl_panelRight = new GridBagLayout();
-		gbl_panelRight.columnWidths = new int[] { 0, 0 };
-		gbl_panelRight.rowHeights = new int[] { 0, 30, 0 };
-		gbl_panelRight.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_panelRight.rowWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panelRight.columnWidths = new int[] { 0, 0, 0, 0 };
+		gbl_panelRight.rowHeights = new int[] { 0, 0 };
+		gbl_panelRight.columnWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panelRight.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		panelRight.setLayout(gbl_panelRight);
 
 		hexEditPanel = new HexEditPanel();
 		GridBagConstraints gbc_hexEditPanel = new GridBagConstraints();
-		gbc_hexEditPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_hexEditPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_hexEditPanel.anchor = GridBagConstraints.WEST;
 		gbc_hexEditPanel.fill = GridBagConstraints.VERTICAL;
 		gbc_hexEditPanel.gridx = 0;
 		gbc_hexEditPanel.gridy = 0;
 		panelRight.add(hexEditPanel, gbc_hexEditPanel);
+		
+		hexEditPanel_1 = new HexEditPanel();
+		GridBagLayout gbl_hexEditPanel_1 = (GridBagLayout) hexEditPanel_1.getLayout();
+		gbl_hexEditPanel_1.rowWeights = new double[]{0.0, 1.0};
+		gbl_hexEditPanel_1.rowHeights = new int[]{25, 0};
+		gbl_hexEditPanel_1.columnWeights = new double[]{0.0, 0.0};
+		gbl_hexEditPanel_1.columnWidths = new int[]{780, 25};
+		GridBagConstraints gbc_hexEditPanel_1 = new GridBagConstraints();
+		gbc_hexEditPanel_1.fill = GridBagConstraints.BOTH;
+		gbc_hexEditPanel_1.gridx = 2;
+		gbc_hexEditPanel_1.gridy = 0;
+		panelRight.add(hexEditPanel_1, gbc_hexEditPanel_1);
 		splitPane1.setDividerLocation(250);
 
 		JPanel panelStatus = new JPanel();

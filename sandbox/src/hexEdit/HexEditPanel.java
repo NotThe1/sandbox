@@ -124,8 +124,8 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 		SortedMap<Integer, Byte> rowChanges = changes.subMap(bufferAddress, bufferAddress + bytesRead);
 
 		if (rowChanges.size() != 0) {
-			System.out.printf("[applyChanges]: %n");
-			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
+//			System.out.printf("[applyChanges]: %n");
+//			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
 
 			rowChanges.forEach((k, v) -> ans[(int) k - bufferAddress] = (byte) v);
 		} // if need to update
@@ -300,19 +300,8 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 	}// loadDocument
 	
 	public byte[] unloadDocument(){
-		byte ans[] = source.array();
-		int numberOfBytes = ans.length;
-		
-		SortedMap<Integer, Byte> rowChanges = changes.subMap(0, numberOfBytes);
-
-		if (rowChanges.size() != 0) {
-//			System.out.printf("[unloadDocument]: %n");
-//			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
-
-			rowChanges.forEach((k, v) -> ans[ k ] = (byte) v);
-		} // if need to update
-		return ans;
-	}
+		return applyChanges(source.array(), source.limit(), 0);
+	}//unloadDocument
 
 	private void calcHexMetrics(long sourceSize) {
 		if (hexMetrics != null) {
