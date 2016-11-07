@@ -5,7 +5,7 @@ import javax.swing.text.NavigationFilter;
 import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 
-public class HexEditNavigationFilterSB extends NavigationFilter {
+public class HexEditNavigationFilter extends NavigationFilter {
 
 	
 	private HexEditMetrics hexMetrics;
@@ -28,7 +28,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 //	private int asciiCount = 0;
 	
 
-	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
+	public HexEditNavigationFilter(StyledDocument doc, HexEditMetrics hexMetrics) {
 		this.doc = doc;
 		this.hexMetrics= hexMetrics;
 		

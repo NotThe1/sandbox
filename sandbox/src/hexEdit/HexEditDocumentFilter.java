@@ -25,7 +25,7 @@ import javax.swing.text.StyledDocument;
  * @author Frank Martyn
  *
  */
-public class HexEditDocumentFilterSB extends DocumentFilter {
+public class HexEditDocumentFilter extends DocumentFilter {
 
 	private StyledDocument doc;
 	private int row; // , column, elementPosition;
@@ -42,7 +42,7 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 	private SortedMap<Integer, Byte> changes;
 	// private boolean innerFlag = false;
 
-	public HexEditDocumentFilterSB(StyledDocument doc, HexEditMetrics hexMetrics, SortedMap<Integer, Byte> changes) {
+	public HexEditDocumentFilter(StyledDocument doc, HexEditMetrics hexMetrics, SortedMap<Integer, Byte> changes) {
 		this.doc = doc;
 		this.hexMetrics = hexMetrics;
 		this.changes = changes;
@@ -107,8 +107,13 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 
 		Integer newCharacterIndex = dataToAsciiTable[columnPosition];
 		;
+		
+		if(columnType == null){
+			int a = 0;
+		}
 
 		switch (columnType) {
+		
 		case HEX1:
 		case HEX2:
 			if (!isTextHex(text)) {

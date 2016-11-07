@@ -45,7 +45,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class HexEditPanelSB extends JPanel implements AdjustmentListener, ComponentListener, ChangeListener {
+public class HexEditPanel extends JPanel implements AdjustmentListener, ComponentListener, ChangeListener {
 	private static final long serialVersionUID = 1L;
 
 	private ByteBuffer source;
@@ -56,8 +56,8 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private int currentExtent;
 
 	private StyledDocument doc;
-	private HexEditDocumentFilterSB hexFilter;
-	private HexEditNavigationFilterSB hexNavigationFilter;
+	private HexEditDocumentFilter hexFilter;
+	private HexEditNavigationFilter hexNavigationFilter;
 	private HexEditMetrics hexMetrics;
 
 	private String addressFormat;
@@ -116,6 +116,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		hexNavigationFilter.setLastLine(bytesToRead, linesToDisplay - 1);
 		// System.out.printf("[fillPane] bytesToRead: %d,linesToDisplay: %d%n",
 		// bytesToRead, linesToDisplay - 1);
+		textPane.setCaretPosition(0);
 	}// fillPane
 
 	private byte[] applyChanges(byte[] rawData, int bytesRead, int bufferAddress) {
@@ -251,7 +252,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 	private void setDocumentFilter(StyledDocument doc) {
 
-		hexFilter = new HexEditDocumentFilterSB(doc, hexMetrics, changes);
+		hexFilter = new HexEditDocumentFilter(doc, hexMetrics, changes);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
 		// hexFilter = null;
@@ -273,7 +274,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// restoreFilters
 
 	private void setNavigationFilter(StyledDocument doc) {
-		hexNavigationFilter = new HexEditNavigationFilterSB(doc, hexMetrics);
+		hexNavigationFilter = new HexEditNavigationFilter(doc, hexMetrics);
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// resetDocumentFilter
 
@@ -297,6 +298,21 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		setDocumentFilter(doc);
 		setNavigationFilter(doc);
 	}// loadDocument
+	
+	public byte[] unloadDocument(){
+		byte ans[] = source.array();
+		int numberOfBytes = ans.length;
+		
+		SortedMap<Integer, Byte> rowChanges = changes.subMap(0, numberOfBytes);
+
+		if (rowChanges.size() != 0) {
+//			System.out.printf("[unloadDocument]: %n");
+//			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
+
+			rowChanges.forEach((k, v) -> ans[ k ] = (byte) v);
+		} // if need to update
+		return ans;
+	}
 
 	private void calcHexMetrics(long sourceSize) {
 		if (hexMetrics != null) {
@@ -386,7 +402,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// makeStyles1
 		// -------------------------------------------------------------------------------------------------------
 
-	public HexEditPanelSB() {
+	public HexEditPanel() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -475,6 +491,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				currentLineStart = adjustmentEvent.getValue();
+				spinnerAddress.setValue(BYTES_PER_LINE * currentLineStart);
 				fillPane();
 			}// run
 		});
@@ -568,12 +585,12 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 
 		scrollBar.setValue(targetValue);
 
-		System.out.printf("[focusLost] spinnerValue: %d (%X)%n", value, value);
-		int valueSB = (int) scrollBar.getValue();
-		System.out.printf("[focusLost] scrollBar Value: %d (%X)%n", valueSB, valueSB);
-
-		int maxSB = (int) scrollBar.getValue();
-		System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB, maxSB);
+//		int valueSB = (int) scrollBar.getValue();
+//		int maxSB = (int) scrollBar.getValue();
+		
+//		System.out.printf("[focusLost] spinnerValue: %d (%X)%n", value, value);
+//		System.out.printf("[focusLost] scrollBar Value: %d (%X)%n", valueSB, valueSB);
+//		System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB, maxSB);
 
 	}//stateChanged
 
