@@ -8,6 +8,23 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.Element;
 import javax.swing.text.StyledDocument;
 
+/**
+ * used for hexEdit. it constructs a set of tables to control what will be
+ * placed in the document based on which doc column the replace references. It
+ * skips the part of the line that is used for the address. In the data section
+ * it will allow only hex digits. In the ascii section it will accept any byte
+ * value and show its printable representation.
+ * 
+ * It will perform mutual updates of the corresponding data and ascii sections.
+ * 
+ * The last changes original data are recorded in a SortedMap and applied only
+ * in the document, not in the source These changes are available to
+ * constructing classes in the - SortedMap<Integer, Byte> changes- argument of
+ * the constructor
+ * 
+ * @author Frank Martyn
+ *
+ */
 public class HexEditDocumentFilterSB extends DocumentFilter {
 
 	private StyledDocument doc;
@@ -71,10 +88,10 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 
 		// length of 0 equals a insert length of 1 equals a replace
 		Integer columnPosition = getColumnPosition(offset);
-		if(columnPosition == null){
+		if (columnPosition == null) {
 			return;
-		}//if - do nothing
-		
+		} // if - do nothing
+
 		int netLength = length == 0 ? 1 : length;
 
 		int docOffset = 0;
@@ -87,9 +104,9 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 		// System.out.printf("replace:: position: offset: %d, netLength: %d,
 		// text: %s, columnType: %d, innerFlag %s%n",
 		// offset, netLength, text, columnType, innerFlag);
-		
-		
-		Integer newCharacterIndex = dataToAsciiTable[columnPosition];;
+
+		Integer newCharacterIndex = dataToAsciiTable[columnPosition];
+		;
 
 		switch (columnType) {
 		case HEX1:
@@ -126,15 +143,16 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 
 		changes.put(getSourceIndex(offset, sourceColumn), newValue);
 
-//		if (changes.size() != 0) {
-//			System.out.printf("[replace]: %n");
-//			changes.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
-//		} // if need to update
+		// if (changes.size() != 0) {
+		// System.out.printf("[replace]: %n");
+		// changes.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue =
+		// %02X%n", k, v));
+		// } // if need to update
 
 	}// replace
 
 	private int getSourceIndex(int docPosition, int columnIndex) {
-		int ans=0;
+		int ans = 0;
 		Element rowElement = doc.getParagraphElement(docPosition);
 		try {
 			String addressStr = doc.getText(rowElement.getStartOffset(), this.addressSize);
@@ -158,7 +176,7 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 			HexString = doc.getText(offset, 2).trim();
 		} catch (BadLocationException e) {
 			e.printStackTrace();
-		}//try
+		} // try
 		return Integer.valueOf(HexString, 16);
 	}// getValueAtOffset
 
@@ -185,10 +203,10 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 
 		// ans[colPosition++] = BLANK; // make space after colon move the cursor
 
-		Integer[] dataKinds = new Integer[] { HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1,
-				HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, null, HEX1, HEX2, null, HEX1,
-				HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2,
-				null, HEX1, HEX2, };
+		Integer[] dataKinds = new Integer[] { HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null,
+				HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, null, HEX1, HEX2, null, HEX1,
+				HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null, HEX1, HEX2, null,
+				HEX1, HEX2, };
 		System.arraycopy(dataKinds, 0, ans, colPosition, dataKinds.length);
 		colPosition += dataKinds.length;
 
@@ -196,8 +214,8 @@ public class HexEditDocumentFilterSB extends DocumentFilter {
 			ans[colPosition] = null;
 		} // for Data PAD
 
-		Integer[] asciiKinds = new Integer[] { ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII,
-				ASCII, ASCII, ASCII, ASCII, ASCII, null, null };
+		Integer[] asciiKinds = new Integer[] { ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, ASCII,
+				ASCII, ASCII, ASCII, ASCII, ASCII, ASCII, null, null };
 		System.arraycopy(asciiKinds, 0, ans, colPosition, asciiKinds.length);
 
 		return ans;

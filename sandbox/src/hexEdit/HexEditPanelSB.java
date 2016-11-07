@@ -51,7 +51,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private ByteBuffer source;
 	private int addressSize;
 
-	private static int currentLineStart;
+	private  int currentLineStart;
 	private int currentMax;
 	private int currentExtent;
 
@@ -110,7 +110,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			if (bytesToRead == 0) {
 				bytesToRead = BYTES_PER_LINE;
 				break;
-			}
+			}//if
 		} // for
 		restoreFilters();
 		hexNavigationFilter.setLastLine(bytesToRead, linesToDisplay - 1);
@@ -150,17 +150,9 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			doc.insertString(doc.getLength(), dataStr, dataAttributes);
 			doc.insertString(doc.getLength(), asciiStr, asciiAttributes);
 		} catch (BadLocationException e) {
-			//
 			e.printStackTrace();
-		}
-
-		// System.out.printf("%s", bufferAddressStr);
-		// System.out.printf("%s", dataStr);
-		// System.out.printf("%s", asciiStr);
-
-		// sourceBuffer.clear();
-		return bufferAddress += bytesRead;
-
+		} // try
+		return bufferAddress + bytesRead;
 	}// processLine
 
 	private String getASCII(byte[] rawData, int size) {
@@ -229,7 +221,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	}// adjustHeaderAndSpinner
 
 	public void setAddressSize(int addressSize) {
-
 		switch (addressSize) {
 		case ADDRESS_4:
 		case ADDRESS_6:
@@ -246,8 +237,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			} // if
 		}// switch
 		System.out.printf("addressSize = %d %n", this.addressSize);
-		// addressFormat = "%0" + this.addressSize + "X: ";
-
 	}// setAddressSize
 
 	private void prepareDoc(StyledDocument doc, long srcSize) {
@@ -312,7 +301,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	private void calcHexMetrics(long sourceSize) {
 		if (hexMetrics != null) {
 			hexMetrics = null;
-		} //
+		} //if
 		hexMetrics = new HexEditMetrics(sourceSize);
 	}// calcHexMetrics
 
@@ -357,7 +346,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 				// --
 			}// run
 		});
-
 	}// setUpScrollBar
 
 	private int calcUsableHeight(JTextPane thisPane) {
@@ -514,17 +502,17 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 	// implemented--------------------------------------------------------------
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 	}// componentHidden
 
 	@Override
 	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 	}// componentMoved
 
 	@Override
 	public void componentShown(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 	}// componentShown
 
 	// ----------------------------------------------------------------------------------------------------------
@@ -563,6 +551,7 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 			return new HexFormatter(addressLength);
 		}// getDefaultFormatter
 	}// class MyFormatterFactory
+	
 		// ----------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -586,6 +575,6 @@ public class HexEditPanelSB extends JPanel implements AdjustmentListener, Compon
 		int maxSB = (int) scrollBar.getValue();
 		System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB, maxSB);
 
-	}
+	}//stateChanged
 
 }// class HexEditPanelSB

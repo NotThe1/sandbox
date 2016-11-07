@@ -25,7 +25,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private int lastAsciiEnd = 0;
 	private int lineLength;
 	
-	private int asciiCount = 0;
+//	private int asciiCount = 0;
 	
 
 	public HexEditNavigationFilterSB(StyledDocument doc, HexEditMetrics hexMetrics) {
@@ -67,10 +67,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 			return; // past the ASCII
 		} // if
 		
-		int a = 0;
-		
-		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {
-			
+		if ((dot >= lastDataEnd) & (dot < lastAsciiStart - 1)) {	
 			return;
 		} // past the last data , before the ASCII
 
@@ -91,7 +88,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 			break;
 		case BLANK_1:	//7
 			//fix double call to setPos from DocumentFilter.FilteBypass
-			if((priorColumn == (hexMetrics.getAsciiStart() +1)) & (column ==(hexMetrics.getDataBlockEnd()) )){
+			if((priorColumn == (hexMetrics.getAsciiStart() +1)) && (column ==(hexMetrics.getDataBlockEnd()) )){
 				position = priorPosition-2;
 			}else{
 				position = dot + 1;
@@ -104,9 +101,9 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 			position = paragraphElement.getEndOffset() + this.dataStart;
 			break;
 		case ASCII_WRAP:	//4
-			System.out.printf("%s%n", "ASCII Wrap");
+//			System.out.printf("%s%n", "ASCII Wrap");
 			position = paragraphElement.getEndOffset() + this.asciiStart;
-			asciiCount = 1;
+//			asciiCount = 1;
 			break;
 		default:
 			position = dot;
@@ -122,7 +119,11 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 		System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, this.dataStart);
 	}// moveDot
 		// -----------------------------------------------------------
-
+/**
+ * columnTable maps the actions to be taken as a function of the column in the doc.
+ * 
+ * @return
+ */
 	private int[] makeColumnTable() {
 		int[] ans = new int[hexMetrics.getAsciiEnd()+3];
 		int columnPosition = 0;
@@ -175,7 +176,7 @@ public class HexEditNavigationFilterSB extends NavigationFilter {
 	private static final int BLANK_1 = 7;
 	private static final int BLANK_2 = 8;
 	
-	private final static int BYTES_PER_LINE = HexEditPanelSB.BYTES_PER_LINE;
+	private final static int BYTES_PER_LINE = HexEditMetrics.BYTES_PER_LINE;
 
 
 }// class HexEditNavigationFilter
