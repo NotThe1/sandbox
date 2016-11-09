@@ -41,6 +41,7 @@ public class HexEditDocumentFilter extends DocumentFilter {
 	private HexEditMetrics hexMetrics;
 	private SortedMap<Integer, Byte> changes;
 	// private boolean innerFlag = false;
+	
 
 	public HexEditDocumentFilter(StyledDocument doc, HexEditMetrics hexMetrics, SortedMap<Integer, Byte> changes) {
 		this.doc = doc;

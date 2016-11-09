@@ -27,7 +27,7 @@ import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
 
-public class HexEditPanelDriver {
+public class HexEditPaneConcurrentlDriver {
 
 	int sourceSize = (3 * 16) - 6;
 
@@ -38,11 +38,11 @@ public class HexEditPanelDriver {
 	private JButton btnFour;
 	private JSplitPane splitPane1;
 	private byte[] source;
-	private HexEditPanel hexEditPanel;
+	private HexEditPanelConcurrent hexEditPanel;
+	private HexEditPanelConcurrent hexEditPanel_1;
 	private JSpinner spinnerRows;
 	private JLabel lblPlus;
 	private JSpinner spinnerPlus;
-	private HexEditPanel hexEditPanel_1;
 
 	/**
 	 * Launch the application.
@@ -51,7 +51,7 @@ public class HexEditPanelDriver {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HexEditPanelDriver window = new HexEditPanelDriver();
+					HexEditPaneConcurrentlDriver window = new HexEditPaneConcurrentlDriver();
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -86,8 +86,8 @@ public class HexEditPanelDriver {
 	}// doBtnOne
 
 	private void doBtnTwo() {
-		byte[] unloadedData = hexEditPanel.unloadData();	
-		hexEditPanel_1.loadData(unloadedData);
+//		byte[] unloadedData = hexEditPanel.unloadData();	
+//		hexEditPanel_1.loadData(unloadedData);
 		
 	}// doBtnTwo
 
@@ -139,7 +139,7 @@ public class HexEditPanelDriver {
 	}// doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPanelDriver.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPaneConcurrentlDriver.class);
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -153,8 +153,8 @@ public class HexEditPanelDriver {
 	}// appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPanelDriver.class);
-		frmTemplate.setSize(1096, 516);
+		Preferences myPrefs = Preferences.userNodeForPackage(HexEditPaneConcurrentlDriver.class);
+		frmTemplate.setSize(myPrefs.getInt("Width",1096),myPrefs.getInt("Height", 516));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		spinnerRows.setValue((int) myPrefs.getInt("Rows", 10));
@@ -165,7 +165,7 @@ public class HexEditPanelDriver {
 
 	}// appInit
 
-	public HexEditPanelDriver() {
+	public HexEditPaneConcurrentlDriver() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -175,7 +175,7 @@ public class HexEditPanelDriver {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("HexEditPanelBDriver");
+		frmTemplate.setTitle("HexEditPaneConcurrentlDriver");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -320,7 +320,7 @@ public class HexEditPanelDriver {
 		gbl_panelRight.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		panelRight.setLayout(gbl_panelRight);
 
-		hexEditPanel = new HexEditPanel();
+		hexEditPanel = new HexEditPanelConcurrent();
 		GridBagConstraints gbc_hexEditPanel = new GridBagConstraints();
 		gbc_hexEditPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_hexEditPanel.anchor = GridBagConstraints.WEST;
@@ -329,7 +329,7 @@ public class HexEditPanelDriver {
 		gbc_hexEditPanel.gridy = 0;
 		panelRight.add(hexEditPanel, gbc_hexEditPanel);
 		
-		hexEditPanel_1 = new HexEditPanel();
+		hexEditPanel_1 = new HexEditPanelConcurrent();
 		GridBagLayout gbl_hexEditPanel_1 = (GridBagLayout) hexEditPanel_1.getLayout();
 		gbl_hexEditPanel_1.rowWeights = new double[]{0.0, 1.0};
 		gbl_hexEditPanel_1.rowHeights = new int[]{25, 0};
