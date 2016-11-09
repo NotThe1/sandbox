@@ -82,12 +82,12 @@ public class HexEditPanelDriver {
 		for (int i = 0; i < numberOfBytes; i++) {
 			source[i] = (byte) (i % 256);
 		} // for
-		hexEditPanel.loadDocument(source);
+		hexEditPanel.loadData(source);
 	}// doBtnOne
 
 	private void doBtnTwo() {
-		byte[] unloadedData = hexEditPanel.unloadDocument();	
-		hexEditPanel_1.loadDocument(unloadedData);
+		byte[] unloadedData = hexEditPanel.unloadData();	
+		hexEditPanel_1.loadData(unloadedData);
 		
 	}// doBtnTwo
 
@@ -263,41 +263,43 @@ public class HexEditPanelDriver {
 		splitPane.setLeftComponent(panel_top);
 		GridBagLayout gbl_panel_top = new GridBagLayout();
 		gbl_panel_top.columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_panel_top.rowHeights = new int[] { 0, 0 };
+		gbl_panel_top.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
 		gbl_panel_top.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_panel_top.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gbl_panel_top.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panel_top.setLayout(gbl_panel_top);
-
-		JLabel lblRows = new JLabel("Rows");
-		GridBagConstraints gbc_lblRows = new GridBagConstraints();
-		gbc_lblRows.insets = new Insets(0, 0, 0, 5);
-		gbc_lblRows.gridx = 0;
-		gbc_lblRows.gridy = 0;
-		panel_top.add(lblRows, gbc_lblRows);
-
-		spinnerRows = new JSpinner();
-		spinnerRows.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
-		spinnerRows.setPreferredSize(new Dimension(80, 20));
-		GridBagConstraints gbc_spinnerRows = new GridBagConstraints();
-		gbc_spinnerRows.insets = new Insets(0, 0, 0, 5);
-		gbc_spinnerRows.gridx = 1;
-		gbc_spinnerRows.gridy = 0;
-		panel_top.add(spinnerRows, gbc_spinnerRows);
-
-		lblPlus = new JLabel("+");
-		GridBagConstraints gbc_lblPlus = new GridBagConstraints();
-		gbc_lblPlus.insets = new Insets(0, 0, 0, 5);
-		gbc_lblPlus.gridx = 3;
-		gbc_lblPlus.gridy = 0;
-		panel_top.add(lblPlus, gbc_lblPlus);
-
-		spinnerPlus = new JSpinner();
-		spinnerPlus.setModel(new SpinnerNumberModel(0, 0, 15, 1));
-		spinnerPlus.setPreferredSize(new Dimension(35, 20));
-		GridBagConstraints gbc_spinnerPlus = new GridBagConstraints();
-		gbc_spinnerPlus.gridx = 4;
-		gbc_spinnerPlus.gridy = 0;
-		panel_top.add(spinnerPlus, gbc_spinnerPlus);
+		
+				JLabel lblRows = new JLabel("Rows");
+				GridBagConstraints gbc_lblRows = new GridBagConstraints();
+				gbc_lblRows.insets = new Insets(0, 0, 5, 5);
+				gbc_lblRows.gridx = 1;
+				gbc_lblRows.gridy = 0;
+				panel_top.add(lblRows, gbc_lblRows);
+		
+				spinnerRows = new JSpinner();
+				spinnerRows.setMinimumSize(new Dimension(80, 20));
+				spinnerRows.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
+				spinnerRows.setPreferredSize(new Dimension(80, 20));
+				GridBagConstraints gbc_spinnerRows = new GridBagConstraints();
+				gbc_spinnerRows.insets = new Insets(0, 0, 5, 5);
+				gbc_spinnerRows.gridx = 1;
+				gbc_spinnerRows.gridy = 1;
+				panel_top.add(spinnerRows, gbc_spinnerRows);
+								
+										lblPlus = new JLabel("+");
+										GridBagConstraints gbc_lblPlus = new GridBagConstraints();
+										gbc_lblPlus.insets = new Insets(0, 0, 5, 5);
+										gbc_lblPlus.gridx = 1;
+										gbc_lblPlus.gridy = 2;
+										panel_top.add(lblPlus, gbc_lblPlus);
+								
+										spinnerPlus = new JSpinner();
+										GridBagConstraints gbc_spinnerPlus = new GridBagConstraints();
+										gbc_spinnerPlus.insets = new Insets(0, 0, 5, 5);
+										gbc_spinnerPlus.gridx = 1;
+										gbc_spinnerPlus.gridy = 3;
+										panel_top.add(spinnerPlus, gbc_spinnerPlus);
+										spinnerPlus.setModel(new SpinnerNumberModel(0, 0, 15, 1));
+										spinnerPlus.setPreferredSize(new Dimension(35, 20));
 
 		JPanel panel_Bottom = new JPanel();
 		splitPane.setRightComponent(panel_Bottom);

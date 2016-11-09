@@ -116,7 +116,7 @@ public class HexEditNavigationFilter extends NavigationFilter {
 	}// setDot
 
 	public void moveDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
-		System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, this.dataStart);
+	//	System.out.printf("[moveDot] **** dot: %d, dataStart: %d%n", dot, this.dataStart);
 	}// moveDot
 		// -----------------------------------------------------------
 /**

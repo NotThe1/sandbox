@@ -107,13 +107,14 @@ public class HexEditDocumentFilter extends DocumentFilter {
 
 		Integer newCharacterIndex = dataToAsciiTable[columnPosition];
 		;
-		
-		if(columnType == null){
-			int a = 0;
-		}
+
+		if (columnType == null) {
+			// TODO - follow up
+			return;
+		} // if null columnType
 
 		switch (columnType) {
-		
+
 		case HEX1:
 		case HEX2:
 			if (!isTextHex(text)) {
@@ -133,7 +134,8 @@ public class HexEditDocumentFilter extends DocumentFilter {
 			fb.replace(docOffset, 1, newChar, attrASCII);
 			break;
 		case ASCII:
-			fb.replace(offset, netLength, text, attrs);
+			String displayText = isTextPrintable(text)? text:NON_PRINTABLE_CHAR;
+			fb.replace(offset, netLength, displayText, attrs);
 
 			byte[] hexValues = text.getBytes();
 			newValue = hexValues[0];
@@ -194,6 +196,10 @@ public class HexEditDocumentFilter extends DocumentFilter {
 	private boolean isTextHex(String text) {
 		return text.matches(PATTERN_HEX);
 	}// isTextHex
+
+	private boolean isTextPrintable(String text) {
+		return text.matches(PATTERN_PRINTABLE);
+	}// isTextPrintable
 
 	private Integer[] makeColumnTable() {
 		Integer[] ans = new Integer[hexMetrics.getAsciiEnd() + 4];
@@ -277,10 +283,10 @@ public class HexEditDocumentFilter extends DocumentFilter {
 	}// makeSourceColumnTable
 
 	private final static String PATTERN_HEX = "[A-F|a-f|0-9]+";
-	// private static String PATTERN_PRINTABLE =
-	// "^([a-zA-Z0-9!@#$%^&amp;*()-_=+;:'&quot;|~`&lt;&gt;?/{}]{1,1})$";
+	private static String PATTERN_PRINTABLE = "^([a-zA-Z0-9!@#$%^&amp;*()-_=+;:'&quot;|~`&lt;&gt;?/{}]{1,1})$";
 
 	private final static String NON_PRINTABLE_CHAR = ".";
+	// private final static String TAB = "\t";
 
 	private final static int HEX1 = 1;
 	private final static int HEX2 = 2;

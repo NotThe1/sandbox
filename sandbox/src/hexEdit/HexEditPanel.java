@@ -26,7 +26,6 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSpinner;
@@ -73,7 +72,43 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 	private JLabel lblDocHeader;
 
 	private SortedMap<Integer, Byte> changes;
+	
+	//---------------------------------------------------------------
+	public void loadData(byte[] sourceArray) {
+		changes.clear();
+		this.source = ByteBuffer.wrap(sourceArray);
 
+		setUpScrollBar();
+
+		int srcSize = sourceArray.length;
+		currentLineStart = 0;
+		prepareDoc(doc, (long) srcSize);
+
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				fillPane();
+			}// run
+		});
+
+		calcHexMetrics(sourceArray.length);
+		setDocumentFilter(doc);
+		setNavigationFilter(doc);
+	}// loadDocument
+	
+	public byte[] unloadData(){
+		return applyChanges(source.array(), source.limit(), 0);
+	}//unloadDocument
+	
+	public boolean isDataChanged(){
+		return !changes.isEmpty();
+	}//isDataChanges
+	
+	public SortedMap<Integer, Byte> getChangedData(){
+		return changes;
+	}//getChangedData
+
+//-----------------------------------------------------------------------------------------------
+	
 	private void fillPane() {
 		if (currentExtent == 0) {
 			return;
@@ -118,6 +153,7 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 		// bytesToRead, linesToDisplay - 1);
 		textPane.setCaretPosition(0);
 	}// fillPane
+	
 
 	private byte[] applyChanges(byte[] rawData, int bytesRead, int bufferAddress) {
 		byte[] ans = rawData.clone();
@@ -221,25 +257,6 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 
 	}// adjustHeaderAndSpinner
 
-	public void setAddressSize(int addressSize) {
-		switch (addressSize) {
-		case ADDRESS_4:
-		case ADDRESS_6:
-		case ADDRESS_8:
-			this.addressSize = addressSize;
-			break;
-		default:
-			Object possibleValues[] = { "4 - 65 Kilobytes ", "6 - 16 Megabytes", "8 - 2 Gigabytes" };
-			Object selectedValue = JOptionPane.showInputDialog(null, "Choose one", "Address Size",
-					JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-			if (selectedValue != null) {
-				int value = Integer.valueOf(selectedValue.toString().substring(0, 1));
-				this.addressSize = value;
-			} // if
-		}// switch
-		System.out.printf("addressSize = %d %n", this.addressSize);
-	}// setAddressSize
-
 	private void prepareDoc(StyledDocument doc, long srcSize) {
 		setFormats(srcSize);
 		clearFilters();
@@ -277,31 +294,6 @@ public class HexEditPanel extends JPanel implements AdjustmentListener, Componen
 		hexNavigationFilter = new HexEditNavigationFilter(doc, hexMetrics);
 		textPane.setNavigationFilter(hexNavigationFilter);
 	}// resetDocumentFilter
-
-	public void loadDocument(byte[] sourceArray) {
-		changes.clear();
-		this.source = ByteBuffer.wrap(sourceArray);
-
-		setUpScrollBar();
-
-		int srcSize = sourceArray.length;
-		currentLineStart = 0;
-		prepareDoc(doc, (long) srcSize);
-
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				fillPane();
-			}// run
-		});
-
-		calcHexMetrics(sourceArray.length);
-		setDocumentFilter(doc);
-		setNavigationFilter(doc);
-	}// loadDocument
-	
-	public byte[] unloadDocument(){
-		return applyChanges(source.array(), source.limit(), 0);
-	}//unloadDocument
 
 	private void calcHexMetrics(long sourceSize) {
 		if (hexMetrics != null) {
