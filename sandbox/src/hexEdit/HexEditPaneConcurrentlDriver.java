@@ -87,7 +87,7 @@ public class HexEditPaneConcurrentlDriver {
 
 	private void doBtnTwo() {
 //		byte[] unloadedData = hexEditPanel.unloadData();	
-//		hexEditPanel_1.loadData(unloadedData);
+		hexEditPanel_1.loadData(source);
 		
 	}// doBtnTwo
 

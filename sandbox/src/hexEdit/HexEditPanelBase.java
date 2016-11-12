@@ -50,7 +50,7 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	protected ByteBuffer source;
 	private int addressSize;
 
-	protected  int currentLineStart;
+	protected int currentLineStart;
 	private int currentMax;
 	private int currentExtent;
 
@@ -71,44 +71,21 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	private JScrollBar scrollBar;
 	private JLabel lblDocHeader;
 
-	 protected SortedMap<Integer, Byte> changes;
-	
-	//---------------------------------------------------------------
-//	public void loadData(byte[] sourceArray) {
-//		changes.clear();
-//		this.source = ByteBuffer.wrap(sourceArray);
-//
-//		setUpScrollBar();
-//
-//		int srcSize = sourceArray.length;
-//		currentLineStart = 0;
-//		prepareDoc(doc, (long) srcSize);
-//
-//		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				fillPane();
-//			}// run
-//		});
-//
-//		calcHexMetrics(sourceArray.length);
-//		setDocumentFilter(doc);
-//		setNavigationFilter(doc);
-//	}// loadDocument
-//	
-//	public byte[] unloadData(){
-//		return applyChanges(source.array(), source.limit(), 0);
-//	}//unloadDocument
-	 
-	public boolean isDataChanged(){
-		return !changes.isEmpty();
-	}//isDataChanges
-	
-	public SortedMap<Integer, Byte> getChangedData(){
-		return changes;
-	}//getChangedData
+	protected SortedMap<Integer, Byte> changes;
 
-//-----------------------------------------------------------------------------------------------
-	
+	// ---------------------------------------------------------------
+	public abstract void loadData(Object source);
+
+	public boolean isDataChanged() {
+		return !changes.isEmpty();
+	}// isDataChanges
+
+	public SortedMap<Integer, Byte> getChangedData() {
+		return changes;
+	}// getChangedData
+
+	// -----------------------------------------------------------------------------------------------
+
 	void fillPane() {
 		if (currentExtent == 0) {
 			return;
@@ -145,7 +122,7 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 			if (bytesToRead == 0) {
 				bytesToRead = BYTES_PER_LINE;
 				break;
-			}//if
+			} // if
 		} // for
 		restoreFilters();
 		hexNavigationFilter.setLastLine(bytesToRead, linesToDisplay - 1);
@@ -153,15 +130,15 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 		// bytesToRead, linesToDisplay - 1);
 		textPane.setCaretPosition(0);
 	}// fillPane
-	
 
 	protected byte[] applyChanges(byte[] rawData, int bytesRead, int bufferAddress) {
 		byte[] ans = rawData.clone();
 		SortedMap<Integer, Byte> rowChanges = changes.subMap(bufferAddress, bufferAddress + bytesRead);
 
 		if (rowChanges.size() != 0) {
-//			System.out.printf("[applyChanges]: %n");
-//			rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue = %02X%n", k, v));
+			// System.out.printf("[applyChanges]: %n");
+			// rowChanges.forEach((k, v) -> System.out.printf("\t\tIndex = %4d,
+			// vlaue = %02X%n", k, v));
 
 			rowChanges.forEach((k, v) -> ans[(int) k - bufferAddress] = (byte) v);
 		} // if need to update
@@ -267,22 +244,23 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	// ((AbstractDocument) doc).setDocumentFilter(null);
 	// }// resetDocumentFilter
 
-	protected void setDocumentFilter(StyledDocument doc) {
+	// protected void setDocumentFilter(StyledDocument doc) {
+	//
+	// hexFilter = new HexEditDocumentFilter(doc, hexMetrics, changes);
+	// hexFilter.setAsciiAttributes(asciiAttributes);
+	// hexFilter.setDataAttributes(dataAttributes);
+	// // hexFilter = null;
+	// ((AbstractDocument) doc).setDocumentFilter(hexFilter);
+	// }// setDocumentFilter
+
+	protected HexEditDocumentFilter setDocumentFilter(StyledDocument doc) {
 
 		hexFilter = new HexEditDocumentFilter(doc, hexMetrics, changes);
 		hexFilter.setAsciiAttributes(asciiAttributes);
 		hexFilter.setDataAttributes(dataAttributes);
 		// hexFilter = null;
 		((AbstractDocument) doc).setDocumentFilter(hexFilter);
-	}// setDocumentFilter
-	
-	protected void setDocumentFilter(StyledDocument doc,byte[] sourceData) {
-
-		hexFilter = new HexEditDocumentFilterConcurrent(doc, hexMetrics, changes,byte[] sourceData);
-		hexFilter.setAsciiAttributes(asciiAttributes);
-		hexFilter.setDataAttributes(dataAttributes);
-		// hexFilter = null;
-		((AbstractDocument) doc).setDocumentFilter(hexFilter);
+		return hexFilter;
 	}// setDocumentFilter
 
 	// private void resetNavigationFilter() {
@@ -307,7 +285,7 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	protected void calcHexMetrics(long sourceSize) {
 		if (hexMetrics != null) {
 			hexMetrics = null;
-		} //if
+		} // if
 		hexMetrics = new HexEditMetrics(sourceSize);
 	}// calcHexMetrics
 
@@ -558,8 +536,8 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 			return new HexFormatter(addressLength);
 		}// getDefaultFormatter
 	}// class MyFormatterFactory
-	
-		// ----------------------------------------------------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void stateChanged(ChangeEvent changeEvent) {
@@ -575,13 +553,16 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 
 		scrollBar.setValue(targetValue);
 
-//		int valueSB = (int) scrollBar.getValue();
-//		int maxSB = (int) scrollBar.getValue();
-		
-//		System.out.printf("[focusLost] spinnerValue: %d (%X)%n", value, value);
-//		System.out.printf("[focusLost] scrollBar Value: %d (%X)%n", valueSB, valueSB);
-//		System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB, maxSB);
+		// int valueSB = (int) scrollBar.getValue();
+		// int maxSB = (int) scrollBar.getValue();
 
-	}//stateChanged
+		// System.out.printf("[focusLost] spinnerValue: %d (%X)%n", value,
+		// value);
+		// System.out.printf("[focusLost] scrollBar Value: %d (%X)%n", valueSB,
+		// valueSB);
+		// System.out.printf("[focusLost] scrollBar Max: %d (%X)%n", maxSB,
+		// maxSB);
+
+	}// stateChanged
 
 }// class HexEditPanelSB

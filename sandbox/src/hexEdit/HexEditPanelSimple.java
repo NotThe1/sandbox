@@ -8,13 +8,12 @@ public class HexEditPanelSimple extends HexEditPanelBase {
 	private static final long serialVersionUID = 1L;
 
 	//---------------------------------------------------------------
-	public void loadData(byte[] sourceArray) {
+	public void loadData(Object src){
+		this.source = ByteBuffer.wrap((byte[])src);
 		changes.clear();
-		this.source = ByteBuffer.wrap(sourceArray);
-
 		setUpScrollBar();
 
-		int srcSize = sourceArray.length;
+		int srcSize = source.limit();	//sourceArray.length;
 		currentLineStart = 0;
 		prepareDoc(doc, (long) srcSize);
 
@@ -24,7 +23,7 @@ public class HexEditPanelSimple extends HexEditPanelBase {
 			}// run
 		});
 
-		calcHexMetrics(sourceArray.length);
+		calcHexMetrics(srcSize);
 		setDocumentFilter(doc);
 		setNavigationFilter(doc);
 	}// loadDocument

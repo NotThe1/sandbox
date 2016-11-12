@@ -1,6 +1,7 @@
 package hexEdit;
 
 import java.util.SortedMap;
+import java.util.Vector;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -110,7 +111,6 @@ public class HexEditDocumentFilter extends DocumentFilter {
 		;
 
 		if (columnType == null) {
-			// TODO - follow up
 			return;
 		} // if null columnType
 
@@ -149,8 +149,8 @@ public class HexEditDocumentFilter extends DocumentFilter {
 			return;
 		}// switch - columnType
 
-		changes.put(getSourceIndex(offset, sourceColumn), newValue);
-
+		recordTheChange(offset,sourceColumn,newValue);
+		
 		// if (changes.size() != 0) {
 		// System.out.printf("[replace]: %n");
 		// changes.forEach((k, v) -> System.out.printf("\t\tIndex = %4d, vlaue =
@@ -158,6 +158,11 @@ public class HexEditDocumentFilter extends DocumentFilter {
 		// } // if need to update
 
 	}// replace
+	private void recordTheChange(int offset,int sourceColumn,byte value){
+		int location = getSourceIndex(offset, sourceColumn);
+		changes.put(location, value);
+		fireHexSourceChange(location, value);
+	}//recordTheChange
 
 	private int getSourceIndex(int docPosition, int columnIndex) {
 		int ans = 0;
@@ -282,6 +287,41 @@ public class HexEditDocumentFilter extends DocumentFilter {
 				9, 10, 11, 12, 13, 14, 15, null, null };
 		return ans;
 	}// makeSourceColumnTable
+	
+	//---------------------------------------------------
+	//---------------------------------------------------
+	private Vector<HexSourceChangeListener> hexSourceChangeListeners = new Vector<HexSourceChangeListener>();
+	
+	public synchronized void addHexSourceChangeListener(HexSourceChangeListener hexSourceChangeListener){
+		if (hexSourceChangeListeners.contains(hexSourceChangeListener)){
+			return; 	// already on list
+		}//if
+		hexSourceChangeListeners.add(hexSourceChangeListener);
+	}//addHexSourceChangeListener
+	
+	public synchronized void removeHexSourceChangeListener(HexSourceChangeListener hexSourceChangeListener){
+		hexSourceChangeListeners.remove(hexSourceChangeListener);
+	}//removeHexSourceChangeListener
+	
+	private void fireHexSourceChange(int location, byte value){
+		if(hexSourceChangeListeners.size() == 0){
+			return;		// no listeners
+		}
+		Vector<HexSourceChangeListener> workingSourceChangeListeners;
+		synchronized (this){
+			workingSourceChangeListeners =(Vector<HexSourceChangeListener>) hexSourceChangeListeners.clone();
+			HexSourceChangeEvent hexSourceChangeEvent = new HexSourceChangeEvent(this,location,value);
+			
+			for(HexSourceChangeListener listener:hexSourceChangeListeners){
+				listener.dataChanged(hexSourceChangeEvent);
+			}//for
+		}//sync
+	}//fireHexSourceChange
+	
+	//---------------------------------------------------
+	//---------------------------------------------------
+	
+	
 
 	private final static String PATTERN_HEX = "[A-F|a-f|0-9]+";
 	private static String PATTERN_PRINTABLE = "^([a-zA-Z0-9!@#$%^&amp;*()-_=+;:'&quot;|~`&lt;&gt;?/{}]{1,1})$";

@@ -2,21 +2,22 @@ package hexEdit;
 
 import java.nio.ByteBuffer;
 
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.StyledDocument;
+public class HexEditPanelConcurrent extends HexEditPanelBase implements HexSourceChangeListener{
+	
+	private static final long serialVersionUID = 1L;
+	private byte[] sourceArray;
 
-public class HexEditPanelConcurrent extends HexEditPanelBase {
-	byte[] sourceArray ;
+	//---------------------------------------------------------------
+	
+	public void loadData(Object src){
+		this.sourceArray = (byte[])src;
 
-	public void loadData(byte[] sourceArray) {
-		this.sourceArray = sourceArray;
-		
 		changes.clear();
 		this.source = ByteBuffer.wrap(sourceArray);
 
 		setUpScrollBar();
 
-		int srcSize = sourceArray.length;
+		int srcSize = source.limit();
 		currentLineStart = 0;
 		prepareDoc(doc, (long) srcSize);
 
@@ -26,19 +27,25 @@ public class HexEditPanelConcurrent extends HexEditPanelBase {
 			}// run
 		});
 
-		calcHexMetrics(sourceArray.length);
-		setDocumentFilter(doc);
+		calcHexMetrics(srcSize);
+		HexEditDocumentFilter hexFilter = setDocumentFilter(doc);
+		hexFilter.addHexSourceChangeListener(this);
 		setNavigationFilter(doc);
 	}// loadDocument
-	
-	protected void setDocumentFilter(StyledDocument doc) {
-
-		hexFilter = new HexEditDocumentFilter(doc, hexMetrics, changes);
-		hexFilter.setAsciiAttributes(asciiAttributes);
-		hexFilter.setDataAttributes(dataAttributes);
-		// hexFilter = null;
-		((AbstractDocument) doc).setDocumentFilter(hexFilter);
-	}// setDocumentFilter
-
 		
-}//class HexEditPanelConcurrent
+
+//	public SortedMap<Integer, Byte> getChangedData(){
+//		return changes;
+//	}//getChangedData
+	
+	@Override
+	public void dataChanged(HexSourceChangeEvent hexSourceChangeEvent) {
+		int location = hexSourceChangeEvent.getLocation();
+		byte value = hexSourceChangeEvent.getValue();
+		System.out.printf("[] location = %04X, value = %02X%n", location,value);
+		sourceArray[location] = value;
+		
+	}//dataChanged
+
+
+}//class hexEditPanelSimple
