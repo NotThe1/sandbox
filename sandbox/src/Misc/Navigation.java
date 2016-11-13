@@ -6,7 +6,6 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.Element;
 import javax.swing.text.NavigationFilter;
@@ -39,7 +38,7 @@ public class Navigation {
 					public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
 						StyledDocument doc = (StyledDocument) textPane.getDocument();
 						Element paragraphElement = doc.getParagraphElement(dot);
-						Element dataElement = paragraphElement.getElement(1);
+						Element dataElement = paragraphElement.getElement(0);
 						int limit = dataElement.getStartOffset();
 						if (dot < START_STRING_LENGTH) {
 							fb.setDot(START_STRING_LENGTH, bias);

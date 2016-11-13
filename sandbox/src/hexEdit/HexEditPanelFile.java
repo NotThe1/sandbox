@@ -14,8 +14,15 @@ public class HexEditPanelFile extends HexEditPanelBase {
 	private MappedByteBuffer disk;
 
 	// ---------------------------------------------------------------
+	
+	
+	// ---------------------------------------------------------------
 	public void loadData(Object src) {
 		File sourceFile = (File) src;
+		long sourceLength = sourceFile.length();
+		
+		System.out.printf("[loadData] sourceLength %,d%n", sourceLength);
+		System.out.printf("[loadData] Max Value %,d  [%08X]%n", Integer.MAX_VALUE, Integer.MAX_VALUE);
 		try {
 			fileChannel = new RandomAccessFile(sourceFile, "rw").getChannel();
 			disk = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
