@@ -22,7 +22,7 @@ public class HexEditPanelConcurrent extends HexEditPanelBase implements HexSourc
 	public void dataChanged(HexSourceChangeEvent hexSourceChangeEvent) {
 		int location = hexSourceChangeEvent.getLocation();
 		byte value = hexSourceChangeEvent.getValue();
-		System.out.printf("[] location = %04X, value = %02X%n", location,value);
+//		System.out.printf("[] location = %04X, value = %02X%n", location,value);
 		sourceArray[location] = value;
 		
 	}//dataChanged

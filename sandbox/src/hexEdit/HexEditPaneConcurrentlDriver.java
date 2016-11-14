@@ -75,7 +75,7 @@ public class HexEditPaneConcurrentlDriver {
 	/* Standard Stuff */
 
 	private void doBtnOne() {
-		int numberOfBytes = (HexEditPanel.BYTES_PER_LINE * (int) spinnerRows.getValue())
+		int numberOfBytes = (HexEditMetrics.BYTES_PER_LINE * (int) spinnerRows.getValue())
 				+ (int) spinnerPlus.getValue();
 		source = new byte[numberOfBytes];
 
