@@ -350,7 +350,8 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	}// calcExtent
 
 	private int maximumNumberOfRows(JTextPane thisTextPane) {
-		return (source.limit() / BYTES_PER_LINE) + 1;
+//		return (source.limit() / BYTES_PER_LINE) + 1;
+		return (source.capacity() / BYTES_PER_LINE) + 1;
 	}// maximumNumberOfRows
 
 	private void makeStyles() {
