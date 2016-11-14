@@ -85,6 +85,24 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	}// getChangedData
 
 	// -----------------------------------------------------------------------------------------------
+	HexEditDocumentFilter loadDataCommon(int sourceSize) {
+		changes.clear();
+		setUpScrollBar();
+		currentLineStart = 0;
+		prepareDoc(doc, (long) sourceSize);
+		//
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				fillPane();
+			}// run
+		});
+		//
+		calcHexMetrics(sourceSize);
+		setNavigationFilter(doc);
+		HexEditDocumentFilter hexDocumentFilter = setDocumentFilter(doc);
+		
+		return hexDocumentFilter;
+	}//loadDataCommon
 
 	void fillPane() {
 		if (currentExtent == 0) {
@@ -350,7 +368,7 @@ public abstract class HexEditPanelBase extends JPanel implements AdjustmentListe
 	}// calcExtent
 
 	private int maximumNumberOfRows(JTextPane thisTextPane) {
-//		return (source.limit() / BYTES_PER_LINE) + 1;
+		// return (source.limit() / BYTES_PER_LINE) + 1;
 		return (source.capacity() / BYTES_PER_LINE) + 1;
 	}// maximumNumberOfRows
 

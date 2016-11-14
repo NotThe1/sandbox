@@ -18,6 +18,7 @@ public class HexEditPanelFile extends HexEditPanelBase {
 	
 	// ---------------------------------------------------------------
 	public void loadData(Object src) {
+		closeFile();
 		File sourceFile = (File) src;
 		long sourceLength = sourceFile.length();
 		if (sourceLength >= Integer.MAX_VALUE){
@@ -25,8 +26,8 @@ public class HexEditPanelFile extends HexEditPanelBase {
 			return;
 		}//if
 		
-		System.out.printf("[loadData] sourceLength %,d%n", sourceLength);
-		System.out.printf("[loadData] Max Value %,d  [%08X]%n", Integer.MAX_VALUE, Integer.MAX_VALUE);
+//		System.out.printf("[loadData] sourceLength %,d%n", sourceLength);
+//		System.out.printf("[loadData] Max Value %,d  [%08X]%n", Integer.MAX_VALUE, Integer.MAX_VALUE);
 		try {
 			fileChannel = new RandomAccessFile(sourceFile, "rw").getChannel();
 			fileMap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
@@ -35,27 +36,23 @@ public class HexEditPanelFile extends HexEditPanelBase {
 			e.printStackTrace();
 		}//try
 
-		// this.source = ByteBuffer.wrap((byte[])src);
+		
 		this.source = fileMap.asReadOnlyBuffer();
 		
-		 changes.clear();
-		 setUpScrollBar();
-		//
-		 int srcSize = source.capacity(); //sourceArray.length;
-		 
-		 currentLineStart = 0;
-		 prepareDoc(doc, (long) srcSize);
-		//
-		 javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		 public void run() {
-		 fillPane();
-		 }// run
-		 });
+		loadDataCommon(source.capacity());
+
 		
-		 calcHexMetrics(srcSize);
-		 setDocumentFilter(doc);
-		 setNavigationFilter(doc);
 	}// loadDocument
+	
+	public void closeFile(){
+		try {
+			if (fileChannel != null) {
+				fileChannel.close();
+			} //if
+		} catch (IOException e) {
+			e.printStackTrace();
+		}// try
+	}
 
 	public byte[] unloadData() {
 		return applyChanges(source.array(), source.limit(), 0);

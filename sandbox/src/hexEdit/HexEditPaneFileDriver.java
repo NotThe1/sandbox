@@ -13,7 +13,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.prefs.Preferences;
 
@@ -172,14 +171,7 @@ public class HexEditPaneFileDriver {
 		myPrefs.put("ReadFileName", strReadName);
 		myPrefs = null;
 
-		try {
-			if (streamRead != null) {
-				streamRead.close();
-			} //if
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}// try
+		hexEditPanel.closeFile();
 	}// appClose
 
 	private void appInit() {
