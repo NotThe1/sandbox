@@ -1,47 +1,39 @@
 package box2;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Point;
-
-import javax.swing.JFrame;
-
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.MenuElement;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-
-import java.awt.event.ActionListener;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import javax.swing.JComboBox;
-import java.awt.GridBagConstraints;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JList;
-import java.awt.Insets;
-import javax.swing.AbstractListModel;
+
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import java.awt.Dimension;
-import java.awt.Font;
-import javax.swing.JLabel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class TestMenus {
 
@@ -99,13 +91,11 @@ public class TestMenus {
 
 			reader.close();
 		} catch (FileNotFoundException fnfe) {
-			JOptionPane.showMessageDialog(null, newFile.getAbsolutePath()
-					+ "not found", "unable to locate",
+			JOptionPane.showMessageDialog(null, newFile.getAbsolutePath() + "not found", "unable to locate",
 					JOptionPane.ERROR_MESSAGE);
 			return false; // exit gracefully
 		} catch (IOException ie) {
-			JOptionPane.showMessageDialog(null, newFile.getAbsolutePath()
-					+ ie.getMessage(), "IO error",
+			JOptionPane.showMessageDialog(null, newFile.getAbsolutePath() + ie.getMessage(), "IO error",
 					JOptionPane.ERROR_MESSAGE);
 			return false; // exit gracefully
 		}
@@ -116,8 +106,29 @@ public class TestMenus {
 
 	// -----------------------------------------------------------------------------------
 	private void appInit() {
-		fileList = new HashMap<File, Point>();
-		listings = new HashMap<File, String>();
+		// fileList = new HashMap<File, Point>();
+		// listings = new HashMap<File, String>();
+		SpinnerNumberModel n = (SpinnerNumberModel) spinValue.getModel();
+		
+		Component[] components = spinValue.getComponents();
+		int i = 0;
+		for (Component c : components) {
+			if (c instanceof AbstractButton) {
+//				c.setVisible(false);
+				System.out.printf("[TestMenus:appInit]component[%d]: %s%n",i++, c.toString());
+//				c = null;
+//				int nextNumber = 0;//(int) n.getNextValue();
+//				int number = (int) n.getNumber();
+//				System.out.printf("[TestMenus:appInit]Model - number : %d, next number: %d%n", number,nextNumber);
+				
+//				int nextNumberS = (int) spinValue.getValue();
+//				int numberS = ((Integer) spinValue.getNextValue())==null?(int) n.getMaximum():(int) spinValue.getNextValue();
+//				int numberS = ((Integer) spinValue.getNextValue());
+//				System.out.printf("[TestMenus:appInit]Spinner - number : %d, next number: %d%n", numberS,nextNumberS);
+
+			}//if
+		}//for
+		int a = 0;
 
 	}
 
@@ -142,14 +153,14 @@ public class TestMenus {
 		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
-		
+
 		JLabel lblResult = new JLabel("Result");
 		lblResult.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (arg0.getClickCount() > 1){
+				if (arg0.getClickCount() > 1) {
 					double value = 1.234;
-					value = 1234567890/10000;
+					value = 1234567890 / 10000;
 					lblResult.setText(String.format(txtFormat.getText(), value));
 				}
 			}
@@ -159,7 +170,7 @@ public class TestMenus {
 		gbc_lblResult.gridx = 3;
 		gbc_lblResult.gridy = 0;
 		frame.getContentPane().add(lblResult, gbc_lblResult);
-		
+
 		txtFormat = new JTextField();
 		txtFormat.setText("00");
 		txtFormat.setPreferredSize(new Dimension(40, 20));
@@ -172,7 +183,7 @@ public class TestMenus {
 		gbc_txtFormat.gridx = 3;
 		gbc_txtFormat.gridy = 1;
 		frame.getContentPane().add(txtFormat, gbc_txtFormat);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridheight = 2;
@@ -181,12 +192,13 @@ public class TestMenus {
 		gbc_scrollPane.gridx = 1;
 		gbc_scrollPane.gridy = 2;
 		frame.getContentPane().add(scrollPane, gbc_scrollPane);
-		
-		JTextArea txtrOneTwoThree = new JTextArea();
-		txtrOneTwoThree.setText("One\r\nTwo\r\nThree\r\nFour\r\nFive\r\nSix\r\nSeven\r\nEight\r\nNine\r\nTen");
-		scrollPane.setViewportView(txtrOneTwoThree);
-		
+
+		JTextArea txtLog = new JTextArea();
+		txtLog.setText("One");
+		scrollPane.setViewportView(txtLog);
+
 		spinValue = new JSpinner();
+		spinValue.setModel(new SpinnerNumberModel(1, 0, 1, 1));
 		spinValue.setPreferredSize(new Dimension(80, 20));
 		spinValue.setMinimumSize(new Dimension(60, 20));
 		GridBagConstraints gbc_spinValue = new GridBagConstraints();
@@ -226,9 +238,9 @@ public class TestMenus {
 							mnuNew.setName(thisFileName);
 							mnuNew.setActionCommand(newFile.getAbsolutePath());
 							mnuFile.add(mnuNew);
-						}// only add if we built the HashMaps ok
-					}// for each newFile
-				}// if
+						} // only add if we built the HashMaps ok
+					} // for each newFile
+				} // if
 			}
 		});
 		mnuFile.add(mnuFileAdd);
@@ -245,10 +257,10 @@ public class TestMenus {
 							selected = "will be removed";
 						} else {
 							selected = "will remain";
-						}// inner if
+						} // inner if
 						System.out.printf("Item %s %s%n", mnuFile.getItem(i).getName(), selected);
-					}// outer if
-				}// for
+					} // outer if
+				} // for
 
 			}// actionPerformed
 		});
