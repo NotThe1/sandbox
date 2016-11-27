@@ -1,17 +1,22 @@
 package seekPanel;
 
 import java.awt.Color;
+//import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
@@ -21,20 +26,24 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class SeekPanel extends JPanel {
-
+	private static final long serialVersionUID = 1L;
+	
 	SpinnerNumberModel numberModel;
 	int currentValue, priorValue;
-	private JTextField txtValueDisplay;
-	private JFormattedTextField txtHexDisplay;
+	private JFormattedTextField txtValueDisplay;
 	EventListenerList seekValueChangedListenerList;
-	String decimalDisplayFormat = "%,d";
+
+	String decimalDisplayFormat = "%d";
 	String hexDisplayFormat = "%X";
 	boolean showDecimal = true;
-	PlainDocument decimalDoc;
-	PlainDocument hexDoc;
-
+	SeekDocument displayDoc;
+	
 	public void setNumberModel(SpinnerNumberModel numberModel) {
 		this.numberModel = numberModel;
+		int newValue = (int) numberModel.getValue();
+		priorValue = newValue;
+		currentValue = newValue;
+		setNewValue(newValue);
 	}// setNumberModel
 
 	public SpinnerNumberModel getNumberModel() {
@@ -56,12 +65,16 @@ public class SeekPanel extends JPanel {
 
 	public void setDecimalDisplay() {
 		showDecimal = true;
-		txtValueDisplay.setDocument(decimalDoc);
+		displayDoc.displayDecimal();
+		displayValue();
+		txtValueDisplay.setToolTipText("Display is Decimal");
 	}// setDecimalDisplay
 
 	public void setHexDisplay() {
 		showDecimal = false;
-		txtValueDisplay.setDocument(hexDoc);
+		displayDoc.displayHex();
+		displayValue();
+		txtValueDisplay.setToolTipText("Display is Hex");
 	}// setHexDisplay
 
 	public boolean isDecimalDisplay() {
@@ -73,8 +86,10 @@ public class SeekPanel extends JPanel {
 	private void displayValue() {
 		String displayFormat = showDecimal ? decimalDisplayFormat : hexDisplayFormat;
 		currentValue = (int) numberModel.getValue();
+
 		String stringValue = String.format(displayFormat, currentValue);
 		txtValueDisplay.setText(stringValue);
+		txtValueDisplay.repaint();
 	}// showValue
 
 	private void setNewValue(int newValue) {
@@ -121,36 +136,43 @@ public class SeekPanel extends JPanel {
 
 	public SeekPanel(SpinnerNumberModel numberModel, boolean decimalDisplay) {
 		this.numberModel = numberModel;
-		
+
 		appInit0();
 		Initialize();
 		appInit();
-		
+
 		if (decimalDisplay) {
 			setDecimalDisplay();
 		} else {
 			setHexDisplay();
 		} // if
 	}// Constructor
-	
-	public void appInit0(){
-		decimalDoc = new SeekDocument(true);
-		hexDoc = new SeekDocument(false);
-	}//appInit0
+
+	public void appInit0() {
+		displayDoc = new SeekDocument(true);
+	}// appInit0
 
 	public void appInit() {
 		currentValue = (int) numberModel.getValue();
-		// priorValue = (int) numberModel.getPreviousValue();
+		txtValueDisplay.setDocument(displayDoc);
 		txtValueDisplay.setPreferredSize(new Dimension(100, 23));
 		seekValueChangedListenerList = new EventListenerList();
-
-//		decimalDoc = new SeekDocument(true);
-//		hexDoc = new SeekDocument(false);
-
-		displayValue();
 	}// appInit
 
 	public void Initialize() {
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent mouseEvent) {
+				if (mouseEvent.getClickCount() > 1) {
+					if (showDecimal) {
+						setHexDisplay();
+					} else {
+						setDecimalDisplay();
+					} // if inner
+				} // if click count
+			}// mouseClicked
+		});
+
 		setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 59, 0, 0, 0 };
@@ -183,7 +205,18 @@ public class SeekPanel extends JPanel {
 		gbc_btnNewButton_1.gridy = 0;
 		add(btnNewButton_1, gbc_btnNewButton_1);
 
-		txtValueDisplay = new JTextField();
+		txtValueDisplay = new JFormattedTextField();
+		txtValueDisplay.setFont(new Font("Courier New", Font.PLAIN, 13));
+		txtValueDisplay.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (txtValueDisplay.getText().equals("")) {
+					return;
+				} // if null
+				int radix = showDecimal ? 10 : 16;
+				setNewValue(Integer.valueOf(txtValueDisplay.getText(), radix));
+			}
+		});
 
 		txtValueDisplay.setHorizontalAlignment(SwingConstants.CENTER);
 		txtValueDisplay.setPreferredSize(new Dimension(50, 23));
@@ -241,24 +274,36 @@ public class SeekPanel extends JPanel {
 
 	// ---------------------------
 	class SeekDocument extends PlainDocument {
-		// private boolean decimalDisplay;
+		private static final long serialVersionUID = 1L;
+		
 		private String inputPattern;
 
 		SeekDocument(boolean decimalDisplay) {
 			if (decimalDisplay == true) {
-				inputPattern = "[0-9]";
+				displayDecimal();
 			} else {
-				inputPattern = "[A-F|a-f|0-9]";
+				displayHex();
 			} // if
 		}// Constructor
+
+		public void displayDecimal() {
+			inputPattern = "-??[0-9]*";
+
+		}// displayDecimal
+
+		public void displayHex() {
+			inputPattern = "[A-F|a-f|0-9]+";
+		}// displayHex
 
 		public void insertString(int offSet, String string, AttributeSet attributeSet) throws BadLocationException {
 			if (string == null) {
 				return;
 			} // if
+
 			if (!string.matches(inputPattern)) {
 				return;
 			} // for
+
 			super.insertString(offSet, string, attributeSet);
 		}// insertString
 	}// class SeekDocument

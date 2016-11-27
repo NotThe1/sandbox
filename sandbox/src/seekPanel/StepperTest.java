@@ -13,21 +13,19 @@ import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.MaskFormatter;
-import javax.swing.text.PlainDocument;
 
 public class StepperTest {
 
@@ -39,8 +37,10 @@ public class StepperTest {
 	private JButton btnThree;
 	private JButton btnFour;
 	private JSplitPane splitPane1;
-	private JTextField ftfDecimal;
-	private JFormattedTextField ftfHex;
+	private JSpinner spinnerValue;
+	private JSpinner spinnerMin;
+	private JSpinner spinnerStep;
+	private JSpinner spinnerMax;
 
 	/**
 	 * Launch the application.
@@ -69,7 +69,9 @@ public class StepperTest {
 	}// doBtnOne
 
 	private void doBtnTwo() {
-
+		SpinnerNumberModel snm = new SpinnerNumberModel((int)spinnerValue.getValue(),
+				(int)spinnerMin.getValue(),(int)spinnerMax.getValue(),(int)spinnerStep.getValue());
+			seekPanel.setNumberModel(snm);	
 	}// doBtnTwo
 
 	private void doBtnThree() {
@@ -139,36 +141,10 @@ public class StepperTest {
 		myPrefs = null;
 		MaskFormatter maskFormatter = new MaskFormatter();
 		maskFormatter.setValidCharacters("0123456789");
-		PlainDocument decimalDoc = new SeekDocument(true);
-		PlainDocument hexDoc = new SeekDocument(false);
-
-		ftfDecimal.setDocument(decimalDoc);
 		seekPanel.setDecimalDisplay();
 		// ftfDecimal.get
 	}// appInit
 
-	class SeekDocument extends PlainDocument {
-		// private boolean decimalDisplay;
-		private String inputPattern;
-
-		SeekDocument(boolean decimalDisplay) {
-			if (decimalDisplay == true) {
-				inputPattern = "[0-9]";
-			} else {
-				inputPattern = "[A-F|a-f|0-9]";
-			} // if
-		}// Constructor
-
-		public void insertString(int offSet, String string, AttributeSet attributeSet) throws BadLocationException {
-			if (string == null) {
-				return;
-			} // if
-			if (!string.matches(inputPattern)) {
-				return;
-			} // for
-			super.insertString(offSet, string, attributeSet);
-		}// insertString
-	}// class SeekDocument
 
 	public StepperTest() {
 		initialize();
@@ -199,7 +175,7 @@ public class StepperTest {
 		gbc_toolBar.gridy = 0;
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
 
-		btnOne = new JButton("1");
+		btnOne = new JButton("H/D");
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doBtnOne();
@@ -209,7 +185,7 @@ public class StepperTest {
 		btnOne.setPreferredSize(new Dimension(50, 20));
 		toolBar.add(btnOne);
 
-		btnTwo = new JButton("2");
+		btnTwo = new JButton("Set Model");
 		btnTwo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnTwo();
@@ -253,7 +229,7 @@ public class StepperTest {
 		gbl_panelLeft.columnWidths = new int[] { 0, 0, 0 };
 		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0, 0 };
 		gbl_panelLeft.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
-		gbl_panelLeft.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panelLeft.rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		panelLeft.setLayout(gbl_panelLeft);
 
 		seekPanel = new SeekPanel();
@@ -265,27 +241,86 @@ public class StepperTest {
 			}
 		});
 		GridBagConstraints gbc_spinnerTest = new GridBagConstraints();
+		gbc_spinnerTest.fill = GridBagConstraints.BOTH;
 		gbc_spinnerTest.insets = new Insets(0, 0, 5, 5);
 		gbc_spinnerTest.gridx = 0;
 		gbc_spinnerTest.gridy = 0;
 		panelLeft.add(seekPanel, gbc_spinnerTest);
-
-		ftfDecimal = new JTextField();
-		GridBagConstraints gbc_ftfDecimal = new GridBagConstraints();
-		gbc_ftfDecimal.anchor = GridBagConstraints.NORTH;
-		gbc_ftfDecimal.insets = new Insets(0, 0, 5, 5);
-		gbc_ftfDecimal.fill = GridBagConstraints.HORIZONTAL;
-		gbc_ftfDecimal.gridx = 0;
-		gbc_ftfDecimal.gridy = 2;
-		panelLeft.add(ftfDecimal, gbc_ftfDecimal);
-
-		ftfHex = new JFormattedTextField();
-		GridBagConstraints gbc_ftfHex = new GridBagConstraints();
-		gbc_ftfHex.insets = new Insets(0, 0, 0, 5);
-		gbc_ftfHex.fill = GridBagConstraints.HORIZONTAL;
-		gbc_ftfHex.gridx = 0;
-		gbc_ftfHex.gridy = 3;
-		panelLeft.add(ftfHex, gbc_ftfHex);
+		
+		JPanel panelMain = new JPanel();
+		GridBagConstraints gbc_panelMain = new GridBagConstraints();
+		gbc_panelMain.insets = new Insets(0, 0, 5, 5);
+		gbc_panelMain.fill = GridBagConstraints.BOTH;
+		gbc_panelMain.gridx = 0;
+		gbc_panelMain.gridy = 1;
+		panelLeft.add(panelMain, gbc_panelMain);
+		GridBagLayout gbl_panelMain = new GridBagLayout();
+		gbl_panelMain.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panelMain.rowHeights = new int[]{0, 0, 0};
+		gbl_panelMain.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panelMain.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		panelMain.setLayout(gbl_panelMain);
+		
+		JLabel lblNewLabel = new JLabel("Value");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.anchor = GridBagConstraints.NORTH;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridy = 1;
+		panelMain.add(lblNewLabel, gbc_lblNewLabel);
+		
+		spinnerValue = new JSpinner();
+		spinnerValue.setPreferredSize(new Dimension(50, 20));
+		GridBagConstraints gbc_spinnerValue = new GridBagConstraints();
+		gbc_spinnerValue.insets = new Insets(0, 0, 0, 5);
+		gbc_spinnerValue.gridx = 1;
+		gbc_spinnerValue.gridy = 1;
+		panelMain.add(spinnerValue, gbc_spinnerValue);
+		
+		JLabel lblHeight = new JLabel("min");
+		GridBagConstraints gbc_lblHeight = new GridBagConstraints();
+		gbc_lblHeight.anchor = GridBagConstraints.WEST;
+		gbc_lblHeight.insets = new Insets(0, 0, 0, 5);
+		gbc_lblHeight.gridx = 3;
+		gbc_lblHeight.gridy = 1;
+		panelMain.add(lblHeight, gbc_lblHeight);
+		
+		spinnerMin = new JSpinner();
+		spinnerMin.setPreferredSize(new Dimension(50, 20));
+		GridBagConstraints gbc_spinnerMin = new GridBagConstraints();
+		gbc_spinnerMin.insets = new Insets(0, 0, 0, 5);
+		gbc_spinnerMin.gridx = 4;
+		gbc_spinnerMin.gridy = 1;
+		panelMain.add(spinnerMin, gbc_spinnerMin);
+		
+		JLabel lblMax = new JLabel("Max");
+		GridBagConstraints gbc_lblMax = new GridBagConstraints();
+		gbc_lblMax.insets = new Insets(0, 0, 0, 5);
+		gbc_lblMax.gridx = 6;
+		gbc_lblMax.gridy = 1;
+		panelMain.add(lblMax, gbc_lblMax);
+		
+		spinnerMax = new JSpinner();
+		spinnerMax.setPreferredSize(new Dimension(50, 20));
+		GridBagConstraints gbc_spinnerMax = new GridBagConstraints();
+		gbc_spinnerMax.insets = new Insets(0, 0, 0, 5);
+		gbc_spinnerMax.gridx = 7;
+		gbc_spinnerMax.gridy = 1;
+		panelMain.add(spinnerMax, gbc_spinnerMax);
+		
+		JLabel lblStep = new JLabel("step");
+		GridBagConstraints gbc_lblStep = new GridBagConstraints();
+		gbc_lblStep.insets = new Insets(0, 0, 0, 5);
+		gbc_lblStep.gridx = 9;
+		gbc_lblStep.gridy = 1;
+		panelMain.add(lblStep, gbc_lblStep);
+		
+		spinnerStep = new JSpinner();
+		spinnerStep.setPreferredSize(new Dimension(50, 20));
+		GridBagConstraints gbc_spinnerStep = new GridBagConstraints();
+		gbc_spinnerStep.gridx = 10;
+		gbc_spinnerStep.gridy = 1;
+		panelMain.add(spinnerStep, gbc_spinnerStep);
 
 		JPanel panelRight = new JPanel();
 		splitPane1.setRightComponent(panelRight);
