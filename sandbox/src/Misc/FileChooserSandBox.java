@@ -1,31 +1,25 @@
 package Misc;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-
-import java.awt.GridBagLayout;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.prefs.Preferences;
-
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 
 public class FileChooserSandBox {
@@ -110,6 +104,8 @@ public class FileChooserSandBox {
 		frame.setSize(myPrefs.getInt("Width", 100), myPrefs.getInt("Height", 100));
 		frame.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;
+//		TestClass tc = new TestClass();
+//		System.out.printf("[appInit] getSomething %s%n", tc.getSomething());
 	}//appInit
 		
 	/**
