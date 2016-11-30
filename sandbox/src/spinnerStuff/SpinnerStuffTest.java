@@ -1,4 +1,4 @@
-package seekPanel;
+package spinnerStuff;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -10,26 +10,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.ParseException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
-import javax.swing.text.MaskFormatter;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
-public class StepperTest {
-
-	private SeekPanel seekPanel;
+public class SpinnerStuffTest {
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -37,10 +38,13 @@ public class StepperTest {
 	private JButton btnThree;
 	private JButton btnFour;
 	private JSplitPane splitPane1;
-	private JSpinner spinnerValue;
-	private JSpinner spinnerMin;
-	private JSpinner spinnerStep;
-	private JSpinner spinnerMax;
+	private JSpinner spinner1;
+	private JSpinner spinner2;
+
+	JFormattedTextField ftf;
+	JFormattedTextField ftf2;
+	JFormattedTextField.AbstractFormatterFactory decimalFormatterFactory;
+	HexFormatterFactory hexFormatterFactory;
 
 	/**
 	 * Launch the application.
@@ -49,7 +53,7 @@ public class StepperTest {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					StepperTest window = new StepperTest();
+					SpinnerStuffTest window = new SpinnerStuffTest();
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -61,17 +65,15 @@ public class StepperTest {
 	/* Standard Stuff */
 
 	private void doBtnOne() {
-		if (seekPanel.isDecimalDisplay()) {
-			seekPanel.setHexDisplay();
-		} else {
-			seekPanel.setDecimalDisplay();
-		}
+		ftf.setFormatterFactory(hexFormatterFactory);
+		ftf2.setFormatterFactory(hexFormatterFactory);
+		ftf.setToolTipText("Hex Display");
 	}// doBtnOne
 
 	private void doBtnTwo() {
-		SpinnerNumberModel snm = new SpinnerNumberModel((int)spinnerValue.getValue(),
-				(int)spinnerMin.getValue(),(int)spinnerMax.getValue(),(int)spinnerStep.getValue());
-			seekPanel.setNumberModel(snm);	
+		ftf.setFormatterFactory(decimalFormatterFactory);
+		ftf2.setFormatterFactory(decimalFormatterFactory);
+		ftf.setToolTipText("Decimal Display");
 	}// doBtnTwo
 
 	private void doBtnThree() {
@@ -122,7 +124,7 @@ public class StepperTest {
 	}// doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(StepperTest.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(SpinnerStuffTest.class);
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -134,19 +136,24 @@ public class StepperTest {
 	}// appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(StepperTest.class);
-		frmTemplate.setSize(653, 500);
+		Preferences myPrefs = Preferences.userNodeForPackage(SpinnerStuffTest.class);
+		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
-		MaskFormatter maskFormatter = new MaskFormatter();
-		maskFormatter.setValidCharacters("0123456789");
-		seekPanel.setDecimalDisplay();
-		// ftfDecimal.get
+
+		JSpinner.DefaultEditor editor = (DefaultEditor) spinner1.getEditor();
+		ftf = editor.getTextField();
+		
+		decimalFormatterFactory = ftf.getFormatterFactory();
+		hexFormatterFactory = new HexFormatterFactory();
+		ftf.setFormatterFactory(hexFormatterFactory);
+		
+		editor = (DefaultEditor) spinner2.getEditor();
+		ftf2 = editor.getTextField();
 	}// appInit
 
-
-	public StepperTest() {
+	public SpinnerStuffTest() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -156,7 +163,7 @@ public class StepperTest {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("Stepper Test");
+		frmTemplate.setTitle("SpinnerStuffTest");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -175,7 +182,7 @@ public class StepperTest {
 		gbc_toolBar.gridy = 0;
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
 
-		btnOne = new JButton("H/D");
+		btnOne = new JButton("hex");
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doBtnOne();
@@ -185,7 +192,7 @@ public class StepperTest {
 		btnOne.setPreferredSize(new Dimension(50, 20));
 		toolBar.add(btnOne);
 
-		btnTwo = new JButton("Set Model");
+		btnTwo = new JButton("decimal");
 		btnTwo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnTwo();
@@ -226,101 +233,26 @@ public class StepperTest {
 		JPanel panelLeft = new JPanel();
 		splitPane1.setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
-		gbl_panelLeft.columnWidths = new int[] { 0, 0, 0 };
-		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0, 0 };
-		gbl_panelLeft.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
-		gbl_panelLeft.rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panelLeft.columnWidths = new int[] { 0, 0 };
+		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0 };
+		gbl_panelLeft.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gbl_panelLeft.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panelLeft.setLayout(gbl_panelLeft);
 
-		seekPanel = new SeekPanel();
-		seekPanel.addSeekValueChangedListener(new SeekValueChangeListener() {
-			public void valueChanged(SeekValueChangeEvent seekValueChangeEvent) {
-				int priorValue = seekValueChangeEvent.getOldValue();
-				int value = seekValueChangeEvent.getNewValue();
-				System.out.printf("[valueChanged] OldValue: %d, newValue: %d%n", priorValue, value);
-			}
-		});
-		GridBagConstraints gbc_spinnerTest = new GridBagConstraints();
-		gbc_spinnerTest.fill = GridBagConstraints.BOTH;
-		gbc_spinnerTest.insets = new Insets(0, 0, 5, 5);
-		gbc_spinnerTest.gridx = 0;
-		gbc_spinnerTest.gridy = 0;
-		panelLeft.add(seekPanel, gbc_spinnerTest);
-		
-		JPanel panelMain = new JPanel();
-		GridBagConstraints gbc_panelMain = new GridBagConstraints();
-		gbc_panelMain.insets = new Insets(0, 0, 5, 5);
-		gbc_panelMain.fill = GridBagConstraints.BOTH;
-		gbc_panelMain.gridx = 0;
-		gbc_panelMain.gridy = 1;
-		panelLeft.add(panelMain, gbc_panelMain);
-		GridBagLayout gbl_panelMain = new GridBagLayout();
-		gbl_panelMain.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panelMain.rowHeights = new int[]{0, 0, 0};
-		gbl_panelMain.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panelMain.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		panelMain.setLayout(gbl_panelMain);
-		
-		JLabel lblNewLabel = new JLabel("Value");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.anchor = GridBagConstraints.NORTH;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 1;
-		panelMain.add(lblNewLabel, gbc_lblNewLabel);
-		
-		spinnerValue = new JSpinner();
-		spinnerValue.setPreferredSize(new Dimension(50, 20));
-		GridBagConstraints gbc_spinnerValue = new GridBagConstraints();
-		gbc_spinnerValue.insets = new Insets(0, 0, 0, 5);
-		gbc_spinnerValue.gridx = 1;
-		gbc_spinnerValue.gridy = 1;
-		panelMain.add(spinnerValue, gbc_spinnerValue);
-		
-		JLabel lblHeight = new JLabel("min");
-		GridBagConstraints gbc_lblHeight = new GridBagConstraints();
-		gbc_lblHeight.anchor = GridBagConstraints.WEST;
-		gbc_lblHeight.insets = new Insets(0, 0, 0, 5);
-		gbc_lblHeight.gridx = 3;
-		gbc_lblHeight.gridy = 1;
-		panelMain.add(lblHeight, gbc_lblHeight);
-		
-		spinnerMin = new JSpinner();
-		spinnerMin.setPreferredSize(new Dimension(50, 20));
-		GridBagConstraints gbc_spinnerMin = new GridBagConstraints();
-		gbc_spinnerMin.insets = new Insets(0, 0, 0, 5);
-		gbc_spinnerMin.gridx = 4;
-		gbc_spinnerMin.gridy = 1;
-		panelMain.add(spinnerMin, gbc_spinnerMin);
-		
-		JLabel lblMax = new JLabel("Max");
-		GridBagConstraints gbc_lblMax = new GridBagConstraints();
-		gbc_lblMax.insets = new Insets(0, 0, 0, 5);
-		gbc_lblMax.gridx = 6;
-		gbc_lblMax.gridy = 1;
-		panelMain.add(lblMax, gbc_lblMax);
-		
-		spinnerMax = new JSpinner();
-		spinnerMax.setPreferredSize(new Dimension(50, 20));
-		GridBagConstraints gbc_spinnerMax = new GridBagConstraints();
-		gbc_spinnerMax.insets = new Insets(0, 0, 0, 5);
-		gbc_spinnerMax.gridx = 7;
-		gbc_spinnerMax.gridy = 1;
-		panelMain.add(spinnerMax, gbc_spinnerMax);
-		
-		JLabel lblStep = new JLabel("step");
-		GridBagConstraints gbc_lblStep = new GridBagConstraints();
-		gbc_lblStep.insets = new Insets(0, 0, 0, 5);
-		gbc_lblStep.gridx = 9;
-		gbc_lblStep.gridy = 1;
-		panelMain.add(lblStep, gbc_lblStep);
-		
-		spinnerStep = new JSpinner();
-		spinnerStep.setPreferredSize(new Dimension(50, 20));
-		GridBagConstraints gbc_spinnerStep = new GridBagConstraints();
-		gbc_spinnerStep.gridx = 10;
-		gbc_spinnerStep.gridy = 1;
-		panelMain.add(spinnerStep, gbc_spinnerStep);
+		spinner1 = new JSpinner();
+		spinner1.setPreferredSize(new Dimension(100, 20));
+		GridBagConstraints gbc_spinner1 = new GridBagConstraints();
+		gbc_spinner1.insets = new Insets(0, 0, 5, 0);
+		gbc_spinner1.gridx = 0;
+		gbc_spinner1.gridy = 0;
+		panelLeft.add(spinner1, gbc_spinner1);
+
+		spinner2 = new JSpinner();
+		spinner2.setPreferredSize(new Dimension(100, 20));
+		GridBagConstraints gbc_spinner2 = new GridBagConstraints();
+		gbc_spinner2.gridx = 0;
+		gbc_spinner2.gridy = 2;
+		panelLeft.add(spinner2, gbc_spinner2);
 
 		JPanel panelRight = new JPanel();
 		splitPane1.setRightComponent(panelRight);
@@ -437,5 +369,35 @@ public class StepperTest {
 			}
 		});
 	}// initialize
+
+	// ----------------------------------------------------------------------------------------------------------
+
+	private static class HexFormatterFactory extends DefaultFormatterFactory {
+		private static final long serialVersionUID = 1L;
+
+		public AbstractFormatter getDefaultFormatter() {
+			return new HexFormatter();
+		}// getDefaultFormatter
+
+		// .................................................
+		private static class HexFormatter extends DefaultFormatter {
+			private static final long serialVersionUID = 1L;
+
+			public Object stringToValue(String text) throws ParseException {
+				try {
+					return Integer.valueOf(text, 16);
+				} catch (NumberFormatException nfe) {
+					throw new ParseException(text, 0);
+				} // try
+			}// stringToValue
+
+			public String valueToString(Object value) throws ParseException {
+				return String.format("%X", value);
+			}// valueToString
+		}// class HexFormatter
+			// .................................................
+
+	}// class MyFormatterFactory
+		// ----------------------------------------------------------------------------------------------------------
 
 }// class GUItemplate
