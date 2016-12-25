@@ -1,4 +1,4 @@
-package spinnerStuff;
+package Misc;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -10,28 +10,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.ParseException;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
-import javax.swing.text.DefaultFormatter;
-import javax.swing.text.DefaultFormatterFactory;
 
-public class SpinnerStuffTest {
+public class TempFiles {
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -39,14 +40,11 @@ public class SpinnerStuffTest {
 	private JButton btnThree;
 	private JButton btnFour;
 	private JSplitPane splitPane1;
-	private JSpinner spinner1;
-	private JSpinner spinner2;
-
-	JFormattedTextField ftf;
-	JFormattedTextField ftf2;
-	JFormattedTextField.AbstractFormatterFactory decimalFormatterFactory;
-	HexFormatterFactory hexFormatterFactory;
-	private JFormattedTextField ftfTest;
+	File tempDirectory;
+	File oneFile;
+	final static String PREFIX = "tempFiles.";
+	final static String SUFFIX = ".F5DD";
+	private JTextArea textPane;
 
 	/**
 	 * Launch the application.
@@ -55,78 +53,124 @@ public class SpinnerStuffTest {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SpinnerStuffTest window = new SpinnerStuffTest();
+					TempFiles window = new TempFiles();
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
-				} // try
-			}// run
+				}//try
+			}//run
 		});
 	}// main
 
 	/* Standard Stuff */
+	
+	private void doBtnOne(){
+		try {
+			oneFile =File.createTempFile(PREFIX, SUFFIX);
+			File.createTempFile(PREFIX, SUFFIX);
+			File.createTempFile(PREFIX, SUFFIX);
+			File.createTempFile(PREFIX, SUFFIX);
+			File.createTempFile(PREFIX, SUFFIX);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}//doBtnOne
+	
+	private void doBtnTwo(){
+		doBtnOne();
+		String TEMP = "TEMP"; 
+		String tempDir = System.getenv(TEMP);
+		textPane.setText("");
+		textPane.append(String.format("%-25s = %s%n%n", TEMP,tempDir));
+		
+		File targetDir = new File(tempDir);
+		String xx = File.separator;
+		String[] tempFiles = targetDir.list(new PrefixFilter(PREFIX));
+		for(String tempFile:tempFiles){
+			textPane.append(String.format("%s%n", tempDir+ xx + tempFile));
+		}//for
+		
+		
+		for(String tempFile:tempFiles){
+			Boolean result;
+			try {
+				result =Files.deleteIfExists(Paths.get(tempDir+ xx + tempFile));
+				textPane.append(String.format("%-10s,%s%n",result,tempDir+ xx + tempFile));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}//
+		}//for
+		
+	}//doBtnTwo
+	
+	private void doBtnThree(){
+		
+	}//doBtnThree
+	
+	private void doBtnFour(){
+		textPane.setText("");
+		Map<String,String> envVars = System.getenv();
+		Set<String> keys = envVars.keySet();
+		for(String key:keys){
+			textPane.append(String.format("%-25s = %s%n", key,envVars.get(key)));
+		}//for
+		
+		textPane.append(String.format("%n%-25s = %s%n", "TEMP",System.getenv("TEMP")));
+		
+	}//doBtnFour
+	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	class PrefixFilter implements FilenameFilter {
+		  String prefix;
 
-	private void doBtnOne() {
-		ftf.setFormatterFactory(hexFormatterFactory);
-		ftf2.setFormatterFactory(hexFormatterFactory);
-		ftf.setToolTipText("Hex Display");
-	}// doBtnOne
+		  public PrefixFilter(String prefix) {
+		    this.prefix = prefix;
+		  }//Constructor
 
-	private void doBtnTwo() {
-		ftf.setFormatterFactory(decimalFormatterFactory);
-		ftf2.setFormatterFactory(decimalFormatterFactory);
-		ftf.setToolTipText("Decimal Display");
-	}// doBtnTwo
-
-	private void doBtnThree() {
-
-	}// doBtnThree
-
-	private void doBtnFour() {
-
-	}// doBtnFour
-
-	// ---------------------------------------------------------
-
-	private void doFileNew() {
-
-	}// doFileNew
-
-	private void doFileOpen() {
-
-	}// doFileOpen
-
-	private void doFileSave() {
-
-	}// doFileSave
-
-	private void doFileSaveAs() {
-
-	}// doFileSaveAs
-
-	private void doFilePrint() {
-
-	}// doFilePrint
-
-	private void doFileExit() {
+		  public boolean accept(File dir, String name) {
+			  boolean yes = name.startsWith(prefix);
+			    return yes;
+			   // return name.endsWith(ext);
+		  }//accept
+		}//class PrefixFilter
+	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	
+	//---------------------------------------------------------
+	
+	private void doFileNew(){
+		
+	}//doFileNew
+	private void doFileOpen(){
+		
+	}//doFileOpen
+	private void doFileSave(){
+		
+	}//doFileSave
+	private void doFileSaveAs(){
+		
+	}//doFileSaveAs
+	private void doFilePrint(){
+		
+	}//doFilePrint
+	private void doFileExit(){
 		appClose();
 		System.exit(0);
-	}// doFileExit
-
-	private void doEditCut() {
-
-	}// doEditCut
-
-	private void doEditCopy() {
-
-	}// doEditCopy
-
-	private void doEditPaste() {
-
-	}// doEditPaste
+	}//doFileExit
+	private void doEditCut(){
+		
+	}//doEditCut
+	private void doEditCopy(){
+		
+	}//doEditCopy
+	private void doEditPaste(){
+		
+	}//doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(SpinnerStuffTest.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(TempFiles.class);
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -135,27 +179,17 @@ public class SpinnerStuffTest {
 		myPrefs.putInt("LocY", point.y);
 		myPrefs.putInt("Divider", splitPane1.getDividerLocation());
 		myPrefs = null;
-	}// appClose
+	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(SpinnerStuffTest.class);
-		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
+		Preferences myPrefs = Preferences.userNodeForPackage(TempFiles.class);
+		frmTemplate.setSize(696, 753);
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
-
-		JSpinner.DefaultEditor editor = (DefaultEditor) spinner1.getEditor();
-		ftf = editor.getTextField();
-		
-		decimalFormatterFactory = ftf.getFormatterFactory();
-		hexFormatterFactory = new HexFormatterFactory();
-		ftf.setFormatterFactory(hexFormatterFactory);
-		
-		editor = (DefaultEditor) spinner2.getEditor();
-		ftf2 = editor.getTextField();
 	}// appInit
 
-	public SpinnerStuffTest() {
+	public TempFiles() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -165,7 +199,7 @@ public class SpinnerStuffTest {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("SpinnerStuffTest");
+		frmTemplate.setTitle("GUItemplate");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -174,7 +208,7 @@ public class SpinnerStuffTest {
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		frmTemplate.getContentPane().setLayout(gridBagLayout);
-
+		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		GridBagConstraints gbc_toolBar = new GridBagConstraints();
@@ -183,8 +217,8 @@ public class SpinnerStuffTest {
 		gbc_toolBar.gridx = 0;
 		gbc_toolBar.gridy = 0;
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
-
-		btnOne = new JButton("hex");
+		
+		btnOne = new JButton("Create Files");
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doBtnOne();
@@ -193,8 +227,8 @@ public class SpinnerStuffTest {
 		btnOne.setMaximumSize(new Dimension(70, 20));
 		btnOne.setPreferredSize(new Dimension(50, 20));
 		toolBar.add(btnOne);
-
-		btnTwo = new JButton("decimal");
+		
+		btnTwo = new JButton("Create/Delete");
 		btnTwo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnTwo();
@@ -203,7 +237,7 @@ public class SpinnerStuffTest {
 		btnTwo.setPreferredSize(new Dimension(30, 20));
 		btnTwo.setMaximumSize(new Dimension(70, 20));
 		toolBar.add(btnTwo);
-
+		
 		btnThree = new JButton("3");
 		btnThree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -213,8 +247,8 @@ public class SpinnerStuffTest {
 		btnThree.setPreferredSize(new Dimension(30, 20));
 		btnThree.setMaximumSize(new Dimension(70, 20));
 		toolBar.add(btnThree);
-
-		btnFour = new JButton("4");
+		
+		btnFour = new JButton("Env Vars");
 		btnFour.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnFour();
@@ -223,7 +257,7 @@ public class SpinnerStuffTest {
 		btnFour.setPreferredSize(new Dimension(30, 20));
 		btnFour.setMaximumSize(new Dimension(70, 20));
 		toolBar.add(btnFour);
-
+		
 		splitPane1 = new JSplitPane();
 		GridBagConstraints gbc_splitPane1 = new GridBagConstraints();
 		gbc_splitPane1.insets = new Insets(0, 0, 5, 0);
@@ -231,51 +265,36 @@ public class SpinnerStuffTest {
 		gbc_splitPane1.gridx = 0;
 		gbc_splitPane1.gridy = 1;
 		frmTemplate.getContentPane().add(splitPane1, gbc_splitPane1);
-
+		
 		JPanel panelLeft = new JPanel();
 		splitPane1.setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
-		gbl_panelLeft.columnWidths = new int[] { 0, 0 };
-		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-		gbl_panelLeft.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_panelLeft.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panelLeft.columnWidths = new int[]{0, 0};
+		gbl_panelLeft.rowHeights = new int[]{0, 0};
+		gbl_panelLeft.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_panelLeft.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		panelLeft.setLayout(gbl_panelLeft);
-
-		spinner1 = new JSpinner();
-		spinner1.setModel(new SpinnerNumberModel(0, 0, 10, 1));
-		spinner1.setPreferredSize(new Dimension(100, 20));
-		GridBagConstraints gbc_spinner1 = new GridBagConstraints();
-		gbc_spinner1.insets = new Insets(0, 0, 5, 0);
-		gbc_spinner1.gridx = 0;
-		gbc_spinner1.gridy = 0;
-		panelLeft.add(spinner1, gbc_spinner1);
-
-		spinner2 = new JSpinner();
-		spinner2.setModel(new SpinnerNumberModel(0, 0, 55, 1));
-		spinner2.setPreferredSize(new Dimension(100, 20));
-		GridBagConstraints gbc_spinner2 = new GridBagConstraints();
-		gbc_spinner2.insets = new Insets(0, 0, 5, 0);
-		gbc_spinner2.gridx = 0;
-		gbc_spinner2.gridy = 2;
-		panelLeft.add(spinner2, gbc_spinner2);
 		
-		ftfTest = new JFormattedTextField();
-		GridBagConstraints gbc_ftfTest = new GridBagConstraints();
-		gbc_ftfTest.fill = GridBagConstraints.HORIZONTAL;
-		gbc_ftfTest.gridx = 0;
-		gbc_ftfTest.gridy = 5;
-		panelLeft.add(ftfTest, gbc_ftfTest);
-
+		JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 0;
+		panelLeft.add(scrollPane, gbc_scrollPane);
+		
+		textPane = new JTextArea();
+		scrollPane.setViewportView(textPane);
+		
 		JPanel panelRight = new JPanel();
 		splitPane1.setRightComponent(panelRight);
 		GridBagLayout gbl_panelRight = new GridBagLayout();
-		gbl_panelRight.columnWidths = new int[] { 0 };
-		gbl_panelRight.rowHeights = new int[] { 0 };
-		gbl_panelRight.columnWeights = new double[] { Double.MIN_VALUE };
-		gbl_panelRight.rowWeights = new double[] { Double.MIN_VALUE };
+		gbl_panelRight.columnWidths = new int[]{0};
+		gbl_panelRight.rowHeights = new int[]{0};
+		gbl_panelRight.columnWeights = new double[]{Double.MIN_VALUE};
+		gbl_panelRight.rowWeights = new double[]{Double.MIN_VALUE};
 		panelRight.setLayout(gbl_panelRight);
 		splitPane1.setDividerLocation(250);
-
+		
 		JPanel panelStatus = new JPanel();
 		panelStatus.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GridBagConstraints gbc_panelStatus = new GridBagConstraints();
@@ -286,10 +305,10 @@ public class SpinnerStuffTest {
 
 		JMenuBar menuBar = new JMenuBar();
 		frmTemplate.setJMenuBar(menuBar);
-
+		
 		JMenu mnuFile = new JMenu("File");
 		menuBar.add(mnuFile);
-
+		
 		JMenuItem mnuFileNew = new JMenuItem("New");
 		mnuFileNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -297,7 +316,7 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFileNew);
-
+		
 		JMenuItem mnuFileOpen = new JMenuItem("Open...");
 		mnuFileOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -305,10 +324,10 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFileOpen);
-
+		
 		JSeparator separator = new JSeparator();
 		mnuFile.add(separator);
-
+		
 		JMenuItem mnuFileSave = new JMenuItem("Save...");
 		mnuFileSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -316,7 +335,7 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFileSave);
-
+		
 		JMenuItem mnuFileSaveAs = new JMenuItem("Save As...");
 		mnuFileSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -324,10 +343,10 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFileSaveAs);
-
+		
 		JSeparator separator_2 = new JSeparator();
 		mnuFile.add(separator_2);
-
+		
 		JMenuItem mnuFilePrint = new JMenuItem("Print...");
 		mnuFilePrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -335,10 +354,11 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFilePrint);
-
+		
+		
 		JSeparator separator_1 = new JSeparator();
 		mnuFile.add(separator_1);
-
+		
 		JMenuItem mnuFileExit = new JMenuItem("Exit");
 		mnuFileExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -346,10 +366,10 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuFile.add(mnuFileExit);
-
+		
 		JMenu mnuEdit = new JMenu("Edit");
 		menuBar.add(mnuEdit);
-
+		
 		JMenuItem mnuEditCut = new JMenuItem("Cut");
 		mnuEditCut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -357,7 +377,7 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuEdit.add(mnuEditCut);
-
+		
 		JMenuItem mnuEditCopy = new JMenuItem("Copy");
 		mnuEditCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -365,7 +385,7 @@ public class SpinnerStuffTest {
 			}
 		});
 		mnuEdit.add(mnuEditCopy);
-
+		
 		JMenuItem mnuEditPaste = new JMenuItem("Paste");
 		mnuEditPaste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -374,6 +394,7 @@ public class SpinnerStuffTest {
 		});
 		mnuEdit.add(mnuEditPaste);
 
+		
 		frmTemplate.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
@@ -381,35 +402,5 @@ public class SpinnerStuffTest {
 			}
 		});
 	}// initialize
-
-	// ----------------------------------------------------------------------------------------------------------
-
-	private static class HexFormatterFactory extends DefaultFormatterFactory {
-		private static final long serialVersionUID = 1L;
-
-		public AbstractFormatter getDefaultFormatter() {
-			return new HexFormatter();
-		}// getDefaultFormatter
-
-		// .................................................
-		private static class HexFormatter extends DefaultFormatter {
-			private static final long serialVersionUID = 1L;
-
-			public Object stringToValue(String text) throws ParseException {
-				try {
-					return Integer.valueOf(text, 16);
-				} catch (NumberFormatException nfe) {
-					throw new ParseException(text, 0);
-				} // try
-			}// stringToValue
-
-			public String valueToString(Object value) throws ParseException {
-				return String.format("%X", value);
-			}// valueToString
-		}// class HexFormatter
-			// .................................................
-
-	}// class MyFormatterFactory
-		// ----------------------------------------------------------------------------------------------------------
 
 }// class GUItemplate
