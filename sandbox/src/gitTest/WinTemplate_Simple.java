@@ -1,5 +1,6 @@
 package gitTest;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -21,8 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 
-public class GUItemplate {
+public class WinTemplate_Simple {
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -38,7 +40,7 @@ public class GUItemplate {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GUItemplate window = new GUItemplate();
+					WinTemplate_Simple window = new WinTemplate_Simple();
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -89,7 +91,7 @@ public class GUItemplate {
 
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(GUItemplate.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(WinTemplate_Simple.class);
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -101,14 +103,14 @@ public class GUItemplate {
 	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(GUItemplate.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(WinTemplate_Simple.class);
 		frmTemplate.setSize(myPrefs.getInt("Height", 761), myPrefs.getInt("Width", 693));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
 	}// appInit
 
-	public GUItemplate() {
+	public WinTemplate_Simple() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -118,7 +120,7 @@ public class GUItemplate {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("GUItemplate");
+		frmTemplate.setTitle("WinTemplate_Simple");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmTemplate.addWindowListener(new WindowAdapter() {
@@ -134,19 +136,20 @@ public class GUItemplate {
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		frmTemplate.getContentPane().setLayout(gridBagLayout);
 		
-		JPanel panel = new JPanel();
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(0, 0, 5, 0);
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 0;
-		gbc_panel.gridy = 0;
-		frmTemplate.getContentPane().add(panel, gbc_panel);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_panel.rowHeights = new int[]{0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-		panel.setLayout(gbl_panel);
+		JPanel panelForButtons = new JPanel();
+		GridBagConstraints gbc_panelForButtons = new GridBagConstraints();
+		gbc_panelForButtons.anchor = GridBagConstraints.NORTH;
+		gbc_panelForButtons.insets = new Insets(0, 0, 5, 0);
+		gbc_panelForButtons.fill = GridBagConstraints.HORIZONTAL;
+		gbc_panelForButtons.gridx = 0;
+		gbc_panelForButtons.gridy = 0;
+		frmTemplate.getContentPane().add(panelForButtons, gbc_panelForButtons);
+		GridBagLayout gbl_panelForButtons = new GridBagLayout();
+		gbl_panelForButtons.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_panelForButtons.rowHeights = new int[]{0, 0};
+		gbl_panelForButtons.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panelForButtons.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panelForButtons.setLayout(gbl_panelForButtons);
 		
 		btnOne = new JButton("Button 1");
 		btnOne.setMinimumSize(new Dimension(100, 20));
@@ -154,7 +157,9 @@ public class GUItemplate {
 		gbc_btnOne.insets = new Insets(0, 0, 0, 5);
 		gbc_btnOne.gridx = 0;
 		gbc_btnOne.gridy = 0;
-		panel.add(btnOne, gbc_btnOne);
+		panelForButtons.add(btnOne, gbc_btnOne);
+		btnOne.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		btnOne.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doBtnOne();
@@ -169,7 +174,8 @@ public class GUItemplate {
 		gbc_btnTwo.insets = new Insets(0, 0, 0, 5);
 		gbc_btnTwo.gridx = 1;
 		gbc_btnTwo.gridy = 0;
-		panel.add(btnTwo, gbc_btnTwo);
+		panelForButtons.add(btnTwo, gbc_btnTwo);
+		btnTwo.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnTwo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnTwo();
@@ -182,9 +188,10 @@ public class GUItemplate {
 		btnThree.setMinimumSize(new Dimension(100, 20));
 		GridBagConstraints gbc_btnThree = new GridBagConstraints();
 		gbc_btnThree.insets = new Insets(0, 0, 0, 5);
-		gbc_btnThree.gridx = 2;
+		gbc_btnThree.gridx = 3;
 		gbc_btnThree.gridy = 0;
-		panel.add(btnThree, gbc_btnThree);
+		panelForButtons.add(btnThree, gbc_btnThree);
+		btnThree.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnThree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnThree();
@@ -196,10 +203,10 @@ public class GUItemplate {
 		btnFour = new JButton("Button 4");
 		btnFour.setMinimumSize(new Dimension(100, 20));
 		GridBagConstraints gbc_btnFour = new GridBagConstraints();
-		gbc_btnFour.anchor = GridBagConstraints.NORTH;
-		gbc_btnFour.gridx = 3;
+		gbc_btnFour.gridx = 4;
 		gbc_btnFour.gridy = 0;
-		panel.add(btnFour, gbc_btnFour);
+		panelForButtons.add(btnFour, gbc_btnFour);
+		btnFour.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnFour.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doBtnFour();
