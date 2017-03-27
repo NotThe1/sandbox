@@ -29,7 +29,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.JTextComponent;
 
-public class GUItemplate {
+public class WinTemplate_Log {
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -47,7 +47,7 @@ public class GUItemplate {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GUItemplate window = new GUItemplate();
+					WinTemplate_Log window = new WinTemplate_Log();
 					window.frmTemplate.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -98,7 +98,7 @@ public class GUItemplate {
 
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(GUItemplate.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(WinTemplate_Log.class);
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -110,15 +110,15 @@ public class GUItemplate {
 	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(GUItemplate.class);
-		frmTemplate.setSize(myPrefs.getInt("Height", 761), myPrefs.getInt("Width", 693));
+		Preferences myPrefs = Preferences.userNodeForPackage(WinTemplate_Log.class);
+		frmTemplate.setSize(myPrefs.getInt("Width", 761), myPrefs.getInt("Height", 693));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
-		txtLog.append(" this is the log");
+
 	}// appInit
 
-	public GUItemplate() {
+	public WinTemplate_Log() {
 		initialize();
 		appInit();
 	}// Constructor
@@ -128,7 +128,7 @@ public class GUItemplate {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("GUItemplate");
+		frmTemplate.setTitle("WinTemplate_Log");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmTemplate.addWindowListener(new WindowAdapter() {

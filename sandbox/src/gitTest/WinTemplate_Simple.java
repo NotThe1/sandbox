@@ -104,7 +104,7 @@ public class WinTemplate_Simple {
 
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(WinTemplate_Simple.class);
-		frmTemplate.setSize(myPrefs.getInt("Height", 761), myPrefs.getInt("Width", 693));
+		frmTemplate.setSize(myPrefs.getInt("Width", 761), myPrefs.getInt("Height", 693));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		myPrefs = null;
