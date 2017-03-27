@@ -2,30 +2,22 @@ package tableInJEditorPane;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
-import javax.swing.JFrame;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JMenuBar;
-import javax.swing.JToolBar;
-
-import java.awt.GridBagConstraints;
-
-import javax.swing.JPanel;
-
-import java.awt.Insets;
-
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
-import javax.swing.JSplitPane;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
-import javax.swing.text.DefaultStyledDocument;
+import javax.swing.JToolBar;
 
 public class TableInText {
 
@@ -60,7 +52,7 @@ public class TableInText {
 	/* Standard Stuff */
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(TableInText.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(TableInText.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmReflec.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -71,7 +63,7 @@ public class TableInText {
 	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(TableInText.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(TableInText.class).node(this.getClass().getSimpleName());
 		frmReflec.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmReflec.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

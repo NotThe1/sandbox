@@ -81,7 +81,7 @@ public class TestToggleButtom {
 	}//doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(TestToggleButtom.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(TestToggleButtom.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -92,7 +92,7 @@ public class TestToggleButtom {
 	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(TestToggleButtom.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(TestToggleButtom.class).node(this.getClass().getSimpleName());
 		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

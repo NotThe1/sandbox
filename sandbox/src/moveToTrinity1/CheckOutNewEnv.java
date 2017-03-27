@@ -2,23 +2,23 @@ package moveToTrinity1;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
-import javax.swing.JFrame;
-import java.awt.GridBagLayout;
-import javax.swing.JMenuBar;
-import javax.swing.JToolBar;
-import java.awt.GridBagConstraints;
-import javax.swing.JPanel;
-import java.awt.Insets;
+
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JToolBar;
 
 public class CheckOutNewEnv {
 
@@ -76,7 +76,7 @@ public class CheckOutNewEnv {
 	}//doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(CheckOutNewEnv.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(CheckOutNewEnv.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -87,7 +87,7 @@ public class CheckOutNewEnv {
 	}//appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(CheckOutNewEnv.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(CheckOutNewEnv.class).node(this.getClass().getSimpleName());
 		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

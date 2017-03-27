@@ -3,57 +3,46 @@ package Misc;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.AttributedCharacterIterator;
 import java.util.Enumeration;
 import java.util.prefs.Preferences;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-
-import java.awt.GridBagLayout;
-
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
-import java.awt.GridBagConstraints;
-
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AbstractDocument.AbstractElement;
 import javax.swing.text.AbstractDocument.BranchElement;
 import javax.swing.text.AbstractDocument.LeafElement;
-import javax.swing.text.StyleConstants.CharacterConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleConstants.CharacterConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
-
-import java.awt.Font;
-
-import javax.swing.JToolBar;
-
-import java.awt.Insets;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JTree;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JTextArea;
 
 public class StyleExplore implements TreeSelectionListener {
 
@@ -261,7 +250,7 @@ public class StyleExplore implements TreeSelectionListener {
 	/* Standard Stuff */
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmReflec.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -272,7 +261,7 @@ public class StyleExplore implements TreeSelectionListener {
 	}// appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class).node(this.getClass().getSimpleName());
 		frmReflec.setSize(761, 722);
 		frmReflec.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

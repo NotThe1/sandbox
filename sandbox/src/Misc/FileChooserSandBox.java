@@ -88,7 +88,7 @@ public class FileChooserSandBox {
 	
 	//--------------------------------
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class).node(this.getClass().getSimpleName());
 		Dimension dim = frame.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -100,7 +100,7 @@ public class FileChooserSandBox {
 
 	private void appInit() {
 		// manage preferences
-		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class).node(this.getClass().getSimpleName());
 		frame.setSize(myPrefs.getInt("Width", 100), myPrefs.getInt("Height", 100));
 		frame.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

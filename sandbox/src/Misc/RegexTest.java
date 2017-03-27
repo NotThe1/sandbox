@@ -105,7 +105,7 @@ public class RegexTest {
 	}// CaseInsensitiveSort
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(RegexTest.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(RegexTest.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -116,7 +116,7 @@ public class RegexTest {
 	}// appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(RegexTest.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(RegexTest.class).node(this.getClass().getSimpleName());
 		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

@@ -49,7 +49,7 @@ public class Reflec1 {
 	}// main
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(Reflec1.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(Reflec1.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmReflec.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -61,7 +61,7 @@ public class Reflec1 {
 
 //	@SuppressWarnings("unchecked")
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(Reflec1.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(Reflec1.class).node(this.getClass().getSimpleName());
 		frmReflec.setSize(435,512);
 		frmReflec.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;

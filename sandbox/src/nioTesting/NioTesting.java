@@ -187,7 +187,7 @@ public class NioTesting {
 	}// doEditPaste
 
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(NioTesting.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(NioTesting.class).node(this.getClass().getSimpleName());
 		Dimension dim = frmTemplate.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -199,7 +199,7 @@ public class NioTesting {
 	}// appClose
 
 	private void appInit() {
-		Preferences myPrefs = Preferences.userNodeForPackage(NioTesting.class);
+		Preferences myPrefs = Preferences.userNodeForPackage(NioTesting.class).node(this.getClass().getSimpleName());
 		frmTemplate.setSize(795, 500);
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
