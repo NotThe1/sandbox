@@ -1,5 +1,6 @@
 package box2;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -30,6 +31,7 @@ import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -39,6 +41,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -188,6 +191,10 @@ public class TestMenus implements ActionListener{
 		};
 		private JTextArea txtLog;
 		private JButton btnDoSomething;
+		private JPanel panelTest1;
+		private JButton btnNewButton;
+		private JPanel panelTest2;
+		private JCheckBox chckbxNewCheckBox;
 
 	/**
 	 * Create the application.
@@ -206,9 +213,9 @@ public class TestMenus implements ActionListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 100, 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
 
 		JLabel lblResult = new JLabel("Result");
@@ -302,16 +309,63 @@ public class TestMenus implements ActionListener{
 		btnDoSomething = new JButton("do Something");
 		btnDoSomething.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Object subject = comboBox.getSelectedItem();
-				int loc = fred.getIndexOf(subject);
-				System.out.printf("[btnDoSomething] subject: %s  loc: %d%n", subject, loc);
-				fred.insertElementAt((String) subject, 0);
+				panelTest1.setVisible(!panelTest1.isVisible());
+				panelTest2.setVisible(!panelTest1.isVisible());
+//				Object subject = comboBox.getSelectedItem();
+//				int loc = fred.getIndexOf(subject);
+//				System.out.printf("[btnDoSomething] subject: %s  loc: %d%n", subject, loc);
+//				fred.insertElementAt((String) subject, 0);
 			}// actionPerformed
 		});
 		GridBagConstraints gbc_btnDoSomething = new GridBagConstraints();
+		gbc_btnDoSomething.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDoSomething.gridx = 3;
 		gbc_btnDoSomething.gridy = 4;
 		frame.getContentPane().add(btnDoSomething, gbc_btnDoSomething);
+		
+		panelTest1 = new JPanel();
+		panelTest1.setPreferredSize(new Dimension(0, 0));
+		panelTest1.setMinimumSize(new Dimension(0, 0));
+		panelTest1.setBackground(Color.PINK);
+		GridBagConstraints gbc_panelTest1 = new GridBagConstraints();
+		gbc_panelTest1.insets = new Insets(0, 0, 5, 5);
+		gbc_panelTest1.fill = GridBagConstraints.BOTH;
+		gbc_panelTest1.gridx = 1;
+		gbc_panelTest1.gridy = 5;
+		frame.getContentPane().add(panelTest1, gbc_panelTest1);
+		GridBagLayout gbl_panelTest1 = new GridBagLayout();
+		gbl_panelTest1.columnWidths = new int[]{0, 0};
+		gbl_panelTest1.rowHeights = new int[]{0, 0};
+		gbl_panelTest1.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_panelTest1.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		panelTest1.setLayout(gbl_panelTest1);
+		
+		btnNewButton = new JButton("New button");
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.gridx = 0;
+		gbc_btnNewButton.gridy = 0;
+		panelTest1.add(btnNewButton, gbc_btnNewButton);
+		
+		panelTest2 = new JPanel();
+		panelTest2.setVisible(false);
+		GridBagConstraints gbc_panelTest2 = new GridBagConstraints();
+		gbc_panelTest2.insets = new Insets(0, 0, 5, 5);
+		gbc_panelTest2.fill = GridBagConstraints.BOTH;
+		gbc_panelTest2.gridx = 1;
+		gbc_panelTest2.gridy = 5;
+		frame.getContentPane().add(panelTest2, gbc_panelTest2);
+		GridBagLayout gbl_panelTest2 = new GridBagLayout();
+		gbl_panelTest2.columnWidths = new int[]{0, 0};
+		gbl_panelTest2.rowHeights = new int[]{0, 0};
+		gbl_panelTest2.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_panelTest2.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panelTest2.setLayout(gbl_panelTest2);
+		
+		chckbxNewCheckBox = new JCheckBox("New check box");
+		GridBagConstraints gbc_chckbxNewCheckBox = new GridBagConstraints();
+		gbc_chckbxNewCheckBox.gridx = 0;
+		gbc_chckbxNewCheckBox.gridy = 0;
+		panelTest2.add(chckbxNewCheckBox, gbc_chckbxNewCheckBox);
 
 		// GridBagConstraints gbc_list = new GridBagConstraints();
 		// gbc_list.fill = GridBagConstraints.BOTH;
