@@ -59,7 +59,8 @@ public class ComparableStuff {
 	/* Standard Stuff */
 
 	private void doFileNew() {
-
+		ModalDialogTest mdt = new ModalDialogTest();
+		mdt.setVisible(true);
 	}// doFileNew
 
 	private void doFileOpen() {
@@ -176,6 +177,11 @@ public class ComparableStuff {
 		frmTemplate.getContentPane().add(toolBar, gbc_toolBar);
 
 		btnOne = new JButton("1");
+		btnOne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				taLeft.append("New Line" + System.lineSeparator());
+			}
+		});
 		btnOne.setMaximumSize(new Dimension(30, 20));
 		btnOne.setPreferredSize(new Dimension(30, 20));
 		toolBar.add(btnOne);
@@ -249,7 +255,7 @@ public class ComparableStuff {
 		JMenu mnuFile = new JMenu("File");
 		menuBar.add(mnuFile);
 
-		JMenuItem mnuFileNew = new JMenuItem("New");
+		JMenuItem mnuFileNew = new JMenuItem("New - modal dialog");
 		mnuFileNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doFileNew();
