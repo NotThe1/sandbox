@@ -1,5 +1,6 @@
 package Misc;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -64,6 +65,22 @@ public class ComparableStuff {
 	}// doFileNew
 
 	private void doFileOpen() {
+		
+		taLeft.setText("");
+		String listingFile = "testFile.txtsdsds.txt";
+		String completeSuffix = "." + "txt";
+		
+		String firstString = listingFile.replace("//" + completeSuffix + "$", "");
+		taLeft.append("firstString = " + firstString +  System.lineSeparator());
+		
+		String secondString = listingFile.replace("//" + completeSuffix + "$", "");
+		taLeft.append("secondString = " + secondString +  System.lineSeparator());
+		
+		
+		
+		
+		String thirdString = listingFile.replaceFirst("\\" + completeSuffix + "$", "");
+		taLeft.append("thirdString = " + thirdString +  System.lineSeparator());
 
 	}// doFileOpen
 
@@ -192,11 +209,15 @@ public class ComparableStuff {
 		toolBar.add(btnTwo);
 
 		btnThree = new JButton("3");
+		btnThree.setForeground(new Color(210, 180, 140));
+		btnThree.setBackground(new Color(250, 240, 230));
 		btnThree.setPreferredSize(new Dimension(30, 20));
 		btnThree.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnThree);
 
 		btnFour = new JButton("4");
+		btnFour.setForeground(new Color(128, 0, 0));
+		btnFour.setBackground(new Color(250, 240, 230));
 		btnFour.setPreferredSize(new Dimension(30, 20));
 		btnFour.setMaximumSize(new Dimension(30, 20));
 		toolBar.add(btnFour);
@@ -263,7 +284,7 @@ public class ComparableStuff {
 		});
 		mnuFile.add(mnuFileNew);
 
-		JMenuItem mnuFileOpen = new JMenuItem("Open...");
+		JMenuItem mnuFileOpen = new JMenuItem("Open fix file name");
 		mnuFileOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doFileOpen();
