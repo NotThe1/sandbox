@@ -1,5 +1,6 @@
 package Misc;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -35,6 +36,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 public class TempFiles {
 
@@ -147,14 +150,27 @@ public class TempFiles {
 	}// updateDisk
 
 	private void doBtnFour() {
-		textPane.setText("");
+		textPane.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//		textPane.getCaret().setBlinkRate(1000);
+		textPane.getCaret().setVisible(true);
+		Document doc = textPane.getDocument();
+		//textPane.setText("");
 		Map<String, String> envVars = System.getenv();
 		Set<String> keys = envVars.keySet();
+		String line;
 		for (String key : keys) {
-			textPane.append(String.format("%-25s = %s%n", key, envVars.get(key)));
+//			textPane.append(String.format("%-25s = %s%n", key, envVars.get(key)));
+			line =String.format("%-25s = %s%n", key, envVars.get(key));
+			try {
+				doc.insertString(doc.getLength(), line, null);
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} // for
+		textPane.setCaretPosition(doc.getLength());
 
-		textPane.append(String.format("%n%-25s = %s%n", "TEMP", System.getenv("TEMP")));
+//		textPane.append(String.format("%n%-25s = %s%n", "TEMP", System.getenv("TEMP")));
 
 	}// doBtnFour
 		// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -243,7 +259,7 @@ public class TempFiles {
 	 */
 	private void initialize() {
 		frmTemplate = new JFrame();
-		frmTemplate.setTitle("GUItemplate");
+		frmTemplate.setTitle("TempFiles");
 		frmTemplate.setBounds(100, 100, 450, 300);
 		frmTemplate.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
