@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -46,7 +47,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 public class StyleExplore implements TreeSelectionListener {
 
-	private JFrame frmReflec;
+	private JFrame frmStyleExplorer;
 	private JTextPane txtpnPP;
 	private JToolBar toolBar;
 	private JButton btnOne;
@@ -57,7 +58,7 @@ public class StyleExplore implements TreeSelectionListener {
 	private JSplitPane splitPane;
 	private JScrollPane scrollPaneElements;
 	private JScrollPane scrollPaneAttributes;
-	private JLabel lblNewLabel;
+	private JLabel lblElements;
 	private JLabel lblAttributes;
 	private JTree treeElements;
 	private JTextArea textAttributes;
@@ -70,7 +71,7 @@ public class StyleExplore implements TreeSelectionListener {
 			public void run() {
 				try {
 					StyleExplore window = new StyleExplore();
-					window.frmReflec.setVisible(true);
+					window.frmStyleExplorer.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,7 +114,20 @@ public class StyleExplore implements TreeSelectionListener {
 	}// createNodes
 
 	private void doButton2() {
-
+		Color newColor = JColorChooser.showDialog(frmStyleExplorer, "Font Color", lblAttributes.getForeground());
+		if (newColor == null) {
+			return;
+		} else {
+			lblAttributes.setForeground(newColor);
+		}//if
+		
+		textAttributes.setText("");
+		textAttributes.append(String.format("Red = %02X%n",newColor.getRed()));
+		textAttributes.append(String.format("Green = %02X%n",newColor.getGreen()));
+		textAttributes.append(String.format("Blue = %02X%n",newColor.getBlue()));
+		textAttributes.append(String.format("RGB = %08X%n",newColor.getRGB()));
+		
+		lblRGB3.setForeground(new Color(newColor.getRGB()));
 	}// doButton1
 
 	private void doButton3() {
@@ -251,10 +265,10 @@ public class StyleExplore implements TreeSelectionListener {
 
 	private void appClose() {
 		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class).node(this.getClass().getSimpleName());
-		Dimension dim = frmReflec.getSize();
+		Dimension dim = frmStyleExplorer.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
-		Point point = frmReflec.getLocation();
+		Point point = frmStyleExplorer.getLocation();
 		myPrefs.putInt("LocX", point.x);
 		myPrefs.putInt("LocY", point.y);
 		myPrefs = null;
@@ -262,8 +276,8 @@ public class StyleExplore implements TreeSelectionListener {
 
 	private void appInit() {
 		Preferences myPrefs = Preferences.userNodeForPackage(StyleExplore.class).node(this.getClass().getSimpleName());
-		frmReflec.setSize(761, 722);
-		frmReflec.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
+		frmStyleExplorer.setSize(761, 722);
+		frmStyleExplorer.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;
 
 		txtpnPP.setText("p 1\np 2\np 3\n");
@@ -338,16 +352,16 @@ public class StyleExplore implements TreeSelectionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmReflec = new JFrame();
-		frmReflec.setTitle("GUItemplate");
-		frmReflec.setBounds(100, 100, 450, 300);
-		frmReflec.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmStyleExplorer = new JFrame();
+		frmStyleExplorer.setTitle("GUItemplate");
+		frmStyleExplorer.setBounds(100, 100, 450, 300);
+		frmStyleExplorer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 350, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
-		frmReflec.getContentPane().setLayout(gridBagLayout);
+		gridBagLayout.columnWeights = new double[] { 1.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
+		frmStyleExplorer.getContentPane().setLayout(gridBagLayout);
 
 		toolBar = new JToolBar();
 		GridBagConstraints gbc_toolBar = new GridBagConstraints();
@@ -356,7 +370,7 @@ public class StyleExplore implements TreeSelectionListener {
 		gbc_toolBar.insets = new Insets(0, 0, 5, 0);
 		gbc_toolBar.gridx = 0;
 		gbc_toolBar.gridy = 0;
-		frmReflec.getContentPane().add(toolBar, gbc_toolBar);
+		frmStyleExplorer.getContentPane().add(toolBar, gbc_toolBar);
 
 		btnOne = new JButton("1");
 		btnOne.addActionListener(new ActionListener() {
@@ -408,7 +422,7 @@ public class StyleExplore implements TreeSelectionListener {
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
-		frmReflec.getContentPane().add(scrollPane, gbc_scrollPane);
+		frmStyleExplorer.getContentPane().add(scrollPane, gbc_scrollPane);
 
 		txtpnPP = new JTextPane();
 		// textPane.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -421,7 +435,7 @@ public class StyleExplore implements TreeSelectionListener {
 		gbc_panelDetails.fill = GridBagConstraints.BOTH;
 		gbc_panelDetails.gridx = 1;
 		gbc_panelDetails.gridy = 1;
-		frmReflec.getContentPane().add(panelDetails, gbc_panelDetails);
+		frmStyleExplorer.getContentPane().add(panelDetails, gbc_panelDetails);
 		GridBagLayout gbl_panelDetails = new GridBagLayout();
 		gbl_panelDetails.columnWidths = new int[] { 0, 0 };
 		gbl_panelDetails.rowHeights = new int[] { 0, 0 };
@@ -440,10 +454,10 @@ public class StyleExplore implements TreeSelectionListener {
 		scrollPaneElements = new JScrollPane();
 		splitPane.setLeftComponent(scrollPaneElements);
 
-		lblNewLabel = new JLabel("Elements");
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		scrollPaneElements.setColumnHeaderView(lblNewLabel);
+		lblElements = new JLabel("Elements");
+		lblElements.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblElements.setHorizontalAlignment(SwingConstants.CENTER);
+		scrollPaneElements.setColumnHeaderView(lblElements);
 		// scrollPaneElements.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, JComponent(new String("0")));
 
 		treeElements = new JTree();
@@ -462,10 +476,39 @@ public class StyleExplore implements TreeSelectionListener {
 		textAttributes.setEditable(false);
 		scrollPaneAttributes.setViewportView(textAttributes);
 		splitPane.setDividerLocation(200);
+		
+		panel = new JPanel();
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.insets = new Insets(0, 0, 0, 5);
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 0;
+		gbc_panel.gridy = 2;
+		frmStyleExplorer.getContentPane().add(panel, gbc_panel);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{0, 0};
+		gbl_panel.rowHeights = new int[]{0, 0, 0};
+		gbl_panel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		panel.setLayout(gbl_panel);
+		
+		lblRGB3 = new JLabel("Red,Green,Blue");
+		lblRGB3.setFont(new Font("Times New Roman", Font.BOLD, 40));
+		GridBagConstraints gbc_lblRGB3 = new GridBagConstraints();
+		gbc_lblRGB3.insets = new Insets(0, 0, 5, 0);
+		gbc_lblRGB3.gridx = 0;
+		gbc_lblRGB3.gridy = 0;
+		panel.add(lblRGB3, gbc_lblRGB3);
+		
+		lblRGB1 = new JLabel("RedGreenBlue");
+		lblRGB1.setFont(new Font("Times New Roman", Font.BOLD, 40));
+		GridBagConstraints gbc_lblRGB1 = new GridBagConstraints();
+		gbc_lblRGB1.gridx = 0;
+		gbc_lblRGB1.gridy = 1;
+		panel.add(lblRGB1, gbc_lblRGB1);
 
 		JMenuBar menuBar = new JMenuBar();
-		frmReflec.setJMenuBar(menuBar);
-		frmReflec.addWindowListener(new WindowAdapter() {
+		frmStyleExplorer.setJMenuBar(menuBar);
+		frmStyleExplorer.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				appClose();
@@ -481,5 +524,8 @@ public class StyleExplore implements TreeSelectionListener {
 	private static final String STYLES = "Styles";
 
 	private static final String NL = System.lineSeparator();
+	private JPanel panel;
+	private JLabel lblRGB3;
+	private JLabel lblRGB1;
 
 }// class GUItemplate
