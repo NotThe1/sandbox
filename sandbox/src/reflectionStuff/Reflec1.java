@@ -83,6 +83,7 @@ public class Reflec1 {
 	 */
 	private void initialize() {
 		frmReflec = new JFrame();
+//		frmReflec.setIconImage(Toolkit.getDefaultToolkit().getImage(Reflec1.class.getResource("/reflectionStuff/images/Regex.jpg")));
 		frmReflec.setTitle("Reflec1");
 		frmReflec.setBounds(100, 100, 450, 300);
 		frmReflec.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
