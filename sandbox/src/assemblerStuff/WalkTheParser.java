@@ -72,7 +72,23 @@ public class WalkTheParser {
 	/* Standard Stuff */
 	
 	private void doBtnOne(){
+		String source = textField1.getText().trim();
+		String a1 = null,a2 = null;
+		String args[] = source.split(",");
+		if (source.length()> 0){
+			a1 = args[0];
+			if (args.length> 1){
+				a2 = args[1];
+			}//inner if
+		}//outer if
 		
+		//int count = (a1!=null | a2 != null)?args.length:0;
+		
+		int count = 0;
+		count = a1!=null? count+1:count;
+		count = a2!=null? count+1:count;
+		
+		txtLog.append(String.format("Count = %d, a1 = %s, a2 = %s%n", count,a1,a2));
 		
 	}//doBtnOne
 	
