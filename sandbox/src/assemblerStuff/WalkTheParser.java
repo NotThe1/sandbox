@@ -160,8 +160,34 @@ public static  final String  BAD_OP_CODE = "Bad opCode";
 	}
 	
 	private void doBtnThree(){
+		findDirective(textField1.getText().trim());
+		
 		
 	}//doBtnThree
+	private String findDirective(String workingLine) {
+		String netLine = new String(workingLine).trim();
+		String directive = "<NO Direcive>";
+		String name = "<No Name>";
+		String possibleName = "<No Possible Name>";
+		Pattern patternForDirectives = Pattern.compile("EQU|SET|ORG");
+		Matcher matcherForDirective = patternForDirectives.matcher(netLine);
+
+		if (matcherForDirective.find()) {	// there is a directive
+			if (matcherForDirective.start()!= 0){ // we have a name to process
+				possibleName = netLine.substring(0, matcherForDirective.start());
+				Pattern patternForName = Pattern.compile("[\\@\\?A-Za-z]{1}\\w{1,25}\\s");
+				Matcher matcherForName = patternForName.matcher(possibleName);
+				name = matcherForName.lookingAt() ? possibleName.trim() : null;
+			}// if there is a name
+			directive = matcherForDirective.group();
+			netLine = netLine.substring(matcherForDirective.end()).trim();
+			
+		} // outer if
+		
+		txtLog.append(String.format("Name = %s, Dir = %s, netLine = %s, Possible Name = %s%n",name,directive,netLine, possibleName));
+		return netLine;
+	}// findDirective
+
 	
 	private void doBtnFour(){
 		
