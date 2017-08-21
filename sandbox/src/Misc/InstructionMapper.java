@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
@@ -48,11 +50,11 @@ public class InstructionMapper {
 
 	/* Standard Stuff */
 
-	private void doBtnOne() {
+	private void doBtnOne() {// Map
 		int opCodeValue = (int) spinnerOpCode.getValue();
 		int page = (opCodeValue & 0B11000000) >> 6;
 		spinnerPage.setValue(page);
-		lblPage.setText(getBits(page).substring(0, 2));
+		lblPage.setText(getBits(page).substring(1));
 		int yyy = (opCodeValue & 0B00111000) >> 3;
 		spinnerYYY.setValue(yyy);
 		lblYYY.setText(getBits(yyy));
@@ -93,19 +95,61 @@ public class InstructionMapper {
 		return ans;
 	}//getBits
 
-	private void doBtnTwo() {
-		int page = (int) spinnerPage.getValue()<<6;
-		int yyy = (int) spinnerYYY.getValue()<<3;
+	private void doBtnTwo() {// Combine
+		int page = (int) spinnerPage.getValue();
+		lblPage.setText(getBits(page).substring(1));
+
+		int yyy = (int) spinnerYYY.getValue();
+		lblYYY.setText(getBits(yyy));
+
 		int zzz = (int) spinnerZZZ.getValue();
+		lblZZZ.setText(getBits(zzz));
 		
-		spinnerOpCode.setValue(page + yyy + zzz);
+		int opCode = (page<<6) + (yyy<<3) + zzz;
+
+		
+		spinnerOpCode.setValue(opCode);
 	}// doBtnTwo
 
-	private void doBtnThree() {
+	private void doBtnThree() { // All YYY
+		int page = (int) spinnerPage.getValue();
+		int pageInt = page << 6;
+		int zzz = (int) spinnerZZZ.getValue();
+		int opCode = 0;
+		String bitsPage = getBits(page).substring(1);
+		String bitsYYY = "xxx";
+		String bitsZZZ = getBits(zzz);		
+		String message = "opCode\tPage\tYYY\tZZZ";
+		log.addWarning(message);
+		
+		for (int yyy = 0; yyy <8;yyy++) {
+			opCode = pageInt + (yyy << 3) + zzz;
+			bitsYYY = getBits(yyy);
+			message = String.format("  %02X\t %s\t%s\t%s", opCode,bitsPage,bitsYYY,bitsZZZ);
+			log.addInfo(message);
+		}//for
 
 	}// doBtnThree
 
-	private void doBtnFour() {
+	private void doBtnFour() {// All ZZZ
+		int page = (int) spinnerPage.getValue();
+		int pageInt = page << 6;
+		int yyy = (int) spinnerYYY.getValue();
+		int yyyInt = yyy<<3;
+		int opCode = 0;
+		String bitsPage = getBits(page).substring(1);
+		String bitsYYY = getBits(yyy);
+		String bitsZZZ = "XXX";		
+		String message = "opCode\tPage\tYYY\tZZZ";
+		log.addWarning(message);
+		
+		for (int zzz = 0; zzz <8;zzz++) {
+			opCode = pageInt + yyyInt + zzz;
+			bitsZZZ = getBits(zzz);
+			message = String.format("  %02X\t %s\t%s\t%s", opCode,bitsPage,bitsYYY,bitsZZZ);
+			log.addInfo(message);
+		}//for
+
 
 	}// doBtnFour
 
@@ -230,7 +274,7 @@ public class InstructionMapper {
 		btnTwo.setPreferredSize(new Dimension(100, 20));
 		btnTwo.setMaximumSize(new Dimension(0, 0));
 
-		btnThree = new JButton("Button 3");
+		btnThree = new JButton("All YYY");
 		btnThree.setMinimumSize(new Dimension(100, 20));
 		GridBagConstraints gbc_btnThree = new GridBagConstraints();
 		gbc_btnThree.insets = new Insets(0, 0, 0, 5);
@@ -245,7 +289,7 @@ public class InstructionMapper {
 		btnThree.setPreferredSize(new Dimension(100, 20));
 		btnThree.setMaximumSize(new Dimension(0, 0));
 
-		btnFour = new JButton("Button 4");
+		btnFour = new JButton("All ZZZ");
 		btnFour.setMinimumSize(new Dimension(100, 20));
 		GridBagConstraints gbc_btnFour = new GridBagConstraints();
 		gbc_btnFour.anchor = GridBagConstraints.NORTH;
@@ -390,6 +434,14 @@ public class InstructionMapper {
 		panelRight.add(scrollPane, gbc_scrollPane);
 
 		tpLog = new JTextPane();
+		tpLog.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getClickCount()>1) {
+					log.clear();
+				}
+			}
+		});
 		scrollPane.setViewportView(tpLog);
 
 		lblLog = new JLabel("New label");
