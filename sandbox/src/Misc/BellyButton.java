@@ -20,10 +20,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -81,18 +88,16 @@ public class BellyButton {
 
 	}// log
 
-
-
 	private void doBtnOne() throws IOException {
-				linesCode.clear();
-				linesEmpty.clear();
-				fileNames.clear();
+		linesCode.clear();
+		linesEmpty.clear();
+		fileNames.clear();
 		Path start = Paths.get(lblLog.getText());
 
 		Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-				
+
 				String fileName = path.toFile().getName();
 				fileNames.add(fileName);
 				Integer code = 0, empty = 0;
@@ -134,14 +139,14 @@ public class BellyButton {
 				}
 			}
 		});
-		
+
 		Integer totalCodeLines = 0, totalEmptyLines = 0, totalLines = 0;
-		
-		for(String s:fileNames){
+
+		for (String s : fileNames) {
 			totalCodeLines += linesCode.get(s);
 			totalEmptyLines += linesEmpty.get(s);
-		}//
-		
+		} //
+
 		log(String.format("%n%nFile Count : %,d", fileNames.size()));
 		log(String.format("Code Lines:  %,d", totalCodeLines));
 		log(String.format("Empty Lines: %,d", totalEmptyLines));
@@ -172,14 +177,88 @@ public class BellyButton {
 	}// doBtnTwo
 
 	private void doBtnThree() {
+		Date startDateTime = new Date(System.currentTimeMillis() - 123456789);
+		Date endDateTime = new Date();
+		log(getElapsedTimeToString(startDateTime,endDateTime));
+//		Map<TimeUnit, Long> times = getElapsedTime(startDateTime,endDateTime);
+//		
+//		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+//		Collections.reverse(timeUnits); // Days to Nanoseconds
+//
+//		log("");
+//		for(TimeUnit timeUnit:timeUnits) {
+//			log(timeUnit.toString() + " = " + times.get(timeUnit));
+//		}// for each time unit
 
 	}// doBtnThree
 
 	private void doBtnFour() {
+		// Date has millisecond
+		Date startDateTime = new Date(System.currentTimeMillis() - 123456789);
+		Date endDateTime = new Date();
+
+		long diffInMilliSeconds = endDateTime.getTime() - startDateTime.getTime();
+		List<TimeUnit> units = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+		Collections.reverse(units); // Days to Nanoseconds
+		long diff;
+		String message;
+		for (TimeUnit unit : units) {
+			log("");
+
+			diff = unit.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
+			message = String.format("diff = %d", diff);
+			log(unit.toString() + " = " + message);
+
+			long diffInMilliSecondsForUnit = unit.toMillis(diff);
+			message = String.format("diffInMilliSecondsForUnit = %d", diffInMilliSecondsForUnit);
+			log(message);
+
+			diffInMilliSeconds -= diffInMilliSecondsForUnit;
+			message = String.format("milliSecondsRest = %d", diffInMilliSeconds);
+			log(message);
+
+		} // for - each time unit
 
 	}// doBtnFour
 
 	// ---------------------------------------------------------
+	
+	private static String getElapsedTimeToString(Date startDate, Date endDate) {
+		String result = "";
+		Map<TimeUnit, Long> times = getElapsedTime(startDate,endDate);
+		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+		long duration;
+		boolean nonZeroFlag = false;
+		
+		for(TimeUnit timeUnit:timeUnits) {
+			duration = times.get(timeUnit);
+			if (duration == 0) {
+				if (!nonZeroFlag) {
+					continue;
+				}//if skip zero value
+			} else {
+				nonZeroFlag = true;
+			}// outer if
+			result = String.format("%s = %,d, %s ", timeUnit.toString(),times.get(timeUnit),result);					
+		}// for time Unit
+
+		return result;
+	}//getElapsedTimeToString
+
+	private static Map<TimeUnit, Long> getElapsedTime(Date startDate, Date endDate) {
+		Map<TimeUnit, Long> result = new HashMap<TimeUnit, Long>();
+		long diffInMilliseconds = endDate.getTime() - startDate.getTime();
+		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+		Collections.reverse(timeUnits); // Days to Nanoseconds
+		long difference,milliSecondsLeftPerUnit;
+		for (TimeUnit timeUnit : timeUnits) {
+			difference = timeUnit.convert(diffInMilliseconds, TimeUnit.MILLISECONDS);
+			result.put(timeUnit, difference);
+			milliSecondsLeftPerUnit = timeUnit.toMillis(difference);
+			diffInMilliseconds -= milliSecondsLeftPerUnit;
+		} // for each time unit
+		return result;
+	}// getElapsedTime
 
 	private void doFileNew() {
 
