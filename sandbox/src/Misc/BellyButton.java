@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -179,78 +180,67 @@ public class BellyButton {
 	private void doBtnThree() {
 		Date startDateTime = new Date(System.currentTimeMillis() - 123456789);
 		Date endDateTime = new Date();
-		log(getElapsedTimeToString(startDateTime,endDateTime));
-//		Map<TimeUnit, Long> times = getElapsedTime(startDateTime,endDateTime);
-//		
-//		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
-//		Collections.reverse(timeUnits); // Days to Nanoseconds
-//
-//		log("");
-//		for(TimeUnit timeUnit:timeUnits) {
-//			log(timeUnit.toString() + " = " + times.get(timeUnit));
-//		}// for each time unit
+		log(getElapsedTimeToString(startDateTime, endDateTime));
+		// Map<TimeUnit, Long> times = getElapsedTime(startDateTime,endDateTime);
+		//
+		// List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+		// Collections.reverse(timeUnits); // Days to Nanoseconds
+		//
+		// log("");
+		// for(TimeUnit timeUnit:timeUnits) {
+		// log(timeUnit.toString() + " = " + times.get(timeUnit));
+		// }// for each time unit
 
 	}// doBtnThree
 
 	private void doBtnFour() {
-		// Date has millisecond
-		Date startDateTime = new Date(System.currentTimeMillis() - 123456789);
-		Date endDateTime = new Date();
+		String regexString = System.getProperty("file.separator").equals("\\")?
+				"\\\\" :System.getProperty("file.separator");
 
-		long diffInMilliSeconds = endDateTime.getTime() - startDateTime.getTime();
-		List<TimeUnit> units = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
-		Collections.reverse(units); // Days to Nanoseconds
-		long diff;
-		String message;
-		for (TimeUnit unit : units) {
-			log("");
+		String targetDir = "C:\\target\\sub\\";
+		log(targetDir);
+		String xx = "C:\\Users\\admin\\Dropbox\\Real Estate\\95 Pine St\\Purchase And Sale.pdf";
+		String[] parts = new String[] { "C:", "Primary", "Secondary" };
 
-			diff = unit.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
-			message = String.format("diff = %d", diff);
-			log(unit.toString() + " = " + message);
-
-			long diffInMilliSecondsForUnit = unit.toMillis(diff);
-			message = String.format("diffInMilliSecondsForUnit = %d", diffInMilliSecondsForUnit);
-			log(message);
-
-			diffInMilliSeconds -= diffInMilliSecondsForUnit;
-			message = String.format("milliSecondsRest = %d", diffInMilliSeconds);
-			log(message);
-
-		} // for - each time unit
-
+		StringJoiner sj = new StringJoiner(regexString, "", regexString);
+//		StringJoiner sj = new StringJoiner("/", "", "/");
+		for (int i = 0; i < parts.length; i++) {
+			sj.add(parts[i]);
+		} // for
+		log(sj.toString());
+		
 	}// doBtnFour
 
 	// ---------------------------------------------------------
-	
+
 	private static String getElapsedTimeToString(Date startDate, Date endDate) {
 		String result = "";
-		Map<TimeUnit, Long> times = getElapsedTime(startDate,endDate);
+		Map<TimeUnit, Long> times = getElapsedTime(startDate, endDate);
 		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
 		long duration;
 		boolean nonZeroFlag = false;
-		
-		for(TimeUnit timeUnit:timeUnits) {
+
+		for (TimeUnit timeUnit : timeUnits) {
 			duration = times.get(timeUnit);
 			if (duration == 0) {
 				if (!nonZeroFlag) {
 					continue;
-				}//if skip zero value
+				} // if skip zero value
 			} else {
 				nonZeroFlag = true;
-			}// outer if
-			result = String.format("%s = %,d, %s ", timeUnit.toString(),times.get(timeUnit),result);					
-		}// for time Unit
+			} // outer if
+			result = String.format("%s = %,d, %s ", timeUnit.toString(), times.get(timeUnit), result);
+		} // for time Unit
 
 		return result;
-	}//getElapsedTimeToString
+	}// getElapsedTimeToString
 
 	private static Map<TimeUnit, Long> getElapsedTime(Date startDate, Date endDate) {
 		Map<TimeUnit, Long> result = new HashMap<TimeUnit, Long>();
 		long diffInMilliseconds = endDate.getTime() - startDate.getTime();
 		List<TimeUnit> timeUnits = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
 		Collections.reverse(timeUnits); // Days to Nanoseconds
-		long difference,milliSecondsLeftPerUnit;
+		long difference, milliSecondsLeftPerUnit;
 		for (TimeUnit timeUnit : timeUnits) {
 			difference = timeUnit.convert(diffInMilliseconds, TimeUnit.MILLISECONDS);
 			result.put(timeUnit, difference);
