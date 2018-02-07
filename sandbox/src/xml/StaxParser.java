@@ -23,7 +23,7 @@ public class StaxParser {
 	static final String CURRENT = "current";
 	static final String INTERACTIVE = "interactive";
 
-	@SuppressWarnings({ "unchecked", "null" })
+	@SuppressWarnings({ "unchecked" })
 	public List<Item> readConfig(String configFile) {
 		List<Item> items = new ArrayList<Item>();
 		try {

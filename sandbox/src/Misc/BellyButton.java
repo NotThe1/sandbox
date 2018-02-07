@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -194,22 +193,61 @@ public class BellyButton {
 	}// doBtnThree
 
 	private void doBtnFour() {
-		String regexString = System.getProperty("file.separator").equals("\\")?
-				"\\\\" :System.getProperty("file.separator");
 
-		String targetDir = "C:\\target\\sub\\";
-		log(targetDir);
-		String xx = "C:\\Users\\admin\\Dropbox\\Real Estate\\95 Pine St\\Purchase And Sale.pdf";
-		String[] parts = new String[] { "C:", "Primary", "Secondary" };
+		String testPathString = "C:\\ZZ\\admin\\git\\tools\\tools\\src";
+//		testPathString = "C:\\ZZ\\admin";
+		lblLog.setText(testPathString);
+		txtLog.append(String.format("%n%ntestPath = %s%n", testPathString));
+		Path testPath = Paths.get(testPathString);
+		makeFolder(testPath);
 
-		StringJoiner sj = new StringJoiner(regexString, "", regexString);
-//		StringJoiner sj = new StringJoiner("/", "", "/");
-		for (int i = 0; i < parts.length; i++) {
-			sj.add(parts[i]);
-		} // for
-		log(sj.toString());
-		
+		// txtLog.append(String.format("Root = %s%n", Paths.get(testPathString).getRoot()));
+
+		// String testRoot = "C:\\";
+		// Path testPath = Paths.get(testRoot);
+		// txtLog.append(String.format("%s : Path = %s, Root = %s %n",
+		// testPath.equals(testPath.getRoot()),testPath,testPath.getRoot()));
+
+		// ---------------------------------------
+		// String regexString = System.getProperty("file.separator").equals("\\")?
+		// "\\\\" :System.getProperty("file.separator");
+		//
+		// String targetDir = "C:\\target\\sub\\";
+		// log(targetDir);
+		// String xx = "C:\\Users\\admin\\Dropbox\\Real Estate\\95 Pine St\\Purchase And Sale.pdf";
+		// String[] parts = new String[] { "C:", "Primary", "Secondary" };
+		//
+		// StringJoiner sj = new StringJoiner(regexString, "", regexString);
+		// for (int i = 0; i < parts.length; i++) {
+		// sj.add(parts[i]);
+		// } // for
+		// log(sj.toString());
+
 	}// doBtnFour
+
+	private  void makeFolder(Path path) {
+		if (path.equals(path.getRoot())) {
+			txtLog.append(String.format("%n%nPath: %s is Root%n", path));
+			return ;
+		}// if - root
+		;
+
+		if (Files.exists(path)) {
+			return ;
+		} // if exists
+		
+		makeFolder(path.getParent());
+
+		try {
+			Files.createDirectory(path);
+			return ;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // try
+
+		return ;
+	}// makeFolder
 
 	// ---------------------------------------------------------
 
@@ -299,8 +337,6 @@ public class BellyButton {
 		splitPane1.setDividerLocation(myPrefs.getInt("Divider", 250));
 		txtLog.append(String.format("myPrefs.absolutePath() - %s%n", myPrefs.absolutePath()));
 		myPrefs = null;
-
-		lblLog.setText("C:\\Users\\admin\\git\\tools\\tools\\src");
 
 		linesCode = new HashMap<String, Integer>();
 		linesEmpty = new HashMap<String, Integer>();
