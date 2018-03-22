@@ -14,10 +14,13 @@ public class pipeDriver {
 		try {
 			PipedOutputStream output = new PipedOutputStream();
 			PipedInputStream input = new PipedInputStream(output);
-			Sender sender = new Sender(output, input);
-			Receiver reciever = new Receiver(output, input);
+			
+			Sender sender = new Sender(output);
+			Receiver reciever = new Receiver( input);
+			
 			Thread threadSender = new Thread(sender);
 			Thread threadReceiver = new Thread(reciever);
+			
 			threadSender.start();
 			threadReceiver.start();
 			threadSender.join();

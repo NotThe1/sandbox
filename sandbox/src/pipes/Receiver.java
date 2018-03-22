@@ -2,15 +2,12 @@ package pipes;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 public class Receiver implements Runnable {
 	
-	final PipedOutputStream output; //= new PipedOutputStream();
 	final PipedInputStream input; //= new PipedInputStream();
 
-	public Receiver(PipedOutputStream output,PipedInputStream input) {
-		this.output=output;
+	public Receiver(PipedInputStream input) {
 		this.input=input;
 	}//Constructor
 

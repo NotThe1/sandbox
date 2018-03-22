@@ -1,17 +1,14 @@
 package pipes;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-public class Sender  implements Runnable {
-	final PipedOutputStream output; //= new PipedOutputStream();
-	final PipedInputStream input; //= new PipedInputStream();
+public class Sender implements Runnable {
+	PipedOutputStream output; // = new PipedOutputStream();
 
-	public Sender(PipedOutputStream output,PipedInputStream input) {
-		this.output=output;
-		this.input=input;
-	}//Constructor
+	public Sender(PipedOutputStream output) {
+		this.output = output;
+	}// Constructor
 
 	@Override
 	public void run() {
@@ -20,8 +17,8 @@ public class Sender  implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}//try
+		} // try
 
-	}//run
+	}// run
 
-}//class Sender
+}// class Sender
