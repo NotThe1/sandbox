@@ -89,6 +89,10 @@ public class BellyButton {
 	}// log
 
 	private void doBtnOne() throws IOException {
+		String testPathString = "C:\\ZZ\\admin\\git\\tools\\tools\\src";
+		lblLog.setText(testPathString);
+		txtLog.append(String.format("%n%ntestPath = %s%n", testPathString));
+
 		linesCode.clear();
 		linesEmpty.clear();
 		fileNames.clear();
@@ -193,35 +197,43 @@ public class BellyButton {
 	}// doBtnThree
 
 	private void doBtnFour() {
+		
+/* @formatter:off */
+		byte[] originalBytes = new byte[] {	
+				(byte) 0X00,(byte) 0X01,(byte) 0X02,(byte) 0X03,(byte) 0X04,(byte) 0X05,(byte) 0X06,(byte) 0X07,
+				(byte) 0X08,(byte) 0X09,(byte) 0X0A,(byte) 0X0B,(byte) 0X0C,(byte) 0X0D,(byte) 0X0E,(byte) 0X0F,
+				(byte) 0X10,(byte) 0X11,(byte) 0X12,(byte) 0X13,(byte) 0X14,(byte) 0X15,(byte) 0X16,(byte) 0X17,
+				(byte) 0X18,(byte) 0X19,(byte) 0X1A,(byte) 0X1B,(byte) 0X1C,(byte) 0X1D,(byte) 0X1E,(byte) 0X1F,
+				(byte) 0X20,(byte) 0X21,(byte) 0X22,(byte) 0X23,(byte) 0X24,(byte) 0X25,(byte) 0X26,(byte) 0X27,
+				(byte) 0X28,(byte) 0X29,(byte) 0X2A,(byte) 0X2B,(byte) 0X2C,(byte) 0X2D,(byte) 0X2E,(byte) 0X2F};		
+/* @formatter:on  */
+		String stuff = new String(originalBytes);
+		txtLog.append(String.format("originalBytes = %d, stuff = %d%n", originalBytes.length,stuff.length()));
+		txtLog.append(stuff);
+		int a = 0;
+		
+//		TabStop[] tabStops = new TabStop[] {new TabStop(25),new TabStop(50),new TabStop(100),new TabStop(200),new TabStop(400)};
+//		TabSet tabSet = new TabSet(tabStops);
+//		
+//		try {
+//			DefaultStyledDocument doc = (DefaultStyledDocument) txtLog.getDocument();
+//			doc.insertString(0, "0/t1/t",null);
+//			
+//		} catch (BadLocationException badLocationException) {
+//			// TODO: handle exception
+//		}
+		
+		
+		
+		
+		
+		
+		
+//		Action[] actions =	txtLog.getActions();
+//		for(Action action:actions) {
+//			log(action.toString());
+//		}//for
 
-		String testPathString = "C:\\ZZ\\admin\\git\\tools\\tools\\src";
-//		testPathString = "C:\\ZZ\\admin";
-		lblLog.setText(testPathString);
-		txtLog.append(String.format("%n%ntestPath = %s%n", testPathString));
-		Path testPath = Paths.get(testPathString);
-		makeFolder(testPath);
-
-		// txtLog.append(String.format("Root = %s%n", Paths.get(testPathString).getRoot()));
-
-		// String testRoot = "C:\\";
-		// Path testPath = Paths.get(testRoot);
-		// txtLog.append(String.format("%s : Path = %s, Root = %s %n",
-		// testPath.equals(testPath.getRoot()),testPath,testPath.getRoot()));
-
-		// ---------------------------------------
-		// String regexString = System.getProperty("file.separator").equals("\\")?
-		// "\\\\" :System.getProperty("file.separator");
-		//
-		// String targetDir = "C:\\target\\sub\\";
-		// log(targetDir);
-		// String xx = "C:\\Users\\admin\\Dropbox\\Real Estate\\95 Pine St\\Purchase And Sale.pdf";
-		// String[] parts = new String[] { "C:", "Primary", "Secondary" };
-		//
-		// StringJoiner sj = new StringJoiner(regexString, "", regexString);
-		// for (int i = 0; i < parts.length; i++) {
-		// sj.add(parts[i]);
-		// } // for
-		// log(sj.toString());
 
 	}// doBtnFour
 
@@ -572,6 +584,18 @@ public class BellyButton {
 			}
 		});
 		mnuFile.add(mnuFileExit);
+		
+		JMenu mnuEdit = new JMenu("Edit");
+		menuBar.add(mnuEdit);
+		
+		JMenuItem mnuEditCut = new JMenuItem("Cut");
+		mnuEdit.add(mnuEditCut);
+		
+		JMenuItem mnuEditCopy = new JMenuItem("Copy");
+		mnuEdit.add(mnuEditCopy);
+		
+		JMenuItem mnuEditPaste = new JMenuItem("Paste");
+		mnuEdit.add(mnuEditPaste);
 
 	}// initialize
 
