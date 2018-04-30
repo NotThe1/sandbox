@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,23 +15,18 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.util.Date;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -38,7 +36,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
@@ -48,7 +45,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 
-import myComponents.AppLogger;
+//import myComponents.AppLogger;
 import myComponents.hdnComponents.HDNumberBox;
 
 public class HexDisplayMechanics {
@@ -62,14 +59,16 @@ public class HexDisplayMechanics {
 
 	private AppLogger log = AppLogger.getInstance();
 	private JTextPane txtLog;
-	private JPopupMenu popupLog;
-	private AdapterLog logAdaper = new AdapterLog();
+	private AdapterPrint printAdaper = new AdapterPrint();
 
 	private File activeFile;
 	private File tempFile;
 	private String currentPath;
 	private FileChannel fileChannel;
 	private MappedByteBuffer fileMap;
+
+	String[] textLines;
+	int[] pageBreaks; // array of page break line positions.
 
 	/**
 	 * Launch the application.
@@ -105,42 +104,79 @@ public class HexDisplayMechanics {
 	}// class TempFilter
 
 	private void doBtnOne() {
-		try {
-			tempFile = File.createTempFile("Test", ".tmp");
-			log.addInfo("Target file = " + tempFile.getAbsolutePath());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // try
-		// Path source = Paths.get("C:\\Temp\\A\\ASM.COM");
-		// Path target = Paths.get(tempFile.getAbsolutePath());
+		log.addInfo("Should be maroon");
+//		File testFile = new File("C:\\Temp\\A\\testBase.asm");
+//		FileChannel fileChannel;
+//		MappedByteBuffer fileMap = null;
+//
+//		try (RandomAccessFile raf = new RandomAccessFile(testFile, "rw")) {
+//
+//			fileChannel = raf.getChannel();
+//			fileMap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
+//			fileChannel.close();
+//		} catch (IOException ioe) {
+//			Toolkit.getDefaultToolkit().beep();
+//			log.addError("[loadFile]: " + ioe.getMessage());
+//		} // try
 
 	}// doBtnOne
 
 	private void doBtnTwo() {
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] tempFiles = tempDir.listFiles(new TempFilter());
-		for (File file : tempFiles) {
-			log.addInfo("Listed file: " + file.getName());
-			file.delete();
-		} // for
-
+		try {
+			txtLog.print();
+		} catch (PrinterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}// doBtnTwo
 
 	private void doBtnThree() {
-		Path source = Paths.get("C:\\Temp\\A\\copyTest.txt");
-		Path target = Paths.get(tempFile.getAbsolutePath());
-		try {
-			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // try
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPrintable(new Printable() {
 
+			@Override
+			public int print(Graphics graphics, PageFormat pf, int page) throws PrinterException {
+				if (page > 0) {
+					return NO_SUCH_PAGE;
+				} // if
+
+				Graphics2D g2d = (Graphics2D) graphics;
+				g2d.translate(pf.getImageableX(), pf.getImageableY());
+				panelForLog.printAll(graphics);
+				return 0;
+			}
+
+		});
+
+		
+		if(job.printDialog()) {
+			try {
+				job.print();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
 	}// doBtnThree
 
 	private void doBtnFour() {
 
+		int limit = 0X100;
+		textLines = new String[limit];
+		for (int i = 0; i < limit; i++) {
+			textLines[i] = String.format("%04X: 00 00 00 00 00", i);
+		} //
+
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPrintable(printAdaper);
+		// job.pageDialog(job.defaultPage());
+		boolean ok = job.printDialog();
+		if (ok) {
+			try {
+				job.print();
+			} catch (PrinterException ex) {
+				/* The job did not successfully complete */
+			}
+		}
 	}// doBtnFour
 
 	// ---------------------------------------------------------
@@ -263,7 +299,8 @@ public class HexDisplayMechanics {
 
 		txtLog.setText(EMPTY_STRING);
 
-		log.setDoc(txtLog.getStyledDocument());
+		log.setTextPane(txtLog,"another log");
+//		log.setDoc(txtLog.getStyledDocument());
 		log.addInfo("Starting....");
 
 		// loadFile(new File("C:\\Temp\\A\\ASM.COM"));
@@ -275,26 +312,6 @@ public class HexDisplayMechanics {
 		appInit();
 	}// Constructor
 
-	private void doLogClear() {
-		log.clear();
-	}// doLogClear
-
-	private void doLogPrint() {
-
-		Font originalFont = txtLog.getFont();
-		try {
-			// textPane.setFont(new Font("Courier New", Font.PLAIN, 8));
-			txtLog.setFont(originalFont.deriveFont(8.0f));
-			MessageFormat header = new MessageFormat("Identic Log");
-			MessageFormat footer = new MessageFormat(new Date().toString() + "           Page - {0}");
-			txtLog.print(header, footer);
-			// textPane.setFont(new Font("Courier New", Font.PLAIN, 14));
-			txtLog.setFont(originalFont);
-		} catch (PrinterException e) {
-			e.printStackTrace();
-		} // try
-
-	}// doLogPrint
 
 	/**
 	 * Initialize the contents of the frame.
@@ -492,7 +509,7 @@ public class HexDisplayMechanics {
 		panelLeft.add(asciiValue, gbc_asciiValue);
 		asciiValue.setColumns(10);
 
-		JPanel panelForLog = new JPanel();
+		panelForLog = new JPanel();
 		splitPane1.setRightComponent(panelForLog);
 		GridBagLayout gbl_panelForLog = new GridBagLayout();
 		gbl_panelForLog.columnWidths = new int[] { 0, 0 };
@@ -509,23 +526,8 @@ public class HexDisplayMechanics {
 		panelForLog.add(scrollPaneForLog, gbc_scrollPaneForLog);
 
 		txtLog = new JTextPane();
+		txtLog.setFont(new Font("Courier New", Font.PLAIN, 12));
 		scrollPaneForLog.setViewportView(txtLog);
-
-		popupLog = new JPopupMenu();
-		addPopup(txtLog, popupLog);
-
-		JMenuItem popupLogClear = new JMenuItem("Clear Log");
-		popupLogClear.setName(PUM_LOG_CLEAR);
-		popupLogClear.addActionListener(logAdaper);
-		popupLog.add(popupLogClear);
-
-		JSeparator separator = new JSeparator();
-		popupLog.add(separator);
-
-		JMenuItem popupLogPrint = new JMenuItem("Print Log");
-		popupLogPrint.setName(PUM_LOG_PRINT);
-		popupLogPrint.addActionListener(logAdaper);
-		popupLog.add(popupLogPrint);
 
 		JLabel lblNewLabel = new JLabel("Application Log");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -607,49 +609,60 @@ public class HexDisplayMechanics {
 
 	}// initialize
 
-	private static final String PUM_LOG_PRINT = "popupLogPrint";
-	private static final String PUM_LOG_CLEAR = "popupLogClear";
 
 	static final String EMPTY_STRING = "";
 	private JTextField stringValue;
 	private JTextField asciiValue;
 	private HDNumberBox byteValue;
+	private JPanel panelForLog;
 
 	//////////////////////////////////////////////////////////////////////////
 
-	class AdapterLog implements ActionListener {// , ListSelectionListener
+	class AdapterPrint implements  Printable {// , ListSelectionListener
 		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			String name = ((Component) actionEvent.getSource()).getName();
-			switch (name) {
-			case PUM_LOG_PRINT:
-				doLogPrint();
-				break;
-			case PUM_LOG_CLEAR:
-				doLogClear();
-				break;
-			}// switch
-		}// actionPerformed
-	}// class AdapterAction
+		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 
-	private static void addPopup(Component component, final JPopupMenu popup) {
-		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				} // if popup Trigger
-			}
+			// Font font = new Font("Serif", Font.PLAIN, 10);
+			FontMetrics metrics = graphics.getFontMetrics(txtLog.getFont());
+			int lineHeight = metrics.getHeight();
 
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
+			if (pageBreaks == null) {
+				double pageHeight = pageFormat.getImageableHeight();
+				int linesPerPage = ((int) pageHeight / lineHeight);
+				int numBreaks = (textLines.length - 1) / linesPerPage;
+				pageBreaks = new int[numBreaks];
+				for (int b = 0; b < numBreaks; b++) {
+					pageBreaks[b] = (b + 1) * linesPerPage;
+				} // for
 
-			private void showMenu(MouseEvent e) {
-				popup.show(e.getComponent(), e.getX(), e.getY());
-			}
-		});
-	}// addPopup
+			} // first time thru
+			log.info("[HexDisplayMechanics.print]");
+			if (pageIndex > pageBreaks.length) { /* We have exceeded the data */
+				return NO_SUCH_PAGE;
+			} // if - done
+
+			/*
+			 * User (0,0) is typically outside the imageable area, so we must translate by the X and Y values in the
+			 * PageFormat to avoid clipping
+			 */
+			Graphics2D g2d = (Graphics2D) graphics;
+			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+
+			int y = 0;
+			int start = (pageIndex == 0) ? 0 : pageBreaks[pageIndex - 1];
+			int end = (pageIndex == pageBreaks.length) ? textLines.length : pageBreaks[pageIndex];
+
+			/* Now we perform our rendering */
+			for (int line = start; line < end; line++) {
+				y += lineHeight;
+				graphics.drawString(textLines[line], 0, y);
+			} // for
+
+			/* tell the caller that this page is part of the printed document */
+			return PAGE_EXISTS;
+		}// print
+
+	}// class AdapterPrint
+
 
 }// class GUItemplate

@@ -44,7 +44,10 @@ public  class AsciiForms {
 	}//setByte
 	
 	public void setString(String stringValue) {
-		byteForm = Byte.parseByte(stringValue,16);
+		Integer x = Integer.parseInt(stringValue, 16);
+		byteForm = x.byteValue();
+
+//		byteForm = Byte.parseByte(stringValue,16);
 		asciiForm = new String(new byte[] {(byte) byteForm});
 		asciiForm = PRINTABLES.indexOf(asciiForm)==-1?UNPRINTABLE:asciiForm;
 	}//setString
