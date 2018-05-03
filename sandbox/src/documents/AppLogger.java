@@ -164,9 +164,9 @@ public class AppLogger {
 		addMeta(attrBlack, message);
 	}// addInfo
 
-	public void info(String... message) {
-		addMeta(attrBlack, message);
-	}// info
+//	public void info(String... message) {
+//		addMeta(attrBlack, message);
+//	}// info
 
 	public void info(String format, Object... args) {
 		insertListing(doFormat(format, args), attrBlack);

@@ -104,20 +104,26 @@ public class HexDisplayMechanics {
 	}// class TempFilter
 
 	private void doBtnOne() {
-		log.addInfo("Should be maroon");
-//		File testFile = new File("C:\\Temp\\A\\testBase.asm");
-//		FileChannel fileChannel;
-//		MappedByteBuffer fileMap = null;
-//
-//		try (RandomAccessFile raf = new RandomAccessFile(testFile, "rw")) {
-//
-//			fileChannel = raf.getChannel();
-//			fileMap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
-//			fileChannel.close();
-//		} catch (IOException ioe) {
-//			Toolkit.getDefaultToolkit().beep();
-//			log.addError("[loadFile]: " + ioe.getMessage());
-//		} // try
+		Originator originator = new Originator();
+		CareTaker caretaker = new CareTaker();
+		
+		originator.setState("State #1");
+		originator.setState("State #2");
+		caretaker.add(originator.saveStateToMemento());
+		
+		originator.setState("State #3");
+		caretaker.add(originator.saveStateToMemento());
+		
+		originator.setState("State #4");
+		
+		log.info("CurrentState: %s%n",originator.getState());
+		
+		originator.getStateFromMemento(caretaker.get(0));
+		log.info("First Saved State: %s%n",originator.getState());
+		
+		originator.getStateFromMemento(caretaker.get(1));
+		log.info("Second Saved State: %s%n",originator.getState());
+		
 
 	}// doBtnOne
 
