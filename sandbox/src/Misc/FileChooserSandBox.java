@@ -1,4 +1,5 @@
 package Misc;
+
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagLayout;
@@ -21,7 +22,6 @@ import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
 public class FileChooserSandBox {
 
 	private JFrame frame;
@@ -37,17 +37,39 @@ public class FileChooserSandBox {
 				try {
 					FileChooserSandBox window = new FileChooserSandBox();
 					window.frame.setVisible(true);
+					// showProperties();
+
+					prime3();
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
-				}//try
-			}//run
+				} // try
+			}// run
 		});
-	}//main
+	}// main
+
+	private static void prime3() {
+		String format;
+		String valueStr;
+		for (Integer i = 0; i < 256; i++) {
+			valueStr =Integer.toBinaryString(i);
+			if ((i % 3) == 0) {
+				format ="%8s %d**\t%d%n";
+				System.out.printf(format, valueStr, i,valueStr.length());
+
+			} else {
+			//	format ="%8s %d  \t%d%n";
+			} // if
+			//System.out.printf(format, valueStr, i,valueStr.length());
+		} // for
+	}// prime3
+
 	private String getFilePathString(boolean open) {
 		String currentPath = ".";
-		//		String currentPath = currentInstructionSet.equals("") ? "." : currentInstructionSet;
-		 Path path = Paths.get(currentPath);
-		 
+		// String currentPath = currentInstructionSet.equals("") ? "." : currentInstructionSet;
+		Path path = Paths.get(currentPath);
+
 		JFileChooser fileChooser = new JFileChooser(currentPath);
 		FileFilter filter = new FileNameExtensionFilter("Instruction file", "dat", "dat");
 		fileChooser.addChoosableFileFilter(filter);
@@ -57,7 +79,7 @@ public class FileChooserSandBox {
 			result = fileChooser.showOpenDialog(null);
 		} else {
 			result = fileChooser.showSaveDialog(null);
-		}// if
+		} // if
 
 		String getFilePathString = "";
 		if (result != JFileChooser.APPROVE_OPTION) {
@@ -67,28 +89,28 @@ public class FileChooserSandBox {
 			String fileName = fileChooser.getSelectedFile().getAbsolutePath();
 			int dotInd = fileName.lastIndexOf('.');
 			getFilePathString = (dotInd > 0) ? fileName.substring(0, dotInd) : fileName;
-			System.out.printf("You select file %s:%n", getFilePathString);	
-		}// if
+			System.out.printf("You select file %s:%n", getFilePathString);
+		} // if
 
 		return getFilePathString;
 	}//
-	
-	private void showProperties(){
+
+	private static void showProperties() {
 		Properties properties = System.getProperties();
-		Iterable<Entry<Object,Object>> propertySet = properties.entrySet();
-		
-		for( Object property: propertySet){
-			
-//			System.out.printf("%s: - %s%n", property,properties.getProperty( property.toString()));
+		Iterable<Entry<Object, Object>> propertySet = properties.entrySet();
+
+		for (Object property : propertySet) {
+
+			// System.out.printf("%s: - %s%n", property,properties.getProperty( property.toString()));
 			System.out.printf("\t%s: %n", property);
-		}//for
-		
-	}//showProperties
-	
-	
-	//--------------------------------
+		} // for
+
+	}// showProperties
+
+	// --------------------------------
 	private void appClose() {
-		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class).node(this.getClass().getSimpleName());
+		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class)
+				.node(this.getClass().getSimpleName());
 		Dimension dim = frame.getSize();
 		myPrefs.putInt("Height", dim.height);
 		myPrefs.putInt("Width", dim.width);
@@ -100,22 +122,22 @@ public class FileChooserSandBox {
 
 	private void appInit() {
 		// manage preferences
-		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class).node(this.getClass().getSimpleName());
+		Preferences myPrefs = Preferences.userNodeForPackage(FileChooserSandBox.class)
+				.node(this.getClass().getSimpleName());
 		frame.setSize(myPrefs.getInt("Width", 100), myPrefs.getInt("Height", 100));
 		frame.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;
-//		TestClass tc = new TestClass();
-//		System.out.printf("[appInit] getSomething %s%n", tc.getSomething());
-	}//appInit
-		
+		// TestClass tc = new TestClass();
+		// System.out.printf("[appInit] getSomething %s%n", tc.getSomething());
+	}// appInit
+
 	/**
 	 * Create the application.
 	 */
 	public FileChooserSandBox() {
 		initialize();
 		appInit();
-		showProperties();
-	}//Constructor
+	}// Constructor
 
 	/**
 	 * Initialize the contents of the frame.
@@ -126,17 +148,17 @@ public class FileChooserSandBox {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				appClose();
-			}//windowClosing
+			}// windowClosing
 		});
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
-		
+
 		mnuFile = new JMenu("File...");
 		menuBar.add(mnuFile);
-		
+
 		mnuOpen = new JMenuItem("Open...");
 		mnuOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -144,11 +166,11 @@ public class FileChooserSandBox {
 		});
 		mnuFile.add(mnuOpen);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0};
-		gridBagLayout.rowHeights = new int[]{0};
-		gridBagLayout.columnWeights = new double[]{Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{Double.MIN_VALUE};
+		gridBagLayout.columnWidths = new int[] { 0 };
+		gridBagLayout.rowHeights = new int[] { 0 };
+		gridBagLayout.columnWeights = new double[] { Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
-	}//initialize
+	}// initialize
 
-}//class FileChooserSandBox
+}// class FileChooserSandBox

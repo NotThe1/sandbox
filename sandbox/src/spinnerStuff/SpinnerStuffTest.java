@@ -21,17 +21,23 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
-public class SpinnerStuffTest {
+import myComponents.AppLogger;
+
+public class SpinnerStuffTest implements HDNumberValueChangeListener{
+	
+	private AppLogger log =  AppLogger.getInstance();
 
 	private JFrame frmTemplate;
 	private JButton btnOne;
@@ -47,6 +53,9 @@ public class SpinnerStuffTest {
 	JFormattedTextField.AbstractFormatterFactory decimalFormatterFactory;
 	HexFormatterFactory hexFormatterFactory;
 	private JFormattedTextField ftfTest;
+	private HDNumberBox numberBox;
+	private JTextPane textPane;
+	private JSpinner spinner3;
 
 	/**
 	 * Launch the application.
@@ -70,15 +79,32 @@ public class SpinnerStuffTest {
 		ftf.setFormatterFactory(hexFormatterFactory);
 		ftf2.setFormatterFactory(hexFormatterFactory);
 		ftf.setToolTipText("Hex Display");
+		
+		numberBox.setHexDisplay();
 	}// doBtnOne
 
 	private void doBtnTwo() {
 		ftf.setFormatterFactory(decimalFormatterFactory);
 		ftf2.setFormatterFactory(decimalFormatterFactory);
 		ftf.setToolTipText("Decimal Display");
+		numberBox.setDecimalDisplay();
 	}// doBtnTwo
 
 	private void doBtnThree() {
+		float kb = 1024;
+		float mb = 1024*1024;
+
+		long valueInt = (long) spinner3.getValue();
+		float value = valueInt;
+		
+		if (value > mb) {
+			log.info("value (%,.0f) = %,.3f MB%n",value, value/mb);	
+		}else if (value > kb) {
+			log.info("value (%,.0f) = %,.2f KB%n",value, value/kb);	
+		}else {
+			System.out.printf("value (%,.0f) = %,.0f bytes%n",value, value);
+			log.info("value (%,.0f) = %,.0f bytes%n",value, value);
+		}
 
 	}// doBtnThree
 
@@ -138,6 +164,7 @@ public class SpinnerStuffTest {
 	}// appClose
 
 	private void appInit() {
+		log.setDoc(textPane.getStyledDocument());
 		Preferences myPrefs = Preferences.userNodeForPackage(SpinnerStuffTest.class).node(this.getClass().getSimpleName());
 		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
@@ -236,15 +263,17 @@ public class SpinnerStuffTest {
 		splitPane1.setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
 		gbl_panelLeft.columnWidths = new int[] { 0, 0 };
-		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+		gbl_panelLeft.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_panelLeft.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_panelLeft.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panelLeft.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panelLeft.setLayout(gbl_panelLeft);
 
 		spinner1 = new JSpinner();
+		spinner1.setMinimumSize(new Dimension(300, 20));
 		spinner1.setModel(new SpinnerNumberModel(0, 0, 10, 1));
-		spinner1.setPreferredSize(new Dimension(100, 20));
+		spinner1.setPreferredSize(new Dimension(300, 20));
 		GridBagConstraints gbc_spinner1 = new GridBagConstraints();
+		gbc_spinner1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinner1.insets = new Insets(0, 0, 5, 0);
 		gbc_spinner1.gridx = 0;
 		gbc_spinner1.gridy = 0;
@@ -254,26 +283,56 @@ public class SpinnerStuffTest {
 		spinner2.setModel(new SpinnerNumberModel(0, 0, 55, 1));
 		spinner2.setPreferredSize(new Dimension(100, 20));
 		GridBagConstraints gbc_spinner2 = new GridBagConstraints();
+		gbc_spinner2.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinner2.insets = new Insets(0, 0, 5, 0);
 		gbc_spinner2.gridx = 0;
 		gbc_spinner2.gridy = 2;
 		panelLeft.add(spinner2, gbc_spinner2);
 		
+		spinner3 = new JSpinner();
+		spinner3.setModel(new SpinnerNumberModel(new Long(1023), null, null, new Long(1)));
+		GridBagConstraints gbc_spinner3 = new GridBagConstraints();
+		gbc_spinner3.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spinner3.insets = new Insets(0, 0, 5, 0);
+		gbc_spinner3.gridx = 0;
+		gbc_spinner3.gridy = 4;
+		panelLeft.add(spinner3, gbc_spinner3);
+		
 		ftfTest = new JFormattedTextField();
 		GridBagConstraints gbc_ftfTest = new GridBagConstraints();
+		gbc_ftfTest.insets = new Insets(0, 0, 5, 0);
 		gbc_ftfTest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_ftfTest.gridx = 0;
 		gbc_ftfTest.gridy = 5;
 		panelLeft.add(ftfTest, gbc_ftfTest);
+		
+		numberBox = new HDNumberBox();
+		numberBox.addHDNumberValueChangedListener(this);
+		GridBagConstraints gbc_numberBox = new GridBagConstraints();
+		gbc_numberBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_numberBox.gridx = 0;
+		gbc_numberBox.gridy = 8;
+		panelLeft.add(numberBox, gbc_numberBox);
+//		numberBox.setColumns(10);
 
 		JPanel panelRight = new JPanel();
 		splitPane1.setRightComponent(panelRight);
 		GridBagLayout gbl_panelRight = new GridBagLayout();
-		gbl_panelRight.columnWidths = new int[] { 0 };
-		gbl_panelRight.rowHeights = new int[] { 0 };
-		gbl_panelRight.columnWeights = new double[] { Double.MIN_VALUE };
-		gbl_panelRight.rowWeights = new double[] { Double.MIN_VALUE };
+		gbl_panelRight.columnWidths = new int[] { 0, 0 };
+		gbl_panelRight.rowHeights = new int[] { 0, 0 };
+		gbl_panelRight.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_panelRight.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		panelRight.setLayout(gbl_panelRight);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 0;
+		panelRight.add(scrollPane, gbc_scrollPane);
+		
+		textPane = new JTextPane();
+		scrollPane.setViewportView(textPane);
 		splitPane1.setDividerLocation(250);
 
 		JPanel panelStatus = new JPanel();
@@ -411,5 +470,15 @@ public class SpinnerStuffTest {
 
 	}// class MyFormatterFactory
 		// ----------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void valueChanged(HDNumberValueChangeEvent hDNumberValueChangeEvent) {
+		int oldValue = hDNumberValueChangeEvent.getNewValue();
+		int currentValue = hDNumberValueChangeEvent.currentValue;
+		
+		String msg = String.format("Old value %1$d, [%1$X]| New value %1$d, [%1$X]%n", oldValue,currentValue);
+		System.out.println(msg);
+		
+	}//valueChanged
 
 }// class GUItemplate
