@@ -14,6 +14,11 @@ import myComponents.hdnComponents.HDNumberBox;
 public class StyledNumberBox extends JPanel {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Create the panel.
 	 */
 	public StyledNumberBox() {

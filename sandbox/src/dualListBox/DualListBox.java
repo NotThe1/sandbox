@@ -21,20 +21,24 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
 public class DualListBox extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
-	private static final String BTN_ADD = "btnAdd";
+//	private static final String BTN_ADD = "btnAdd";
 	private static final String BTN_ADD_LABEL = "Add >>";
-	private static final String BTN_REMOVE = "btnRemove";
+//	private static final String BTN_REMOVE = "btnRemove";
 	private static final String BTN_REMOVE_LABEL = "<< Remove";
 	private static final String DEFAULT_SOURCE_CHOICE_LABEL = "Available Choices";
 	private static final String DEFAULT_DEST_CHOICE_LABEL = "Your Choices";
 
 	private JLabel lblSource;
-	private JList sourceList;
+	private JList<String> sourceList;
 	private SortedListModel sourceListModel;
 
 	private JLabel lblDest;
-	private JList destList;
+	private JList<String> destList;
 	private SortedListModel destListModel;
 
 	private JButton btnAdd;
@@ -68,20 +72,20 @@ public class DualListBox extends JPanel {
 		destListModel.clear();
 	}// clearDestinationListModel
 
-	public void addSourceElements(ListModel newValues) {
+	public void addSourceElements(ListModel<String> newValues) {
 		fillListModel(sourceListModel, newValues);
 	}// addSourceElements
 
-	public void setSourceElements(ListModel newValues) {
+	public void setSourceElements(ListModel<String> newValues) {
 		clearSourceListModel();
 		addSourceElements(newValues);
 	}// setSourceElements
 
-	public void addDestinationElements(ListModel newValues) {
+	public void addDestinationElements(ListModel<String> newValues) {
 		fillListModel(destListModel, newValues);
 	}// addSourceElements
 
-	private void fillListModel(SortedListModel model, ListModel newValues) {
+	private void fillListModel(SortedListModel model, ListModel<String> newValues) {
 		int size = newValues.getSize();
 		for (int i = 0; i < size; i++) {
 			model.add((String) newValues.getElementAt(i));
@@ -105,26 +109,32 @@ public class DualListBox extends JPanel {
 		fillListModel(destListModel, newValues);
 	}// addDestinationElements
 
-	public Iterator sourceIterator() {
+	@SuppressWarnings("unchecked")
+	public Iterator<String> sourceIterator() {
 		return sourceListModel.iterator();
 	}// sourceIterator
 
-	public Iterator destinationIterator() {
+	@SuppressWarnings("unchecked")
+	public Iterator<String> destinationIterator() {
 		return destListModel.iterator();
 	}// sourceIterator
 
-	public void setSourceCellRenderer(ListCellRenderer renderer) {
+	@SuppressWarnings("unchecked")
+	public void setSourceCellRenderer(@SuppressWarnings("rawtypes") ListCellRenderer renderer) {
 		sourceList.setCellRenderer(renderer);
 	}// setSourceCellRenderer
 
+	@SuppressWarnings("rawtypes")
 	public ListCellRenderer getSourceCellRenderer() {
 		return sourceList.getCellRenderer();
 	}// getSourceCellRenderer
 
-	public void setDestinationCellRenderer(ListCellRenderer renderer) {
+	@SuppressWarnings("unchecked")
+	public void setDestinationCellRenderer(@SuppressWarnings("rawtypes") ListCellRenderer renderer) {
 		destList.setCellRenderer(renderer);
 	}// setDestinationCellRenderer
 
+	@SuppressWarnings("rawtypes")
 	public ListCellRenderer getDestinationCellRenderer() {
 		return destList.getCellRenderer();
 	}// getDestinationCellRenderer
@@ -199,6 +209,7 @@ public class DualListBox extends JPanel {
 
 	///////////////////////////////////////////////////////////////////////////////////////
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void initScreen() {
 		setBorder(BorderFactory.createEtchedBorder());
 		setLayout(new GridBagLayout());

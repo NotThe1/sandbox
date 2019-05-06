@@ -40,6 +40,7 @@ public class UpdateOpCodeMap {
 				
 				fw.write(line+ System.lineSeparator());
 			} // while
+			scanner.close();
 			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

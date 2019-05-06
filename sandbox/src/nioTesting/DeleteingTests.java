@@ -75,7 +75,7 @@ public class DeleteingTests {
 
 	private void doBtnOne() {
 		log.addNL();
-		log.addInfo("Initializing...");
+		log.info("Initializing...");
 
 		String startFolder = "C:\\Temp\\A";
 		lblStartDir.setText(startFolder);
@@ -99,31 +99,31 @@ public class DeleteingTests {
 	}// doBtnOne
 
 	private void makeFolders(String[] folders) {
-		log.addInfo("[makeFolders]....");
+		log.info("[makeFolders]....");
 		for (String f : folders) {
 			Path path = Paths.get(f);
 			path.toFile().mkdir();
-			log.addInfo(f);
+			log.info(f);
 		} // for
 
 	}// makeFolders
 
 	private void removeFolders(String[] folders) {
-		log.addInfo("[removeFolders]....");
+		log.info("[removeFolders]....");
 		for (int i = folders.length - 1; i >= 0; i--) {
 			Path path = Paths.get(folders[i]);
 			//path.toFile().delete();
-			log.addInfo(deleteDirectory(path.toFile()).toString());
+			log.info(deleteDirectory(path.toFile()).toString());
 		} // for
 	}// makeFolders
 
 	private void doBtnTwo() {
 		log.addNL();
-		log.addInfo("Walking...");
+		log.info("Walking...");
 
-		String startDir = lblStartDir.getText();
+//		String startDir = lblStartDir.getText();
 		log.addNL();
-		log.addInfo("Starting myWalker");
+		log.info("Starting myWalker");
 		try {
 			Files.walkFileTree(Paths.get(lblStartDir.getText()), new MyWalker());
 		} catch (IOException e) {
@@ -134,10 +134,10 @@ public class DeleteingTests {
 
 	private void doBtnThree() {
 		log.addNL();
-		log.addInfo("Removing M0...");
+		log.info("Removing M0...");
 
 		String path = "C:\\Temp\\A\\D2\\H3\\J1";
-		Path parent = Paths.get(path);
+//		Path parent = Paths.get(path);
 		Path target = Paths.get(path, "M0");
 		target.toFile().delete();
 //		deleteDirectory(target.toFile());
@@ -149,7 +149,7 @@ public class DeleteingTests {
 		Boolean result = deleteDirectory(pathToBeDeleted.toFile());
 
 		String msg = String.format("Result = %s", result);
-		log.addSpecial(msg);
+		log.special(msg);
 	}// doBtnFour
 
 	Boolean deleteDirectory(File directoryToBeDeleted) {
@@ -215,7 +215,7 @@ public class DeleteingTests {
 		txtLog.setText(EMPTY_STRING);
 
 		log.setDoc(txtLog.getStyledDocument());
-		log.addInfo("Starting....");
+		log.info("Starting....");
 
 	}// appInit
 
@@ -503,7 +503,7 @@ public class DeleteingTests {
 
 		@Override
 		public FileVisitResult postVisitDirectory(Path folder, IOException exc) throws IOException {
-			log.addInfo("[postVisitDirectory] " + folder.toString());
+			log.info("[postVisitDirectory] " + folder.toString());
 	//		log.addSpecial("Count = " + Files.list(folder).count());
 			return FileVisitResult.CONTINUE;
 		}//
@@ -522,10 +522,10 @@ public class DeleteingTests {
 
 		@Override
 		public FileVisitResult visitFileFailed(Path folder, IOException exc) throws IOException {
-			log.addError("visitFileFailed: " + folder.toString());
-			log.addError("  IOException = " + exc.toString());
+			log.error("visitFileFailed: " + folder.toString());
+			log.error("  IOException = " + exc.toString());
 			// UserPrincipal up = Files.getOwner(folder, LinkOption.NOFOLLOW_LINKS);
-			// log.addError("Owner = " + up.getName());
+			// log.error("Owner = " + up.getName());
 			return FileVisitResult.CONTINUE;
 		}//
 

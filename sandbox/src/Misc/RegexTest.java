@@ -10,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -33,8 +31,8 @@ public class RegexTest {
 	private JButton btnTwo;
 	private JButton btnThree;
 	private JButton btnFour;
-	private ArrayList<String> original;
-	private ArrayList<String> result;
+//	private ArrayList<String> original;
+//	private ArrayList<String> result;
 	private JTextField txtRegex;
 	private JTextField textField;
 	private JTextField textField_1;
@@ -97,12 +95,12 @@ public class RegexTest {
 	
 
 	
-	class CaseInsensitiveSort<String> implements Comparator<String> {
-		@Override
-		public int compare(String arg0, String arg1) {
-			return ((java.lang.String) arg0).compareToIgnoreCase((java.lang.String) arg1);
-		}// compare
-	}// CaseInsensitiveSort
+//	class CaseInsensitiveSort<String> implements Comparator<String> {
+//		@Override
+//		public int compare(String arg0, String arg1) {
+//			return ((java.lang.String) arg0).compareToIgnoreCase((java.lang.String) arg1);
+//		}// compare
+//	}// CaseInsensitiveSort
 
 	private void appClose() {
 		Preferences myPrefs = Preferences.userNodeForPackage(RegexTest.class).node(this.getClass().getSimpleName());

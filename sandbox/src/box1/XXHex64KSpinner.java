@@ -3,9 +3,9 @@ package box1;
 import java.text.ParseException;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
@@ -50,6 +50,11 @@ public class XXHex64KSpinner extends JSpinner{
 	}//class HexFormatter
 
 	private static class MyFormatterFactory extends DefaultFormatterFactory {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public AbstractFormatter getDefaultFormatter() {
 			return new HexFormatter();
 		}//getDefaultFormatter

@@ -12,7 +12,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -24,7 +23,6 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.prefs.Preferences;
@@ -61,9 +59,9 @@ public class HexDisplayMechanics {
 	private JTextPane txtLog;
 	private AdapterPrint printAdaper = new AdapterPrint();
 
-	private File activeFile;
-	private File tempFile;
-	private String currentPath;
+//	private File activeFile;
+//	private File tempFile;
+//	private String currentPath;
 	private FileChannel fileChannel;
 	private MappedByteBuffer fileMap;
 
@@ -225,37 +223,37 @@ public class HexDisplayMechanics {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} // try
-		activeFile = null;
+//		activeFile = null;
 	}// closeFile
 
-	private void loadFile(File sourceFile) {
-		activeFile = sourceFile;
-		currentPath = activeFile.getParent();
-		log.addInfo("Loading File -> " + sourceFile.toString());
-		// setActivityStates(FILE_ACTIVE);
-		closeFile();
-
-		long sourceLength = sourceFile.length();
-		if (sourceLength >= Integer.MAX_VALUE) {
-			Toolkit.getDefaultToolkit().beep();
-			String message = String.format("[HexEditPanelFile : loadData] file too large %,d%n", sourceLength);
-			log.addWarning(message);
-			return;
-		} // if
-
-		try (RandomAccessFile raf = new RandomAccessFile(sourceFile, "rw")) {
-			fileChannel = raf.getChannel();
-			fileMap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
-			fileChannel.close();
-		} catch (IOException ioe) {
-			Toolkit.getDefaultToolkit().beep();
-			log.addError("[loadFile]: " + ioe.getMessage());
-		} // try
-
-		// hexEditDisplay.setData(fileMap);
-		// hexEditDisplay.run();
-
-	}// loadFile
+//	private void loadFile(File sourceFile) {
+//		activeFile = sourceFile;
+//		currentPath = activeFile.getParent();
+//		log.addInfo("Loading File -> " + sourceFile.toString());
+//		// setActivityStates(FILE_ACTIVE);
+//		closeFile();
+//
+//		long sourceLength = sourceFile.length();
+//		if (sourceLength >= Integer.MAX_VALUE) {
+//			Toolkit.getDefaultToolkit().beep();
+//			String message = String.format("[HexEditPanelFile : loadData] file too large %,d%n", sourceLength);
+//			log.addWarning(message);
+//			return;
+//		} // if
+//
+//		try (RandomAccessFile raf = new RandomAccessFile(sourceFile, "rw")) {
+//			fileChannel = raf.getChannel();
+//			fileMap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());// this.totalBytesOnDisk);
+//			fileChannel.close();
+//		} catch (IOException ioe) {
+//			Toolkit.getDefaultToolkit().beep();
+//			log.addError("[loadFile]: " + ioe.getMessage());
+//		} // try
+//
+//		// hexEditDisplay.setData(fileMap);
+//		// hexEditDisplay.run();
+//
+//	}// loadFile
 
 	private void fromByte() {
 		AsciiForms asciiForms = AsciiForms.getInstance();

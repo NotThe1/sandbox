@@ -1,34 +1,23 @@
 package formt;
 
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JTextField;
-import javax.swing.plaf.basic.BasicSpinnerUI;
-import javax.swing.text.DefaultFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.MaskFormatter;
-import javax.swing.text.NumberFormatter;
-
-import java.awt.Dimension;
-import java.text.ParseException;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.JSpinner;
-
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import javax.swing.JFrame;
 import javax.swing.JRadioButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.JTextComponent;
 
 //import javax.swing.JFormattedTextField$AbstractFormatter;
 
@@ -82,7 +71,8 @@ public class HexFormatting {
 	 */
 	public HexFormatting() {
 		initialize();
-	}
+		appInit();
+	}//Constructor
 
 	/**
 	 * Initialize the contents of the frame.

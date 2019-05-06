@@ -3,11 +3,11 @@ package box1;
 
 
 	import java.awt.FlowLayout;
-	import java.awt.Panel;
+import java.awt.Panel;
 
-	import javax.swing.JComboBox;
-	import javax.swing.JFrame;
-	import javax.swing.JSplitPane;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JSplitPane;
 
 	public class SplitExample {
 
@@ -25,10 +25,10 @@ package box1;
 			frame.getContentPane().setLayout(new FlowLayout());
 
 			String[] options1 = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
-			JComboBox combo1 = new JComboBox(options1);
+			JComboBox<String> combo1 = new JComboBox<String>(options1);
 
 			String[] options2 = { "Car", "Motorcycle", "Airplane", "Boat" };
-			JComboBox combo2 = new JComboBox(options2);
+			JComboBox<String> combo2 = new JComboBox<String>(options2);
 
 			Panel panel1 = new Panel();
 			panel1.add(combo1);

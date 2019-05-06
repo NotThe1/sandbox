@@ -9,6 +9,10 @@ import javax.swing.text.StyleContext;
 
 public class MyStyledDocument extends DefaultStyledDocument {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public MyStyledDocument() {
 		super();
 	}// Constructor
@@ -27,7 +31,7 @@ public class MyStyledDocument extends DefaultStyledDocument {
 		try {
 			SimpleAttributeSet attrs = new SimpleAttributeSet();
 
-			ArrayList tableSpecs = new ArrayList();
+			ArrayList<ElementSpec> tableSpecs = new ArrayList<ElementSpec>();
 			tableSpecs.add(new ElementSpec(attrs, ElementSpec.EndTagType)); // close paragraph tag
 
 			SimpleAttributeSet tableAttrs = new SimpleAttributeSet();
@@ -53,7 +57,7 @@ public class MyStyledDocument extends DefaultStyledDocument {
 
 	}// insertTable
 	
-	protected void fillRowSpecs(ArrayList tableSpecs,int rowCount, int[] colWidths){
+	protected void fillRowSpecs(ArrayList<ElementSpec> tableSpecs,int rowCount, int[] colWidths){
 		SimpleAttributeSet rowAttrs = new SimpleAttributeSet();
 		rowAttrs.addAttribute(ElementNameAttribute, ELEMENT_NAME_ROW);
 		for (int i = 0; i < rowCount; i ++){
@@ -67,7 +71,7 @@ public class MyStyledDocument extends DefaultStyledDocument {
 		}//for
 	}//fillRowSpecs
 	
-	protected void fillCellSpecs(ArrayList tableSpecs,int[] colWidths){
+	protected void fillCellSpecs(ArrayList<ElementSpec> tableSpecs,int[] colWidths){
 		for (int i = 0 ; i <colWidths.length; i++){
 		SimpleAttributeSet cellAttrs = new SimpleAttributeSet();
 		cellAttrs.addAttribute(ElementNameAttribute,ELEMENT_NAME_CELL);

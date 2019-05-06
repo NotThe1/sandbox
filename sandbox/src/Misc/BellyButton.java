@@ -63,7 +63,7 @@ public class BellyButton {
 	private HashMap<String, Integer> linesCode;
 	private HashMap<String, Integer> linesEmpty;
 	private Set<String> fileNames;
-	private String rootDirectoryName;
+//	private String rootDirectoryName;
 
 	/**
 	 * Launch the application.
@@ -144,7 +144,7 @@ public class BellyButton {
 			}
 		});
 
-		Integer totalCodeLines = 0, totalEmptyLines = 0, totalLines = 0;
+		Integer totalCodeLines = 0, totalEmptyLines = 0 ;
 
 		for (String s : fileNames) {
 			totalCodeLines += linesCode.get(s);
@@ -210,7 +210,7 @@ public class BellyButton {
 		String stuff = new String(originalBytes);
 		txtLog.append(String.format("originalBytes = %d, stuff = %d%n", originalBytes.length,stuff.length()));
 		txtLog.append(stuff);
-		int a = 0;
+
 		
 //		TabStop[] tabStops = new TabStop[] {new TabStop(25),new TabStop(50),new TabStop(100),new TabStop(200),new TabStop(400)};
 //		TabSet tabSet = new TabSet(tabStops);
@@ -237,29 +237,29 @@ public class BellyButton {
 
 	}// doBtnFour
 
-	private  void makeFolder(Path path) {
-		if (path.equals(path.getRoot())) {
-			txtLog.append(String.format("%n%nPath: %s is Root%n", path));
-			return ;
-		}// if - root
-		;
-
-		if (Files.exists(path)) {
-			return ;
-		} // if exists
-		
-		makeFolder(path.getParent());
-
-		try {
-			Files.createDirectory(path);
-			return ;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // try
-
-		return ;
-	}// makeFolder
+//	private  void makeFolder(Path path) {
+//		if (path.equals(path.getRoot())) {
+//			txtLog.append(String.format("%n%nPath: %s is Root%n", path));
+//			return ;
+//		}// if - root
+//		;
+//
+//		if (Files.exists(path)) {
+//			return ;
+//		} // if exists
+//		
+//		makeFolder(path.getParent());
+//
+//		try {
+//			Files.createDirectory(path);
+//			return ;
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} // try
+//
+//		return ;
+//	}// makeFolder
 
 	// ---------------------------------------------------------
 
@@ -353,7 +353,7 @@ public class BellyButton {
 		linesCode = new HashMap<String, Integer>();
 		linesEmpty = new HashMap<String, Integer>();
 		fileNames = new HashSet<String>();
-		rootDirectoryName = "";
+//		rootDirectoryName = "";
 		;
 
 	}// appInit

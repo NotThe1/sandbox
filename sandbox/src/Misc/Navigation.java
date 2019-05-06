@@ -34,7 +34,7 @@ public class Navigation {
 				frame.add(scrollPane, BorderLayout.CENTER);
 
 				NavigationFilter filter = new NavigationFilter() {
-					private int addressEnd = 7;
+//					private int addressEnd = 7;
 					public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
 						StyledDocument doc = (StyledDocument) textPane.getDocument();
 						Element paragraphElement = doc.getParagraphElement(dot);

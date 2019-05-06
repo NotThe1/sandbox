@@ -12,7 +12,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -96,8 +95,8 @@ public class TestToggleButtom {
 		frmTemplate.setSize(myPrefs.getInt("Width", 500), myPrefs.getInt("Height", 500));
 		frmTemplate.setLocation(myPrefs.getInt("LocX", 100), myPrefs.getInt("LocY", 100));
 		myPrefs = null;
-		Icon iconOff = new ImageIcon(TestToggleButtom.class.getResource("/reflectionStuff/images/Button-Turn-Off-icon-64.png"));
-		Icon iconOn = new ImageIcon(TestToggleButtom.class.getResource("/reflectionStuff/images/Button-Turn-On-icon-64.png"));
+//		Icon iconOff = new ImageIcon(TestToggleButtom.class.getResource("/reflectionStuff/images/Button-Turn-Off-icon-64.png"));
+//		Icon iconOn = new ImageIcon(TestToggleButtom.class.getResource("/reflectionStuff/images/Button-Turn-On-icon-64.png"));
 		
 	
 		toggleButton.setIcon(new ImageIcon(TestToggleButtom.class.getResource("/reflectionStuff/images/Button-Turn-On-icon-64.png")));

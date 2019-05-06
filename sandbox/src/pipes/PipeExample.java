@@ -7,13 +7,6 @@ import java.io.PipedOutputStream;
 public class PipeExample {
 
 	public static void main(String[] args) throws IOException {
-		// byte[] a = new byte[3];
-//		int b = 0;
-//		while (b != 0x51) {
-//			System.out.printf(String.format("b = %02X%n", b));
-//			b = System.in.read();
-//		}
-		int c = 0;
 		final PipedOutputStream output = new PipedOutputStream();
 		final PipedInputStream input = new PipedInputStream(output);
 
@@ -40,13 +33,13 @@ public class PipeExample {
 		Thread thread2 = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				int a = 1;
 				try {
 					int data = input.read();
 					while (data != -1) {
 						System.out.print((char) data);
 						data = input.read();
 					} //
+					input.close();
 				} catch (IOException e) {
 					e.getMessage();
 				}

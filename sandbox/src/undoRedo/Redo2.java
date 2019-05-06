@@ -41,7 +41,12 @@ public class Redo2 {
 			    // Create an undo action and add it to the text component
 			    textcomp.getActionMap().put("Undo",
 			        new AbstractAction("Undo") {
-			            public void actionPerformed(ActionEvent evt) {
+			            /**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						public void actionPerformed(ActionEvent evt) {
 			                try {
 			                    if (undo.canUndo()) {
 			                        undo.undo();
@@ -57,7 +62,12 @@ public class Redo2 {
 			    // Create a redo action and add it to the text component
 			    textcomp.getActionMap().put("Redo",
 			        new AbstractAction("Redo") {
-			            public void actionPerformed(ActionEvent evt) {
+			            /**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						public void actionPerformed(ActionEvent evt) {
 			                try {
 			                    if (undo.canRedo()) {
 			                        undo.redo();

@@ -28,9 +28,14 @@ public class KeyStrokeSample {
 				JButton buttonB = new JButton("<html><center>FOCUS/RELEASE<br>VK_ENTER");
 				JButton buttonC = new JButton("<html><center>ANCESTOR<br>VK_F4+SHIFT_MASK");
 				JButton buttonD = new JButton("<html><center>WINDOW<br>' '");
-				JComboBox comboBox = new JComboBox();
+				JComboBox<InputMap> comboBox = new JComboBox<InputMap>();
 				// Define ActionListener
 				Action actionListener = new AbstractAction() {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
 					public void actionPerformed(ActionEvent actionEvent) {
 						JButton source = (JButton) actionEvent.getSource();
 						System.out.println("Activated: " + source.getText());

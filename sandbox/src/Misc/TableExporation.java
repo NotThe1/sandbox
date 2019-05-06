@@ -292,7 +292,7 @@ public class TableExporation {
 				}
 				if (!selectionModel.isSelectionEmpty()) {
 					String msg = String.format("[valueChanged]index0: %d, index1: %d", lse.getFirstIndex(), lse.getLastIndex());
-					log.addInfo(msg);
+					log.info(msg);
 				}
 			}
 
@@ -307,7 +307,7 @@ public class TableExporation {
 				
 				String msg = String.format("[actionPerformed 1]index0: %d, index1: %d",
 						selectionModel.getMinSelectionIndex(), selectionModel.getMaxSelectionIndex());
-				log.addInfo(msg);
+				log.info(msg);
 
 			}
 		});
@@ -320,7 +320,7 @@ public class TableExporation {
 				
 				String msg = String.format("[actionPerformed 2]index0: %d, index1: %d",
 						selectionModel.getMinSelectionIndex(), selectionModel.getMaxSelectionIndex());
-				log.addInfo(msg);
+				log.info(msg);
 
 			}
 		});

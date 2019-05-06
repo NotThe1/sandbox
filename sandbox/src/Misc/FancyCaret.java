@@ -12,7 +12,12 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 public class FancyCaret extends DefaultCaret {
 
-	  protected synchronized void damage(Rectangle r) {
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	protected synchronized void damage(Rectangle r) {
 	    if (r == null)
 	      return;
 

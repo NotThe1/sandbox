@@ -1,26 +1,19 @@
 package box1;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JButton;
-
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
+import javax.swing.JMenuBar;
 import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
+import javax.swing.JTextArea;
 
 public class TwoButtonTest implements ActionListener {
 
@@ -31,26 +24,26 @@ public class TwoButtonTest implements ActionListener {
 	private JProgressBar progressBar;
 	private JTextArea textArea;
 
-	private void doStart() {
-		int counter = 0;
-		while (runState) {
-			try {
-				TimeUnit.SECONDS.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}//try
-			
-			colorOfTheDay = colorOfTheDay.equals(Color.BLACK) ? Color.RED : Color.BLACK;
-			lbl1.setForeground(colorOfTheDay);
-			lbl1.setText(String.format("Count: %3d", counter++));
-			
-			if (counter > 6) {
-				runState = false;
-			}//if
-		}//while
-
-	}//doStart
+//	private void doStart() {
+//		int counter = 0;
+//		while (runState) {
+//			try {
+//				TimeUnit.SECONDS.sleep(1);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}//try
+//			
+//			colorOfTheDay = colorOfTheDay.equals(Color.BLACK) ? Color.RED : Color.BLACK;
+//			lbl1.setForeground(colorOfTheDay);
+//			lbl1.setText(String.format("Count: %3d", counter++));
+//			
+//			if (counter > 6) {
+//				runState = false;
+//			}//if
+//		}//while
+//
+//	}//doStart
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {

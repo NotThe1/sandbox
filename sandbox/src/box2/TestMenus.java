@@ -62,7 +62,7 @@ public class TestMenus implements ActionListener{
 	private JTextField txtFormat;
 	private JSpinner spinValue;
 	DefaultComboBoxModel<String> fred = new DefaultComboBoxModel<String>(new String[] { "one", "two", "three" });
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 	
 	JPopupMenu popupMenu = new JPopupMenu();
 
@@ -82,10 +82,10 @@ public class TestMenus implements ActionListener{
 		});
 	}
 
-	private JFileChooser getFileChooser(String directory, String filterDescription, String filterExtensions) {
-		return getFileChooser(directory, filterDescription, filterExtensions, false);
-
-	}// getFileChooser - single select
+//	private JFileChooser getFileChooser(String directory, String filterDescription, String filterExtensions) {
+//		return getFileChooser(directory, filterDescription, filterExtensions, false);
+//
+//	}// getFileChooser - single select
 
 	private JFileChooser getFileChooser(String directory, String filterDescription, String filterExtensions,
 			boolean multiSelect) {
@@ -101,10 +101,7 @@ public class TestMenus implements ActionListener{
 		try {
 			FileReader fileReader = new FileReader((newFile));
 			BufferedReader reader = new BufferedReader(fileReader);
-			String line, adjustedLine;
-			// int lineNumber = 0;
 
-			Boolean displayLine = false;
 
 			fileList.put(newFile, new Point(1, 2));
 			listings.put(newFile, newFile.getAbsolutePath());
@@ -126,13 +123,8 @@ public class TestMenus implements ActionListener{
 
 	// -----------------------------------------------------------------------------------
 	private void appInit() {
-		// fileList = new HashMap<File, Point>();
-		// listings = new HashMap<File, String>();
-		
-		SpinnerNumberModel n = (SpinnerNumberModel) spinValue.getModel();
 
 		Component[] components = spinValue.getComponents();
-		int i = 0;
 		for (Component c : components) {
 			if (c instanceof AbstractButton) {
 				// c.setVisible(false);
@@ -151,7 +143,7 @@ public class TestMenus implements ActionListener{
 
 			} // if
 		} // for
-		int a = 0;
+
 		 String ACTION_KEY = "theAction";		
 			KeyStroke controlAlt7 = KeyStroke.getKeyStroke("control alt 7");
 			
@@ -183,6 +175,11 @@ public class TestMenus implements ActionListener{
 
 	}// appInit
 		Action actionListener = new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void actionPerformed(ActionEvent actionEvent) {
 				System.out.println("Selected Index:        xxx");
 				
@@ -271,7 +268,7 @@ public class TestMenus implements ActionListener{
 		gbc_spinValue.gridy = 2;
 		frame.getContentPane().add(spinValue, gbc_spinValue);
 
-		comboBox = new JComboBox(fred);
+		comboBox = new JComboBox<String>(fred);
 		comboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				

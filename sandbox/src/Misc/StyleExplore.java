@@ -138,10 +138,10 @@ public class StyleExplore implements TreeSelectionListener {
 
 	}// doButton4
 
-	private void doAbstractElement(AbstractElement element) {
-		// System.out.printf("%s.%n", "doAbstractElement");
-		doElement(element);
-	}// doAbstractElement
+//	private void doAbstractElement(AbstractElement element) {
+//		// System.out.printf("%s.%n", "doAbstractElement");
+//		doElement(element);
+//	}// doAbstractElement
 
 	private void doBranchElement(BranchElement element) {
 		// System.out.printf("%s.%n", "doBranchElement");
@@ -193,6 +193,7 @@ public class StyleExplore implements TreeSelectionListener {
 	// }
 
 	private void doDocument(DefaultStyledDocument doc) {
+		@SuppressWarnings("unchecked")
 		Enumeration<String> styles = (Enumeration<String>) doc.getStyleNames();
 		String styleHeaderFormat = "%nStyle:   %-30s it has %d AttributeSets.%n";
 		while (styles.hasMoreElements()) {
@@ -516,12 +517,9 @@ public class StyleExplore implements TreeSelectionListener {
 		});
 	}// initialize
 
-	private static final String ATTRIBUTES = "Attributes";
 	private static final String BRANCH = "Branch";
 	private static final String DOCUMENT = "DefaultStyledDocument";
 	private static final String LEAF = "Leaf";
-	private static final String RESOLVER = "resolver";
-	private static final String STYLES = "Styles";
 
 	private static final String NL = System.lineSeparator();
 	private JPanel panel;

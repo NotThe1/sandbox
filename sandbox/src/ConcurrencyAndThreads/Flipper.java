@@ -1,5 +1,11 @@
 package ConcurrencyAndThreads;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
@@ -35,22 +41,22 @@ package ConcurrencyAndThreads;
 
 import java.util.List;
 import java.util.Random;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
-import javax.swing.BorderFactory;
 import javax.swing.SwingWorker;
+import javax.swing.border.Border;
 
 public class Flipper extends JFrame 
                   implements ActionListener {
-    private final GridBagConstraints constraints;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final GridBagConstraints constraints;
     private final JTextField headsText, totalText, devText;
     private final Border border =
         BorderFactory.createLoweredBevelBorder();

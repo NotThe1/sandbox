@@ -33,24 +33,34 @@
 //package components;
 package formt;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-
-import java.beans.PropertyChangeListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
-import java.text.*;
+import javax.swing.BorderFactory;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 /**
  * FormatterFactoryDemo.java requires no other files.
  */
 public class FormatterFactoryDemo extends JPanel
                                   implements PropertyChangeListener {
-    //Values for the text fields
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	//Values for the text fields
     private double amount = 100000;
     private double rate = .075;  //7.5 %
     private int numPeriods = 30;
@@ -105,7 +115,11 @@ public class FormatterFactoryDemo extends JPanel
 
         NumberFormatter percentEditFormatter =
                 new NumberFormatter(percentEditFormat) {
-            public String valueToString(Object o)
+            /**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+			public String valueToString(Object o)
                   throws ParseException {
                 Number number = (Number)o;
                 if (number != null) {

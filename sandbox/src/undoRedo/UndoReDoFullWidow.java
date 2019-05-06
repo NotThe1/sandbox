@@ -89,7 +89,8 @@ public class UndoReDoFullWidow {
 	/* Standard Stuff */
 	
 	private void doBtnOne(){
-		log.addInfo(String.format("Integer.MAX_VALUE = %,d" , Integer.MAX_VALUE));
+
+		log.info(String.format("Integer.MAX_VALUE = %,d" , Integer.MAX_VALUE));
 	}//doBtnOne
 	
 	private void doBtnTwo(){
@@ -149,7 +150,7 @@ public class UndoReDoFullWidow {
 		txtLog.setText(EMPTY_STRING);
 
 		log.setDoc(txtLog.getStyledDocument());
-		log.addInfo("Starting....");
+		log.info("Starting....");
 		 doc = (Document) textPane.getDocument();
 		 doc.addUndoableEditListener(adapterUndoRedo);
 		 initActions();
@@ -157,7 +158,12 @@ public class UndoReDoFullWidow {
 	
 	private void initActions() {
 		actionUndo = new AbstractAction("Undo") {
-            public void actionPerformed(ActionEvent actionEvent) {
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent actionEvent) {
                 try {
                     if (undo.canUndo()) {
                         undo.undo();
@@ -168,7 +174,12 @@ public class UndoReDoFullWidow {
        };//new AbstractAction
        
        actionRedo = new AbstractAction("Redo") {
-           public void actionPerformed(ActionEvent actionEvent) {
+           /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent actionEvent) {
                try {
                    if (undo.canRedo()) {
                        undo.redo();

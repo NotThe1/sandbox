@@ -3,7 +3,6 @@ package Misc;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -69,18 +68,18 @@ public class NewDisk {
 		return targetAbsoluteFileName;
 	}// makeNewDisk
 
-	private static ByteBuffer setUpBuffer(ByteBuffer sector, int value) {
-		sector.clear();
-		// set value to be put into sector
-		Byte byteValue = (byte) 0x00; // default to null
-		Byte MTfileVlaue = (byte) 0xE5; // deleted file value
-		Byte workingValue;
-		while (sector.hasRemaining()) {
-			workingValue = ((sector.position() % 0x20) == 0) ? MTfileVlaue : byteValue;
-			sector.put(workingValue);
-		} // while
-		sector.flip();
-		return sector;
-	}// setUpBuffer
+//	private static ByteBuffer setUpBuffer(ByteBuffer sector, int value) {
+//		sector.clear();
+//		// set value to be put into sector
+//		Byte byteValue = (byte) 0x00; // default to null
+//		Byte MTfileVlaue = (byte) 0xE5; // deleted file value
+//		Byte workingValue;
+//		while (sector.hasRemaining()) {
+//			workingValue = ((sector.position() % 0x20) == 0) ? MTfileVlaue : byteValue;
+//			sector.put(workingValue);
+//		} // while
+//		sector.flip();
+//		return sector;
+//	}// setUpBuffer
 
 }

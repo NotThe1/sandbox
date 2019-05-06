@@ -8,19 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.prefs.Preferences;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileChooserSandBox {
 
@@ -65,47 +58,47 @@ public class FileChooserSandBox {
 		} // for
 	}// prime3
 
-	private String getFilePathString(boolean open) {
-		String currentPath = ".";
-		// String currentPath = currentInstructionSet.equals("") ? "." : currentInstructionSet;
-		Path path = Paths.get(currentPath);
-
-		JFileChooser fileChooser = new JFileChooser(currentPath);
-		FileFilter filter = new FileNameExtensionFilter("Instruction file", "dat", "dat");
-		fileChooser.addChoosableFileFilter(filter);
-		fileChooser.setAcceptAllFileFilterUsed(true);
-		int result;
-		if (open) {
-			result = fileChooser.showOpenDialog(null);
-		} else {
-			result = fileChooser.showSaveDialog(null);
-		} // if
-
-		String getFilePathString = "";
-		if (result != JFileChooser.APPROVE_OPTION) {
-			System.out.printf("You did not select a file%n");
-			getFilePathString = "";
-		} else {
-			String fileName = fileChooser.getSelectedFile().getAbsolutePath();
-			int dotInd = fileName.lastIndexOf('.');
-			getFilePathString = (dotInd > 0) ? fileName.substring(0, dotInd) : fileName;
-			System.out.printf("You select file %s:%n", getFilePathString);
-		} // if
-
-		return getFilePathString;
-	}//
-
-	private static void showProperties() {
-		Properties properties = System.getProperties();
-		Iterable<Entry<Object, Object>> propertySet = properties.entrySet();
-
-		for (Object property : propertySet) {
-
-			// System.out.printf("%s: - %s%n", property,properties.getProperty( property.toString()));
-			System.out.printf("\t%s: %n", property);
-		} // for
-
-	}// showProperties
+//	private String getFilePathString(boolean open) {
+//		String currentPath = ".";
+//		// String currentPath = currentInstructionSet.equals("") ? "." : currentInstructionSet;
+//		Path path = Paths.get(currentPath);
+//
+//		JFileChooser fileChooser = new JFileChooser(currentPath);
+//		FileFilter filter = new FileNameExtensionFilter("Instruction file", "dat", "dat");
+//		fileChooser.addChoosableFileFilter(filter);
+//		fileChooser.setAcceptAllFileFilterUsed(true);
+//		int result;
+//		if (open) {
+//			result = fileChooser.showOpenDialog(null);
+//		} else {
+//			result = fileChooser.showSaveDialog(null);
+//		} // if
+//
+//		String getFilePathString = "";
+//		if (result != JFileChooser.APPROVE_OPTION) {
+//			System.out.printf("You did not select a file%n");
+//			getFilePathString = "";
+//		} else {
+//			String fileName = fileChooser.getSelectedFile().getAbsolutePath();
+//			int dotInd = fileName.lastIndexOf('.');
+//			getFilePathString = (dotInd > 0) ? fileName.substring(0, dotInd) : fileName;
+//			System.out.printf("You select file %s:%n", getFilePathString);
+//		} // if
+//
+//		return getFilePathString;
+//	}//
+//
+//	private static void showProperties() {
+//		Properties properties = System.getProperties();
+//		Iterable<Entry<Object, Object>> propertySet = properties.entrySet();
+//
+//		for (Object property : propertySet) {
+//
+//			// System.out.printf("%s: - %s%n", property,properties.getProperty( property.toString()));
+//			System.out.printf("\t%s: %n", property);
+//		} // for
+//
+//	}// showProperties
 
 	// --------------------------------
 	private void appClose() {

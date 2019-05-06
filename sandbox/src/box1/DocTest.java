@@ -1,62 +1,47 @@
 package box1;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JScrollPane;
-
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Set;
 
-import javax.swing.JTextArea;
-import javax.swing.JLabel;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyleContext.NamedStyle;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.JSpinner;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 
 public class DocTest implements DocumentListener {
 
@@ -64,11 +49,9 @@ public class DocTest implements DocumentListener {
 	private JTextPane txtTarget1;
 	private JScrollPane scrollPane;
 
-	private String rawSource;
-	private byte[] byteSource;
 	private JTextArea txtTarget2;
-	private HashMap<Integer, Byte> memoryImage;
-	private StringBuilder lineBuilder;
+//	private HashMap<Integer, Byte> memoryImage;
+//	private StringBuilder lineBuilder;
 	byte[] pmm;
 	private StyledDocument doc;
 	Style styleDefault, styleHistory, styleCurrent, styleFuture;
@@ -144,12 +127,12 @@ public class DocTest implements DocumentListener {
 		return leaf;
 	}// addLeaf
 
-	private void createNodes(DefaultMutableTreeNode top) {
-		DefaultMutableTreeNode category = null;
-		DefaultMutableTreeNode book = null;
-		category = new DefaultMutableTreeNode("Books for Java Programmers");
-		top.add(category);
-	}// createNodes
+//	private void createNodes(DefaultMutableTreeNode top) {
+//		DefaultMutableTreeNode category = null;
+//		DefaultMutableTreeNode book = null;
+//		category = new DefaultMutableTreeNode("Books for Java Programmers");
+//		top.add(category);
+//	}// createNodes
 
 	private void walkDocument(StyledDocument doc, JTextArea txtTarget) {
 		javax.swing.text.Element docRoot = doc.getDefaultRootElement();
@@ -185,6 +168,7 @@ public class DocTest implements DocumentListener {
 				txtTarget.append(childInfo);
 
 				AttributeSet attributeSet = grandchildElement.getAttributes();
+				@SuppressWarnings("unchecked")
 				Enumeration<Object> keys = (Enumeration<Object>) attributeSet.getAttributeNames();
 
 				String attributeInfo;
@@ -202,21 +186,21 @@ public class DocTest implements DocumentListener {
 		txtTarget.setCaretPosition(0);
 	}// walkDocument
 
-	private SimpleAttributeSet[] attributeSet() {
-		SimpleAttributeSet[] attrs = new SimpleAttributeSet[3];
-		attrs[0] = new SimpleAttributeSet();
-		StyleConstants.setForeground(attrs[0], Color.black);
+//	private SimpleAttributeSet[] attributeSet() {
+//		SimpleAttributeSet[] attrs = new SimpleAttributeSet[3];
+//		attrs[0] = new SimpleAttributeSet();
+//		StyleConstants.setForeground(attrs[0], Color.black);
+//
+//		attrs[1] = new SimpleAttributeSet();
+//		StyleConstants.setForeground(attrs[1], Color.RED);
+//		StyleConstants.setBold(attrs[1], true);
+//
+//		attrs[2] = new SimpleAttributeSet();
+//		StyleConstants.setForeground(attrs[2], Color.BLUE);
+//		return attrs;
+//	}
 
-		attrs[1] = new SimpleAttributeSet();
-		StyleConstants.setForeground(attrs[1], Color.RED);
-		StyleConstants.setBold(attrs[1], true);
-
-		attrs[2] = new SimpleAttributeSet();
-		StyleConstants.setForeground(attrs[2], Color.BLUE);
-		return attrs;
-	}
-
-	private SimpleAttributeSet[] attrs = attributeSet();
+//	private SimpleAttributeSet[] attrs = attributeSet();
 	private JPanel panel;
 	private JSpinner spinner;
 	private JButton btnNewButton;
@@ -244,7 +228,7 @@ public class DocTest implements DocumentListener {
 
 	private void appInit() {
 		makeOpcodeMap();
-		OperationStructure test = opcodeMap.get((byte) 0X03);
+//		OperationStructure test = opcodeMap.get((byte) 0X03);
 		doc = (StyledDocument) txtTarget1.getDocument();
 		makeStyles(doc);
 		try {
@@ -703,37 +687,37 @@ public class DocTest implements DocumentListener {
 
 	}// class operationStructure
 
-	private void appInit0() {
-
-		LMI lmi = new LMI(64 * 1024);
-		lmi.doIt();
-		memoryImage = lmi.getMemoryImage();
-		lmi = null;
-		pmm = new byte[64 * 1024];
-
-		Set<Integer> locations = memoryImage.keySet();
-		for (Integer location : locations) {
-			pmm[location] = memoryImage.get(location);
-		}//
-		locations = null;
-		memoryImage = null;
-		lineBuilder = new StringBuilder();
-
-		Document doc = txtTarget1.getDocument();
-		doc.addDocumentListener(this);
-		txtTarget1.setDocument(doc);
-		txtTarget2.setDocument(doc);
-		System.out.println("one");
-
-		System.out.println("two");
-
-		try {
-			doc.insertString(0, getDisplayForLine(63872), null);
-		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}// appInit
+//	private void appInit0() {
+//
+//		LMI lmi = new LMI(64 * 1024);
+//		lmi.doIt();
+//		memoryImage = lmi.getMemoryImage();
+//		lmi = null;
+//		pmm = new byte[64 * 1024];
+//
+//		Set<Integer> locations = memoryImage.keySet();
+//		for (Integer location : locations) {
+//			pmm[location] = memoryImage.get(location);
+//		}//
+//		locations = null;
+//		memoryImage = null;
+//		lineBuilder = new StringBuilder();
+//
+//		Document doc = txtTarget1.getDocument();
+//		doc.addDocumentListener(this);
+//		txtTarget1.setDocument(doc);
+//		txtTarget2.setDocument(doc);
+//		System.out.println("one");
+//
+//		System.out.println("two");
+//
+//		try {
+//			doc.insertString(0, getDisplayForLine(63872), null);
+//		} catch (BadLocationException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//	}// appInit
 
 	/**
 	 * Create the application. ..2..#N #~......#
@@ -743,50 +727,50 @@ public class DocTest implements DocumentListener {
 		appInit();
 	}
 
-	private String getDisplayForLine(int firstLocation) {
-		int startLocation = firstLocation & 0XFFF0;
-		lineBuilder.setLength(0);
+//	private String getDisplayForLine(int firstLocation) {
+//		int startLocation = firstLocation & 0XFFF0;
+//		lineBuilder.setLength(0);
+//
+//		char[] printables = new char[16];
+//		for (int i = 0; i < 16; i++) {
+//			printables[i] = ((pmm[startLocation + i] >= 0X20) && pmm[startLocation + i] <= 0X7F) ?
+//					(char) pmm[startLocation + i] : '.';
+//		}//
+//
+//		lineBuilder.append(String.format(
+//				"%04X: %02X %02X %02X %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X %02X %02X %02X ",
+//				startLocation,
+//				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
+//				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
+//				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
+//				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++]));
+//		lineBuilder.append(printables);
+//		lineBuilder.append("\n");
+//		return lineBuilder.toString();
+//	}
 
-		char[] printables = new char[16];
-		for (int i = 0; i < 16; i++) {
-			printables[i] = ((pmm[startLocation + i] >= 0X20) && pmm[startLocation + i] <= 0X7F) ?
-					(char) pmm[startLocation + i] : '.';
-		}//
-
-		lineBuilder.append(String.format(
-				"%04X: %02X %02X %02X %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X %02X %02X %02X ",
-				startLocation,
-				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
-				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
-				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++],
-				pmm[startLocation++], pmm[startLocation++], pmm[startLocation++], pmm[startLocation++]));
-		lineBuilder.append(printables);
-		lineBuilder.append("\n");
-		return lineBuilder.toString();
-	}
-
-	private String getMemoryDIsplayImage() {
-		byte[] source = new byte[] { (byte) 0X38, (byte) 0X00, (byte) 0X00, (byte) 0X43,
-				(byte) 0X50, (byte) 0X2F, (byte) 0X4D, (byte) 0X20,
-				(byte) 0X32, (byte) 0X2E, (byte) 0X32, (byte) 0X2E,
-				(byte) 0X30, (byte) 0X30, (byte) 0X20, (byte) 0X30 };
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(String.format("%02X %02X %02X %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X %02X %02X %02X ",
-				source[0], source[1], source[2], source[3], source[4], source[5], source[6], source[7],
-				source[8], source[9], source[10], source[11], source[12], source[13], source[14], source[15]));
-
-		char[] printables = new char[16];
-		for (int i = 0; i < 16; i++) {
-			printables[i] = ((source[i] >= 0X20) && source[i] <= 0X7F) ? (char) source[i] : '.';
-		}//
-		sb.append(printables);
-		sb.append("\n");
-
-		sb.toString();
-		return sb.toString();
-	}// getMemoryDIsplayImage
-
+//	private String getMemoryDIsplayImage() {
+//		byte[] source = new byte[] { (byte) 0X38, (byte) 0X00, (byte) 0X00, (byte) 0X43,
+//				(byte) 0X50, (byte) 0X2F, (byte) 0X4D, (byte) 0X20,
+//				(byte) 0X32, (byte) 0X2E, (byte) 0X32, (byte) 0X2E,
+//				(byte) 0X30, (byte) 0X30, (byte) 0X20, (byte) 0X30 };
+//		StringBuilder sb = new StringBuilder();
+//
+//		sb.append(String.format("%02X %02X %02X %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X %02X %02X %02X ",
+//				source[0], source[1], source[2], source[3], source[4], source[5], source[6], source[7],
+//				source[8], source[9], source[10], source[11], source[12], source[13], source[14], source[15]));
+//
+//		char[] printables = new char[16];
+//		for (int i = 0; i < 16; i++) {
+//			printables[i] = ((source[i] >= 0X20) && source[i] <= 0X7F) ? (char) source[i] : '.';
+//		}//
+//		sb.append(printables);
+//		sb.append("\n");
+//
+//		sb.toString();
+//		return sb.toString();
+//	}// getMemoryDIsplayImage
+//
 	/**
 	 * Initialize the contents of the frame.
 	 */

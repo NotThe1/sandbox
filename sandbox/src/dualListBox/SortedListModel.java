@@ -50,6 +50,7 @@ public class SortedListModel extends AbstractListModel<Object> {
 		return model.last();
 	}//lastElement
 	
+	@SuppressWarnings("rawtypes")
 	public Iterator iterator() {
 		return model.iterator();
 	}//iterator

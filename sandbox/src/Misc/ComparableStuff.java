@@ -13,7 +13,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
 
@@ -129,20 +128,24 @@ public class ComparableStuff {
 		for (String line : result) {
 			taRight.append(line + System.lineSeparator());
 		} // for
-
+		scanner.close();
 	}// loadLists
 
+//	private void sortMyList() {
+//		Collections.sort(result, new CaseInsensitiveSort<String>());
+//
+//	}// sortMyList
 	private void sortMyList() {
-		Collections.sort(result, new CaseInsensitiveSort());
+		Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
 
 	}// sortMyList
 
-	class CaseInsensitiveSort<String> implements Comparator<String> {
-		@Override
-		public int compare(String arg0, String arg1) {
-			return ((java.lang.String) arg0).compareToIgnoreCase((java.lang.String) arg1);
-		}// compare
-	}// CaseInsensitiveSort
+//	class CaseInsensitiveSort<String> implements Comparator<String> {
+//		@Override
+//		public int compare(String arg0, String arg1) {
+//			return ((java.lang.String) arg0).compareToIgnoreCase((java.lang.String) arg1);
+//		}// compare
+//	}// CaseInsensitiveSort
 
 	private void appClose() {
 		Preferences myPrefs = Preferences.userNodeForPackage(ComparableStuff.class).node(this.getClass().getSimpleName());
