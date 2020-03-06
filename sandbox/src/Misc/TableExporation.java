@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -38,7 +37,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import myComponents.AppLogger;
+import appLogger.AppLogger;
+
 
 public class TableExporation {
 	AppLogger log = AppLogger.getInstance();
@@ -61,43 +61,7 @@ public class TableExporation {
 
 	/* Standard Stuff */
 
-	private void doBtnOne() {
 
-	}// doBtnOne
-
-	private void doBtnTwo() {
-
-	}// doBtnTwo
-
-	private void doBtnThree() {
-
-	}// doBtnThree
-
-	private void doBtnFour() {
-
-	}// doBtnFour
-
-	// ---------------------------------------------------------
-
-	private void doFileNew() {
-
-	}// doFileNew
-
-	private void doFileOpen() {
-
-	}// doFileOpen
-
-	private void doFileSave() {
-
-	}// doFileSave
-
-	private void doFileSaveAs() {
-
-	}// doFileSaveAs
-
-	private void doFilePrint() {
-
-	}// doFilePrint
 
 	private void doFileExit() {
 		appClose();
@@ -188,66 +152,6 @@ public class TableExporation {
 		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		gbl_panel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
-
-		btnOne = new JButton("Button 1");
-		btnOne.setMinimumSize(new Dimension(100, 20));
-		GridBagConstraints gbc_btnOne = new GridBagConstraints();
-		gbc_btnOne.insets = new Insets(0, 0, 0, 5);
-		gbc_btnOne.gridx = 0;
-		gbc_btnOne.gridy = 0;
-		panel.add(btnOne, gbc_btnOne);
-		btnOne.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doBtnOne();
-			}
-		});
-		btnOne.setMaximumSize(new Dimension(0, 0));
-		btnOne.setPreferredSize(new Dimension(100, 20));
-
-		btnTwo = new JButton("Button 2");
-		btnTwo.setMinimumSize(new Dimension(100, 20));
-		GridBagConstraints gbc_btnTwo = new GridBagConstraints();
-		gbc_btnTwo.insets = new Insets(0, 0, 0, 5);
-		gbc_btnTwo.gridx = 1;
-		gbc_btnTwo.gridy = 0;
-		panel.add(btnTwo, gbc_btnTwo);
-		btnTwo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doBtnTwo();
-			}
-		});
-		btnTwo.setPreferredSize(new Dimension(100, 20));
-		btnTwo.setMaximumSize(new Dimension(0, 0));
-
-		btnThree = new JButton("Button 3");
-		btnThree.setMinimumSize(new Dimension(100, 20));
-		GridBagConstraints gbc_btnThree = new GridBagConstraints();
-		gbc_btnThree.insets = new Insets(0, 0, 0, 5);
-		gbc_btnThree.gridx = 2;
-		gbc_btnThree.gridy = 0;
-		panel.add(btnThree, gbc_btnThree);
-		btnThree.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doBtnThree();
-			}
-		});
-		btnThree.setPreferredSize(new Dimension(100, 20));
-		btnThree.setMaximumSize(new Dimension(0, 0));
-
-		btnFour = new JButton("Button 4");
-		btnFour.setMinimumSize(new Dimension(100, 20));
-		GridBagConstraints gbc_btnFour = new GridBagConstraints();
-		gbc_btnFour.anchor = GridBagConstraints.NORTH;
-		gbc_btnFour.gridx = 3;
-		gbc_btnFour.gridy = 0;
-		panel.add(btnFour, gbc_btnFour);
-		btnFour.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doBtnFour();
-			}
-		});
-		btnFour.setPreferredSize(new Dimension(100, 20));
-		btnFour.setMaximumSize(new Dimension(0, 0));
 
 		splitPane1 = new JSplitPane();
 		GridBagConstraints gbc_splitPane1 = new GridBagConstraints();
@@ -370,49 +274,25 @@ public class TableExporation {
 		menuBar.add(mnuFile);
 
 		JMenuItem mnuFileNew = new JMenuItem("New");
-		mnuFileNew.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doFileNew();
-			}
-		});
 		mnuFile.add(mnuFileNew);
 
 		JMenuItem mnuFileOpen = new JMenuItem("Open...");
-		mnuFileOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doFileOpen();
-			}
-		});
+
 		mnuFile.add(mnuFileOpen);
 
 		JSeparator separator = new JSeparator();
 		mnuFile.add(separator);
 
 		JMenuItem mnuFileSave = new JMenuItem("Save...");
-		mnuFileSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doFileSave();
-			}
-		});
 		mnuFile.add(mnuFileSave);
 
 		JMenuItem mnuFileSaveAs = new JMenuItem("Save As...");
-		mnuFileSaveAs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doFileSaveAs();
-			}
-		});
 		mnuFile.add(mnuFileSaveAs);
 
 		JSeparator separator_2 = new JSeparator();
 		mnuFile.add(separator_2);
 
 		JMenuItem mnuFilePrint = new JMenuItem("Print...");
-		mnuFilePrint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				doFilePrint();
-			}
-		});
 		mnuFile.add(mnuFilePrint);
 
 		JSeparator separator_1 = new JSeparator();
@@ -429,10 +309,6 @@ public class TableExporation {
 	}// initialize
 
 	private JFrame frmTemplate;
-	private JButton btnOne;
-	private JButton btnTwo;
-	private JButton btnThree;
-	private JButton btnFour;
 	private JSplitPane splitPane1;
 	private JTextPane tpLog;
 	private JLabel lblLog;

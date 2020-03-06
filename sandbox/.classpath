@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/jars/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="C:/jars/slf4j-jdk14-1.7.12.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="forms-1.3.0.jar" sourcepath="forms-1.3.0-src.zip"/>
-	<classpathentry kind="src" path="/tools"/>
+	<classpathentry kind="lib" path="C:/Users/admin/Dropbox/jars/appLogger.jar"/>
+	<classpathentry kind="lib" path="forms-1.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/admin/Dropbox/jars/hdNumberBox.jar"/>
+	<classpathentry kind="lib" path="C:/Users/admin/Dropbox/jars/menuUtility.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

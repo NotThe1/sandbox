@@ -40,7 +40,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 
-import myComponents.AppLogger;
+import appLogger.AppLogger;
 
 public class DeleteingTests {
 
